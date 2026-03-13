@@ -1,1 +1,1 @@
-{"root":["./src/index.ts","./src/commands/hello/index.ts","./src/commands/hello/world.ts"],"version":"5.9.3"}
+{"root":["./src/index.ts","./src/commands/scripts/add.ts","./src/commands/scripts/list.ts","./src/commands/scripts/open.ts","./src/commands/tsk/add.ts","./src/commands/tsk/del.ts","./src/commands/tsk/list.ts","./src/hooks/init.ts","./src/lib/task-scheduler.ts","./src/types/edge-js.d.ts"],"version":"5.9.3"}
