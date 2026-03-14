@@ -67,6 +67,9 @@
     "topics": {
       "tsk": {
         "description": "定时任务管理"
+      },
+      "scripts": {
+        "description": "脚本管理"
       }
     }
   },
