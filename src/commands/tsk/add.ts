@@ -16,12 +16,13 @@ export default class Add extends Command {
     String.raw`<%= config.bin %> <%= command.id %> scriptTask --ps-script "C:\scripts\cleanup.ps1" --trigger daily`,
   ]
   static flags = {
-    arguments: Flags.string({
-      description: '执行参数'
-    }),
     path: Flags.string({
       description: '可执行文件路径'
     }),
+    arguments: Flags.string({
+      description: '执行参数'
+    }),
+
     'ps-script': Flags.string({
       char: 'p',
       description: 'PowerShell 脚本路径，自动使用 powershell.exe 执行'
@@ -30,14 +31,17 @@ export default class Add extends Command {
       description: '任务描述'
     }),
     hidden: Flags.boolean({
+      allowNo: true,
       default: true, 
       description: '是否隐藏任务'
     }),
     'start-when-available': Flags.boolean({
+      allowNo: true,
       default: false, 
       description: '错过启动时间后是否自动启动'
     }),
     'stop-on-battery': Flags.boolean({
+      allowNo: true,
       default: false, 
       description: '使用电池供电时是否停止任务'
     }),
@@ -51,6 +55,7 @@ export default class Add extends Command {
       options: ['boot', 'daily', 'logon', 'monthly', 'once', 'weekly'],
     }),
     wake: Flags.boolean({
+      allowNo: true,
       default: true, 
       description: '是否唤醒计算机运行任务'
     }),

@@ -7,6 +7,7 @@ export default class List extends Command {
   static examples = ['<%= config.bin %> <%= command.id %>', '<%= config.bin %> <%= command.id %> --multi']
   static flags = {
     multi: Flags.boolean({
+      allowNo: true,
       default: false,
       description: '使用多行格式显示任务详情',
     }),
