@@ -23,7 +23,7 @@ $ npm install -g @lppx/taskmgr
 $ tm COMMAND
 running command...
 $ tm (--version)
-@lppx/taskmgr/0.0.1 win32-x64 node-v24.11.0
+@lppx/taskmgr/0.0.2 win32-x64 node-v24.11.0
 $ tm --help [COMMAND]
 USAGE
   $ tm COMMAND
@@ -123,7 +123,7 @@ EXAMPLES
   $ tm scripts add ./script.ps1
 ```
 
-_See code: [src/commands/scripts/add.ts](https://github.com/lipanpan-hub/taskmgr/blob/v0.0.1/src/commands/scripts/add.ts)_
+_See code: [src/commands/scripts/add.ts](https://github.com/lipanpan-hub/taskmgr/blob/v0.0.2/src/commands/scripts/add.ts)_
 
 ## `tm scripts list`
 
@@ -140,7 +140,7 @@ EXAMPLES
   $ tm scripts list
 ```
 
-_See code: [src/commands/scripts/list.ts](https://github.com/lipanpan-hub/taskmgr/blob/v0.0.1/src/commands/scripts/list.ts)_
+_See code: [src/commands/scripts/list.ts](https://github.com/lipanpan-hub/taskmgr/blob/v0.0.2/src/commands/scripts/list.ts)_
 
 ## `tm scripts open`
 
@@ -157,7 +157,7 @@ EXAMPLES
   $ tm scripts open
 ```
 
-_See code: [src/commands/scripts/open.ts](https://github.com/lipanpan-hub/taskmgr/blob/v0.0.1/src/commands/scripts/open.ts)_
+_See code: [src/commands/scripts/open.ts](https://github.com/lipanpan-hub/taskmgr/blob/v0.0.2/src/commands/scripts/open.ts)_
 
 ## `tm tsk add TASKNAME`
 
@@ -165,7 +165,7 @@ _See code: [src/commands/scripts/open.ts](https://github.com/lipanpan-hub/taskmg
 
 ```
 USAGE
-  $ tm tsk add TASKNAME [--arguments <value>] [--path <value>] [-p <value>] [--description <value>]
+  $ tm tsk add TASKNAME [--path <value>] [--arguments <value>] [-p <value>] [--description <value>]
     [--hidden] [--start-when-available] [--stop-on-battery] [--time <value>] [--trigger
     boot|daily|logon|monthly|once|weekly] [--wake]
 
@@ -173,17 +173,17 @@ ARGUMENTS
   TASKNAME  任务名称
 
 FLAGS
-  -p, --ps-script=<value>     PowerShell 脚本路径，自动使用 powershell.exe 执行
-      --arguments=<value>     执行参数
-      --description=<value>   任务描述
-      --hidden                是否隐藏任务
-      --path=<value>          可执行文件路径
-      --start-when-available  错过启动时间后是否自动启动
-      --stop-on-battery       使用电池供电时是否停止任务
-      --time=<value>          [default: 09:00] 任务开始时间 (HH:mm)
-      --trigger=<option>      [default: daily] 触发类型: daily, weekly, monthly, once, boot, logon
-                              <options: boot|daily|logon|monthly|once|weekly>
-      --wake                  是否唤醒计算机运行任务
+  -p, --ps-script=<value>          PowerShell 脚本路径，自动使用 powershell.exe 执行
+      --arguments=<value>          执行参数
+      --description=<value>        任务描述
+      --[no-]hidden                是否隐藏任务
+      --path=<value>               可执行文件路径
+      --[no-]start-when-available  错过启动时间后是否自动启动
+      --[no-]stop-on-battery       使用电池供电时是否停止任务
+      --time=<value>               [default: 09:00] 任务开始时间 (HH:mm)
+      --trigger=<option>           [default: daily] 触发类型: daily, weekly, monthly, once, boot, logon
+                                   <options: boot|daily|logon|monthly|once|weekly>
+      --[no-]wake                  是否唤醒计算机运行任务
 
 DESCRIPTION
   创建定时任务
@@ -202,7 +202,7 @@ EXAMPLES
   $ tm tsk add scriptTask --ps-script "C:\scripts\cleanup.ps1" --trigger daily
 ```
 
-_See code: [src/commands/tsk/add.ts](https://github.com/lipanpan-hub/taskmgr/blob/v0.0.1/src/commands/tsk/add.ts)_
+_See code: [src/commands/tsk/add.ts](https://github.com/lipanpan-hub/taskmgr/blob/v0.0.2/src/commands/tsk/add.ts)_
 
 ## `tm tsk del TASKNAME`
 
@@ -222,7 +222,7 @@ EXAMPLES
   $ tm tsk del myTask
 ```
 
-_See code: [src/commands/tsk/del.ts](https://github.com/lipanpan-hub/taskmgr/blob/v0.0.1/src/commands/tsk/del.ts)_
+_See code: [src/commands/tsk/del.ts](https://github.com/lipanpan-hub/taskmgr/blob/v0.0.2/src/commands/tsk/del.ts)_
 
 ## `tm tsk list`
 
@@ -233,7 +233,7 @@ USAGE
   $ tm tsk list [--multi]
 
 FLAGS
-  --multi  使用多行格式显示任务详情
+  --[no-]multi  使用多行格式显示任务详情
 
 DESCRIPTION
   列出所有定时任务
@@ -244,7 +244,7 @@ EXAMPLES
   $ tm tsk list --multi
 ```
 
-_See code: [src/commands/tsk/list.ts](https://github.com/lipanpan-hub/taskmgr/blob/v0.0.1/src/commands/tsk/list.ts)_
+_See code: [src/commands/tsk/list.ts](https://github.com/lipanpan-hub/taskmgr/blob/v0.0.2/src/commands/tsk/list.ts)_
 
 ## `tm version`
 
