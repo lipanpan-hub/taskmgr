@@ -20,12 +20,14 @@ export default class Add extends Command {
       description: '可执行文件路径'
     }),
     arguments: Flags.string({
-      description: '执行参数'
+      dependsOn: ['path'],
+      description: '执行参数',
     }),
 
     'ps-script': Flags.string({
       char: 'p',
-      description: 'PowerShell 脚本路径，自动使用 powershell.exe 执行'
+      description: 'PowerShell 脚本路径，自动使用 powershell.exe 执行',
+      exclusive: ['path', 'arguments'],
     }),
     description: Flags.string({
       description: '任务描述'
