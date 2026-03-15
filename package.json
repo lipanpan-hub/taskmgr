@@ -48,6 +48,9 @@
     "oclif"
   ],
   "license": "BSL",
+  "publishConfig": {
+    "access": "public"
+  },
   "main": "dist/index.js",
   "type": "module",
   "oclif": {

@@ -13,14 +13,18 @@ export default class Add extends Command {
     String.raw`<%= config.bin %> <%= command.id %> reportTask --path "C:\report.exe" --arguments '-f json -o "output.txt"' --trigger weekly`,
     String.raw`<%= config.bin %> <%= command.id %> psTask --path "powershell.exe" --arguments '-ExecutionPolicy Bypass -File "C:\scripts\cleanup.ps1"' --trigger daily`,
     String.raw`<%= config.bin %> <%= command.id %> psInlineTask --path "powershell.exe" --arguments '-Command "Get-ChildItem C:\temp | Remove-Item -Recurse -Force"' --trigger weekly`,
+    String.raw`<%= config.bin %> <%= command.id %> scriptTask --ps-script "C:\scripts\cleanup.ps1" --trigger daily`,
   ]
   static flags = {
     arguments: Flags.string({
       description: '执行参数'
     }),
     path: Flags.string({
-      description: '可执行文件路径', 
-      required: true
+      description: '可执行文件路径'
+    }),
+    'ps-script': Flags.string({
+      char: 'p',
+      description: 'PowerShell 脚本路径，自动使用 powershell.exe 执行'
     }),
     description: Flags.string({
       description: '任务描述'
@@ -55,12 +59,23 @@ export default class Add extends Command {
   async run(): Promise<void> {
     const {args, flags} = await this.parse(Add)
 
+    if (!flags.path && !flags['ps-script']) {
+      this.error('必须指定 --path 或 --ps-script')
+    }
+
+    let executablePath = flags.path
+    let execArguments = flags.arguments
+    if (flags['ps-script']) {
+      executablePath = 'powershell.exe'
+      execArguments = `-ExecutionPolicy Bypass -File "${flags['ps-script']}"`
+    }
+
     const result = await createScheduledTask({
-      arguments: flags.arguments,
+      arguments: execArguments,
       description: flags.description,
       disallowStartIfOnBatteries: false,
       enabled: true,
-      executablePath: flags.path,
+      executablePath: executablePath!,
       hidden: flags.hidden,
       startTime: flags.time,
       startWhenAvailable: flags['start-when-available'],
