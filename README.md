@@ -23,7 +23,7 @@ $ npm install -g @lppx/taskmgr
 $ tm COMMAND
 running command...
 $ tm (--version)
-@lppx/taskmgr/0.0.2 win32-x64 node-v24.11.0
+@lppx/taskmgr/0.1.0 win32-x64 node-v24.11.0
 $ tm --help [COMMAND]
 USAGE
   $ tm COMMAND
@@ -123,7 +123,7 @@ EXAMPLES
   $ tm scripts add ./script.ps1
 ```
 
-_See code: [src/commands/scripts/add.ts](https://github.com/lipanpan-hub/taskmgr/blob/v0.0.2/src/commands/scripts/add.ts)_
+_See code: [src/commands/scripts/add.ts](https://github.com/lipanpan-hub/taskmgr/blob/v0.1.0/src/commands/scripts/add.ts)_
 
 ## `tm scripts list`
 
@@ -140,7 +140,7 @@ EXAMPLES
   $ tm scripts list
 ```
 
-_See code: [src/commands/scripts/list.ts](https://github.com/lipanpan-hub/taskmgr/blob/v0.0.2/src/commands/scripts/list.ts)_
+_See code: [src/commands/scripts/list.ts](https://github.com/lipanpan-hub/taskmgr/blob/v0.1.0/src/commands/scripts/list.ts)_
 
 ## `tm scripts open`
 
@@ -157,7 +157,7 @@ EXAMPLES
   $ tm scripts open
 ```
 
-_See code: [src/commands/scripts/open.ts](https://github.com/lipanpan-hub/taskmgr/blob/v0.0.2/src/commands/scripts/open.ts)_
+_See code: [src/commands/scripts/open.ts](https://github.com/lipanpan-hub/taskmgr/blob/v0.1.0/src/commands/scripts/open.ts)_
 
 ## `tm tsk add TASKNAME`
 
@@ -165,7 +165,7 @@ _See code: [src/commands/scripts/open.ts](https://github.com/lipanpan-hub/taskmg
 
 ```
 USAGE
-  $ tm tsk add TASKNAME [--path <value>] [--arguments <value>] [-p <value>] [--description <value>]
+  $ tm tsk add TASKNAME [-p <value> |  | [--arguments <value> --path <value>]] [--description <value>]
     [--hidden] [--start-when-available] [--stop-on-battery] [--time <value>] [--trigger
     boot|daily|logon|monthly|once|weekly] [--wake]
 
@@ -202,7 +202,7 @@ EXAMPLES
   $ tm tsk add scriptTask --ps-script "C:\scripts\cleanup.ps1" --trigger daily
 ```
 
-_See code: [src/commands/tsk/add.ts](https://github.com/lipanpan-hub/taskmgr/blob/v0.0.2/src/commands/tsk/add.ts)_
+_See code: [src/commands/tsk/add.ts](https://github.com/lipanpan-hub/taskmgr/blob/v0.1.0/src/commands/tsk/add.ts)_
 
 ## `tm tsk del TASKNAME`
 
@@ -222,7 +222,7 @@ EXAMPLES
   $ tm tsk del myTask
 ```
 
-_See code: [src/commands/tsk/del.ts](https://github.com/lipanpan-hub/taskmgr/blob/v0.0.2/src/commands/tsk/del.ts)_
+_See code: [src/commands/tsk/del.ts](https://github.com/lipanpan-hub/taskmgr/blob/v0.1.0/src/commands/tsk/del.ts)_
 
 ## `tm tsk list`
 
@@ -244,7 +244,7 @@ EXAMPLES
   $ tm tsk list --multi
 ```
 
-_See code: [src/commands/tsk/list.ts](https://github.com/lipanpan-hub/taskmgr/blob/v0.0.2/src/commands/tsk/list.ts)_
+_See code: [src/commands/tsk/list.ts](https://github.com/lipanpan-hub/taskmgr/blob/v0.1.0/src/commands/tsk/list.ts)_
 
 ## `tm version`
 
