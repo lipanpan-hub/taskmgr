@@ -14,7 +14,8 @@
     "@oclif/plugin-not-found": "^3.2.74",
     "@oclif/plugin-version": "^2.2.37",
     "@oclif/plugin-warn-if-update-available": "^3.1.55",
-    "edge-js": "^25.0.1"
+    "edge-js": "^25.0.1",
+    "prompts": "^2.4.2"
   },
   "devDependencies": {
     "@eslint/compat": "^1",
@@ -23,6 +24,7 @@
     "@types/chai": "^4",
     "@types/mocha": "^10",
     "@types/node": "^18",
+    "@types/prompts": "^2.4.9",
     "chai": "^4",
     "eslint": "^9",
     "eslint-config-oclif": "^6",

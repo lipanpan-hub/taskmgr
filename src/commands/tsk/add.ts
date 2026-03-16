@@ -1,4 +1,7 @@
 import {Args, Command, Flags} from '@oclif/core'
+import {copyFileSync, readdirSync} from 'node:fs'
+import {basename, join} from 'node:path'
+import prompts from 'prompts'
 
 import {createScheduledTask} from '../../lib/task-scheduler.js'
 
@@ -24,10 +27,16 @@ export default class Add extends Command {
       description: '执行参数',
     }),
 
-    'ps-script': Flags.string({
+    'ps-script': Flags.file({
       char: 'p',
       description: 'PowerShell 脚本路径，自动使用 powershell.exe 执行',
       exclusive: ['path', 'arguments'],
+      exists: true,
+    }),
+    psi: Flags.boolean({
+      char: 'i',
+      description: '交互式方式选择 PowerShell 脚本',
+      exclusive: ['path', 'arguments', 'ps-script'],
     }),
     description: Flags.string({
       description: '任务描述'
@@ -36,16 +45,6 @@ export default class Add extends Command {
       allowNo: true,
       default: true, 
       description: '是否隐藏任务'
-    }),
-    'start-when-available': Flags.boolean({
-      allowNo: true,
-      default: false, 
-      description: '错过启动时间后是否自动启动'
-    }),
-    'stop-on-battery': Flags.boolean({
-      allowNo: true,
-      default: false, 
-      description: '使用电池供电时是否停止任务'
     }),
     time: Flags.string({
       default: '09:00', 
@@ -56,25 +55,72 @@ export default class Add extends Command {
       description: '触发类型: daily, weekly, monthly, once, boot, logon',
       options: ['boot', 'daily', 'logon', 'monthly', 'once', 'weekly'],
     }),
-    wake: Flags.boolean({
-      allowNo: true,
-      default: true, 
-      description: '是否唤醒计算机运行任务'
-    }),
   }
 
   async run(): Promise<void> {
     const {args, flags} = await this.parse(Add)
 
-    if (!flags.path && !flags['ps-script']) {
-      this.error('必须指定 --path 或 --ps-script')
+    if (!flags.path && !flags['ps-script'] && !flags.psi) {
+      this.error('必须指定 --path, --ps-script 或 --psi')
     }
 
     let executablePath = flags.path
     let execArguments = flags.arguments
     if (flags['ps-script']) {
+      // 先将脚本复制到配置目录下的 scripts 文件夹
+      const scriptsDir = join(this.config.configDir, 'scripts')
+      const fileName = basename(flags['ps-script'])
+      const destPath = join(scriptsDir, fileName)
+      copyFileSync(flags['ps-script'], destPath)
+
       executablePath = 'powershell.exe'
-      execArguments = `-ExecutionPolicy Bypass -File "${flags['ps-script']}"`
+      execArguments = `-ExecutionPolicy Bypass -File "${destPath}"`
+    }
+
+    if (flags.psi) {
+      const scriptsDir = join(this.config.configDir, 'scripts')
+      const scripts = readdirSync(scriptsDir).filter(f => f.endsWith('.ps1'))
+
+      if (scripts.length === 0) {
+        this.error('scripts 目录下没有 PowerShell 脚本')
+      }
+
+      const response = await prompts([
+        {
+          type: 'select',
+          name: 'selected',
+          message: '选择要执行的脚本',
+          choices: scripts.map(s => ({ title: s, value: s })),
+        },
+        {
+          type: 'select',
+          name: 'trigger',
+          message: '选择触发类型',
+          choices: [
+            { title: '每天', value: 'daily' },
+            { title: '每周', value: 'weekly' },
+            { title: '每月', value: 'monthly' },
+            { title: '一次', value: 'once' },
+            { title: '启动时', value: 'boot' },
+            { title: '登录时', value: 'logon' },
+          ],
+          initial: 0,
+        },
+        {
+          type: 'text',
+          name: 'time',
+          message: '输入开始时间 (HH:mm)',
+          initial: '09:00',
+          validate: (value: string) => /^\d{2}:\d{2}$/.test(value) || '请输入有效的时间格式 (HH:mm)',
+        },
+      ])
+
+      executablePath = 'powershell.exe'
+      execArguments = `-ExecutionPolicy Bypass -File "${join(scriptsDir, response.selected)}"`
+
+      // 覆盖 flags 中的值
+      flags.trigger = response.trigger
+      flags.time = response.time
     }
 
     const result = await createScheduledTask({
@@ -85,11 +131,11 @@ export default class Add extends Command {
       executablePath: executablePath!,
       hidden: flags.hidden,
       startTime: flags.time,
-      startWhenAvailable: flags['start-when-available'],
-      stopIfGoingOnBatteries: flags['stop-on-battery'],
+      startWhenAvailable: false,    // 错过启动时间后是否自动启动
+      stopIfGoingOnBatteries: false,  // 电池供电时是否停止任务
       taskName: args.taskName,
       triggerType: flags.trigger as 'boot' | 'daily' | 'logon' | 'monthly' | 'once' | 'weekly',
-      wakeToRun: flags.wake,
+      wakeToRun: true,
     })
 
     this.log(result)
