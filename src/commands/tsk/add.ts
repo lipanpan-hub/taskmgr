@@ -76,7 +76,7 @@ export default class Add extends Command {
       copyFileSync(flags['ps-script'], destPath)
 
       executablePath = 'powershell.exe'
-      execArguments = `-ExecutionPolicy Bypass -File "${destPath}"`
+      execArguments = `-ExecutionPolicy Bypass -NoProfile -WindowStyle Hidden -File "${destPath}"`
     }
 
     if (flags.psi) {
