@@ -60,6 +60,8 @@ export default class Add extends Command {
   async run(): Promise<void> {
     const {args, flags} = await this.parse(Add)
 
+    this.debug('flags', flags)
+
     if (!flags.path && !flags['ps-script'] && !flags.psi) {
       this.error('必须指定 --path, --ps-script 或 --psi')
     }

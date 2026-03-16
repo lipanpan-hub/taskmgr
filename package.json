@@ -26,6 +26,7 @@
     "@types/node": "^18",
     "@types/prompts": "^2.4.9",
     "chai": "^4",
+    "cross-env": "^10.1.0",
     "eslint": "^9",
     "eslint-config-oclif": "^6",
     "eslint-config-prettier": "^10",
@@ -81,6 +82,7 @@
   "repository": "lipanpan-hub/taskmgr",
   "scripts": {
     "build": "shx rm -rf dist && tsc -b",
+    "debug": "cross-env DEBUG=* node --inspect bin/run.js",
     "lint": "eslint",
     "pack:tarballs": "oclif pack tarballs",
     "pack:win": "oclif pack win",
