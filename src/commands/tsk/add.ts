@@ -117,8 +117,9 @@ export default class Add extends Command {
         },
       ])
 
-      executablePath = 'powershell.exe'
-      execArguments = `-ExecutionPolicy Bypass -File "${join(scriptsDir, response.selected)}"`
+      executablePath = 'cmd.exe'
+      execArguments = `/c start /min "" powershell.exe -ExecutionPolicy Bypass -NoProfile -WindowStyle Hidden -File "${join(scriptsDir, response.selected)}"`
+      // execArguments = `-ExecutionPolicy Bypass -File "${join(scriptsDir, response.selected)}"`
 
       // 覆盖 flags 中的值
       flags.trigger = response.trigger
