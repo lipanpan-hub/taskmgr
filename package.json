@@ -15,6 +15,7 @@
     "@oclif/plugin-version": "^2.2.37",
     "@oclif/plugin-warn-if-update-available": "^3.1.55",
     "edge-js": "^25.0.1",
+    "express": "^5.2.1",
     "prompts": "^2.4.2"
   },
   "devDependencies": {
@@ -22,6 +23,7 @@
     "@oclif/prettier-config": "^0.2.1",
     "@oclif/test": "^4",
     "@types/chai": "^4",
+    "@types/express": "^5.0.6",
     "@types/mocha": "^10",
     "@types/node": "^18",
     "@types/prompts": "^2.4.9",

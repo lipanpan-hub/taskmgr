@@ -13,6 +13,7 @@ export default [
   {
     rules: {
       'perfectionist/sort-objects': 'off',
+      'new-cap': ['error', { capIsNew: false }],
     },
   },
 ]
