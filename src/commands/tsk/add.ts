@@ -35,7 +35,7 @@ export default class Add extends Command {
     }),
     psi: Flags.boolean({
       char: 'i',
-      description: '交互式方式选择 PowerShell 脚本创建任务',
+      description: '交互式方式选择现有 PowerShell 脚本创建任务',
       exclusive: ['path', 'arguments', 'ps-script'],
     }),
     description: Flags.string({
