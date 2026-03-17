@@ -48,27 +48,29 @@ describe('tsk:add', () => {
 
   describe('trigger 选项验证', () => {
     it('接受有效的 trigger 选项', async () => {
-      const validTriggers = ['daily', 'weekly', 'monthly', 'once', 'boot', 'logon']
-      // 验证这些选项在静态定义中存在
-      expect(validTriggers).to.include('daily')
-      expect(validTriggers).to.include('weekly')
-      expect(validTriggers).to.include('monthly')
-      expect(validTriggers).to.include('once')
-      expect(validTriggers).to.include('boot')
-      expect(validTriggers).to.include('logon')
+      try {
+        await runCommand(String.raw`tsk:add testTask --path "C:\test.exe" --trigger daily`)
+      } catch (error) {
+        expect((error as Error).message).to.not.include('trigger')
+      }
     })
 
-    it('默认 trigger 为 daily', async () => {
-      // 验证默认值
-      const defaultTrigger = 'daily'
-      expect(defaultTrigger).to.equal('daily')
+    it('拒绝无效的 trigger 选项', async () => {
+      try {
+        await runCommand(String.raw`tsk:add testTask --path "C:\test.exe" --trigger invalid`)
+      } catch (error) {
+        expect((error as Error).message).to.include('Expected --trigger=invalid')
+      }
     })
   })
 
   describe('time 格式验证', () => {
-    it('默认时间为 09:00', async () => {
-      const defaultTime = '09:00'
-      expect(defaultTime).to.match(/^\d{2}:\d{2}$/)
+    it('接受有效的 time 格式', async () => {
+      try {
+        await runCommand(String.raw`tsk:add testTask --path "C:\test.exe" --time "14:30"`)
+      } catch (error) {
+        expect((error as Error).message).to.not.include('time')
+      }
     })
   })
 })

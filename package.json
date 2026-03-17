@@ -81,7 +81,7 @@
   },
   "repository": "lipanpan-hub/taskmgr",
   "scripts": {
-    "build": "shx rm -rf dist && tsc -b",
+    "build": "shx rm -rf dist tsconfig.tsbuildinfo && tsc -b",
     "debug": "cross-env DEBUG=* node --inspect bin/run.js",
     "lint": "eslint",
     "pack:tarballs": "oclif pack tarballs",
