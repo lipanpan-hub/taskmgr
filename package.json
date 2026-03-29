@@ -14,6 +14,7 @@
     "@oclif/plugin-not-found": "^3.2.74",
     "@oclif/plugin-version": "^2.2.37",
     "@oclif/plugin-warn-if-update-available": "^3.1.55",
+    "@oclif/plugin-which": "^3.2.46",
     "edge-js": "^25.0.1",
     "express": "^5.2.1",
     "prompts": "^2.4.2"
@@ -69,7 +70,8 @@
       "@oclif/plugin-autocomplete",
       "@oclif/plugin-not-found",
       "@oclif/plugin-warn-if-update-available",
-      "@oclif/plugin-version"
+      "@oclif/plugin-version",
+      "@oclif/plugin-which"
     ],
     "topicSeparator": " ",
     "topics": {

@@ -11,12 +11,10 @@ export default class Add extends Command {
   }
   static description = '创建定时任务'
   static examples = [
-    String.raw`<%= config.bin %> <%= command.id %> myTask --path "C:\app.exe" --trigger daily --time "09:00"`,
-    String.raw`<%= config.bin %> <%= command.id %> backupTask --path "C:\backup.exe" --arguments "--full --dest D:\backup"`,
-    String.raw`<%= config.bin %> <%= command.id %> reportTask --path "C:\report.exe" --arguments '-f json -o "output.txt"' --trigger weekly`,
-    String.raw`<%= config.bin %> <%= command.id %> psTask --path "powershell.exe" --arguments '-ExecutionPolicy Bypass -File "C:\scripts\cleanup.ps1"' --trigger daily`,
-    String.raw`<%= config.bin %> <%= command.id %> psInlineTask --path "powershell.exe" --arguments '-Command "Get-ChildItem C:\temp | Remove-Item -Recurse -Force"' --trigger weekly`,
-    String.raw`<%= config.bin %> <%= command.id %> scriptTask --ps-script "C:\scripts\cleanup.ps1" --trigger daily`,
+    {
+      description: '交互式选择现有 PowerShell 脚本创建任务',
+      command: String.raw`<%= config.bin %> <%= command.id %> testTask --psi`,
+    },
   ]
   static flags = {
     path: Flags.string({
@@ -40,11 +38,6 @@ export default class Add extends Command {
     }),
     description: Flags.string({
       description: '任务描述'
-    }),
-    hidden: Flags.boolean({
-      allowNo: true,
-      default: true, 
-      description: '是否隐藏任务'
     }),
     time: Flags.string({
       default: '09:00', 
@@ -132,7 +125,7 @@ export default class Add extends Command {
       disallowStartIfOnBatteries: false,
       enabled: true,
       executablePath: executablePath!,
-      hidden: flags.hidden,
+      hidden: false,
       startTime: flags.time,
       startWhenAvailable: false,    // 错过启动时间后是否自动启动
       stopIfGoingOnBatteries: false,  // 电池供电时是否停止任务
