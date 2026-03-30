@@ -15,6 +15,8 @@
     "@oclif/plugin-version": "^2.2.37",
     "@oclif/plugin-warn-if-update-available": "^3.1.55",
     "@oclif/plugin-which": "^3.2.46",
+    "better-sqlite3": "^12.8.0",
+    "drizzle-orm": "^0.45.2",
     "edge-js": "^25.0.1",
     "express": "^5.2.1",
     "prompts": "^2.4.2"
@@ -23,6 +25,7 @@
     "@eslint/compat": "^1",
     "@oclif/prettier-config": "^0.2.1",
     "@oclif/test": "^4",
+    "@types/better-sqlite3": "^7.6.13",
     "@types/chai": "^4",
     "@types/express": "^5.0.6",
     "@types/mocha": "^10",
@@ -30,6 +33,7 @@
     "@types/prompts": "^2.4.9",
     "chai": "^4",
     "cross-env": "^10.1.0",
+    "drizzle-kit": "^0.31.10",
     "eslint": "^9",
     "eslint-config-oclif": "^6",
     "eslint-config-prettier": "^10",
@@ -94,7 +98,11 @@
     "posttest": "npm run lint",
     "prepack": "oclif manifest && oclif readme",
     "test": "mocha --forbid-only \"test/**/*.test.ts\"",
-    "version": "oclif readme && git add README.md"
+    "version": "oclif readme && git add README.md",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio"
   },
   "types": "dist/index.d.ts"
 }

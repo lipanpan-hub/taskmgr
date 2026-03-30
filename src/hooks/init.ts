@@ -1,8 +1,12 @@
 import {Hook} from '@oclif/core'
+import Database from 'better-sqlite3'
 import {execSync} from 'node:child_process'
 import {copyFileSync, existsSync, mkdirSync, readdirSync} from 'node:fs'
 import {platform} from 'node:os'
 import {join} from 'node:path'
+
+import {initializeDatabase} from '../backend/model/schema.js'
+import {envConfig} from '../lib/env.js'
 
 const hook: Hook.Init = async function (options) {
   // 首先检查当前系统是否是Windows系统，如果不是Windows系统，则直接给出警告并退出
@@ -20,14 +24,23 @@ const hook: Hook.Init = async function (options) {
   }
 
   const scriptsDir = join(options.config.configDir, 'scripts')
-  // 若脚本目录不存在，则创建目录并从模板目录复制初始脚本文件
+  const templatesDir = join(options.config.root, 'Templates')
+
+  // 若脚本目录不存在，则创建目录
   if (!existsSync(scriptsDir)) {
     mkdirSync(scriptsDir, {recursive: true})
-    const templatesDir = join(options.config.root, 'Templates')
-    for (const file of readdirSync(templatesDir)) {
-      copyFileSync(join(templatesDir, file), join(scriptsDir, file))
-    }
   }
+
+  // 同步模板目录中的脚本，重名时强制覆盖
+  for (const file of readdirSync(templatesDir)) {
+    copyFileSync(join(templatesDir, file), join(scriptsDir, file))
+  }
+
+  // 初始化数据库，如果表不存在则创建
+  const dbPath = join(options.config.configDir, envConfig.dbName)
+  const db = new Database(dbPath)
+  initializeDatabase(db)
+  db.close()
 }
 
 export default hook

@@ -27,7 +27,7 @@ export default class Add extends Command {
 
     'ps-script': Flags.file({
       char: 'p',
-      description: 'PowerShell 脚本路径，自动使用 powershell.exe 执行',
+      description: '指定PowerShell 脚本路径，自动使用 powershell.exe 执行',
       exclusive: ['path', 'arguments'],
       exists: true,
     }),
@@ -56,11 +56,13 @@ export default class Add extends Command {
     this.debug('flags', flags)
 
     if (!flags.path && !flags['ps-script'] && !flags.psi) {
-      this.error('必须指定 --path, --ps-script 或 --psi')
+      this.error('必须指定 --path 或 --ps-script 或 --psi')
     }
 
     let executablePath = flags.path
     let execArguments = flags.arguments
+
+    // 如果用户使用 ps-script 参数
     if (flags['ps-script']) {
       // 先将脚本复制到配置目录下的 scripts 文件夹
       const scriptsDir = join(this.config.configDir, 'scripts')

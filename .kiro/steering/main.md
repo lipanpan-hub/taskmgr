@@ -1,3 +1,6 @@
+---
+inclusion: always
+---
 
 这是一个 windows 系统下的定时任务管理器
 这个工具管理 windows 系统下/taskmgr 目录中的定时任务

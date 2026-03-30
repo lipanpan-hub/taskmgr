@@ -3,7 +3,8 @@
     "allow": [
       "Bash(npx eslint:*)",
       "Bash(cd:*)",
-      "mcp__ide__getDiagnostics"
+      "mcp__ide__getDiagnostics",
+      "Skill(git-commit)"
     ]
   }
 }
