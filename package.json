@@ -19,6 +19,7 @@
     "drizzle-orm": "^0.45.2",
     "edge-js": "^25.0.1",
     "express": "^5.2.1",
+    "fuse.js": "^7.1.0",
     "prompts": "^2.4.2"
   },
   "devDependencies": {

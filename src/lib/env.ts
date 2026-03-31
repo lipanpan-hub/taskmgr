@@ -18,19 +18,17 @@ function loadEnv(): Record<string, string> {
   const envPath = join(projectRoot, '.env')
   const env: Record<string, string> = {}
 
-  // 检查.env文件是否存在
   if (existsSync(envPath)) {
     const content = readFileSync(envPath, 'utf-8')
+
     // 逐行解析.env文件内容
     content.split('\n').forEach(line => {
       line = line.trim()
-      // 跳过空行和注释行(以#开头)
-      if (line && !line.startsWith('#')) {
-        // 按等号分割,支持值中包含等号的情况
-        const [key, ...values] = line.split('=')
+      
+      if (line && !line.startsWith('#')) {         // 跳过空行和注释行(以#开头)
+        const [key, ...values] = line.split('=')   // 按等号分割,支持值中包含等号的情况
         if (key) {
-          // 将键和值都去除首尾空格后存入对象
-          env[key.trim()] = values.join('=').trim()
+          env[key.trim()] = values.join('=').trim()  // 将键和值都去除首尾空格后存入对象
         }
       }
     })
@@ -39,7 +37,6 @@ function loadEnv(): Record<string, string> {
   return env
 }
 
-// 加载环境变量
 const env = loadEnv()
 
 // 导出应用配置对象,提供默认值以确保应用正常运行

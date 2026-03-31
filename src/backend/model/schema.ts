@@ -21,6 +21,7 @@ export const tasks = sqliteTable('tasks', {
 export type Task = typeof tasks.$inferSelect
 export type NewTask = typeof tasks.$inferInsert
 
+
 // 初始化数据库表结构
 export function initializeDatabase(db: Database.Database): void {
   db.exec(`
