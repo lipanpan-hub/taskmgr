@@ -36,6 +36,26 @@ export function createTasksRouter() {
       res.status(500).json({ error: '查询任务失败', message: (error as Error).message })
     }
   })
+
+  router.get('/name/:name', async (req: Request, res: Response) => {
+    try {
+      const name = Array.isArray(req.params.name) ? req.params.name[0] : req.params.name
+      if (!name || name.trim() === '') {
+        res.status(400).json({ error: '任务名称不能为空' })
+        return
+      }
+
+      const task = await taskService.getTaskByName(name)
+      if (!task) {
+        res.status(404).json({ error: '任务不存在' })
+        return
+      }
+
+      res.json(task)
+    } catch (error) {
+      res.status(500).json({ error: '查询任务失败', message: (error as Error).message })
+    }
+  })
   // #endregion
 
   // #region 创建操作
@@ -85,6 +105,26 @@ export function createTasksRouter() {
       res.json({ message: '所有任务删除成功', count: result.length, tasks: result })
     } catch (error) {
       res.status(500).json({ error: '删除所有任务失败', message: (error as Error).message })
+    }
+  })
+
+  router.delete('/name/:name', async (req: Request, res: Response) => {
+    try {
+      const name = Array.isArray(req.params.name) ? req.params.name[0] : req.params.name
+      if (!name || name.trim() === '') {
+        res.status(400).json({ error: '任务名称不能为空' })
+        return
+      }
+
+      const result = await taskService.deleteTaskByName(name)
+      if (!result) {
+        res.status(404).json({ error: '任务不存在' })
+        return
+      }
+
+      res.json({ message: '任务删除成功', task: result })
+    } catch (error) {
+      res.status(500).json({ error: '删除任务失败', message: (error as Error).message })
     }
   })
 

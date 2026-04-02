@@ -13,6 +13,7 @@ export const tasks = sqliteTable('tasks', {
     enum: ['daily', 'weekly', 'monthly', 'once', 'boot', 'logon'] 
   }).notNull().default('daily'),
   startTime: text('start_time').notNull().default('09:00'),
+  startWhenAvailable: integer('start_when_available', { mode: 'boolean' }).notNull().default(false),
   enabled: integer('enabled', { mode: 'boolean' }).notNull().default(true),
   createdAt: text('created_at').notNull().default(sql`(datetime('now', 'localtime'))`),
   updatedAt: text('updated_at').notNull().default(sql`(datetime('now', 'localtime'))`),
@@ -33,6 +34,7 @@ export function initializeDatabase(db: Database.Database): void {
       arguments TEXT,
       trigger_type TEXT NOT NULL DEFAULT 'daily',
       start_time TEXT NOT NULL DEFAULT '09:00',
+      start_when_available INTEGER NOT NULL DEFAULT 0,
       enabled INTEGER NOT NULL DEFAULT 1,
       created_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
       updated_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))

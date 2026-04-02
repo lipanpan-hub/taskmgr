@@ -48,6 +48,10 @@ export default class Add extends Command {
       description: '触发类型: daily, weekly, monthly, once, boot, logon',
       options: ['boot', 'daily', 'logon', 'monthly', 'once', 'weekly'],
     }),
+    'start-when-available': Flags.boolean({
+      default: false,
+      description: '错过启动时间后是否补运行',
+    }),
   }
 
   async run(): Promise<void> {
@@ -124,12 +128,12 @@ export default class Add extends Command {
     const result = await createScheduledTask({
       arguments: execArguments,
       description: flags.description,
-      disallowStartIfOnBatteries: false,
+      disallowStartIfOnBatteries: false, // 允许在使用电池时启动任务
       enabled: true,
       executablePath: executablePath!,
       hidden: false,
       startTime: flags.time,
-      startWhenAvailable: false,    // 错过启动时间后是否自动启动
+      startWhenAvailable: flags['start-when-available'],
       stopIfGoingOnBatteries: false,  // 电池供电时是否停止任务
       taskName: args.taskName,
       triggerType: flags.trigger as 'boot' | 'daily' | 'logon' | 'monthly' | 'once' | 'weekly',

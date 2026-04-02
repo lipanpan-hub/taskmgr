@@ -14,6 +14,11 @@ export class TaskService {
     const result = await this.db.select().from(tasks).where(eq(tasks.id, id))
     return result[0] || null
   }
+
+  async getTaskByName(name: string): Promise<Task | null> {
+    const result = await this.db.select().from(tasks).where(eq(tasks.name, name))
+    return result[0] || null
+  }
   // #endregion
 
   // #region 创建操作
@@ -34,6 +39,11 @@ export class TaskService {
   // #region 删除操作
   async deleteTask(id: number): Promise<Task | null> {
     const result = await this.db.delete(tasks).where(eq(tasks.id, id)).returning()
+    return result[0] || null
+  }
+
+  async deleteTaskByName(name: string): Promise<Task | null> {
+    const result = await this.db.delete(tasks).where(eq(tasks.name, name)).returning()
     return result[0] || null
   }
 
