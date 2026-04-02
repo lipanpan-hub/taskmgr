@@ -3,7 +3,7 @@ import {Command, Flags} from '@oclif/core'
 import {getAllTasks, TaskInfo} from '../../lib/task-scheduler.js'
 
 export default class List extends Command {
-  static description = '列出所有定时任务'
+  static description = '手动列出所有定时任务'
   static examples = ['<%= config.bin %> <%= command.id %>', '<%= config.bin %> <%= command.id %> --multi']
   static flags = {
     multi: Flags.boolean({

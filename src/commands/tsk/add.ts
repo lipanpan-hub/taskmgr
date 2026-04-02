@@ -9,7 +9,7 @@ export default class Add extends Command {
   static args = {
     taskName: Args.string({description: '任务名称', required: true}),
   }
-  static description = '创建定时任务'
+  static description = '手动创建定时任务'
   static examples = [
     {
       description: '交互式选择现有 PowerShell 脚本创建任务',

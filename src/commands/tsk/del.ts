@@ -4,7 +4,7 @@ import prompts from 'prompts'
 import {deleteScheduledTask, getAllTasks} from '../../lib/task-scheduler.js'
 
 export default class Del extends Command {
-  static description = '删除定时任务'
+  static description = '手动删除定时任务'
   static examples = [`<%= config.bin %> <%= command.id %> -n myTask`]
   static flags = {
     taskName: Flags.string({char: 'n', description: '任务名称'}),

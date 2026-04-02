@@ -25,7 +25,7 @@
         // "**/.venv": true,
         "**/venv": true,
         "**/ENV": true,
-        "**/env": true,
+        // "**/env": true,
         // "**/.env": true,
         // "**/node_modules": true,
         "**/.pytest_cache": true,

@@ -16,3 +16,8 @@ pnpm-lock.yaml
 *.tsbuildinfo
 
 /testbackend
+
+.env.*
+!.env.example
+
+.kiro/skills/
