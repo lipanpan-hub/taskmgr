@@ -1,0 +1,366 @@
+@baseUrl = {{$dotenv BASE_URL}}
+
+### 准备测试 - 创建一个测试任务
+POST {{baseUrl}}/api/tasks
+Content-Type: application/json
+
+{
+  "name": "更新测试任务",
+  "description": "用于测试更新功能的任务",
+  "executablePath": "C:\\test\\update-test.bat",
+  "arguments": "--test",
+  "triggerType": "daily",
+  "startTime": "10:00",
+  "enabled": true
+}
+
+> {%
+  client.test("创建任务成功", () => {
+    client.assert(response.status === 201, "状态码应为 201");
+    client.assert(response.body.id !== undefined, "应返回任务ID");
+  });
+  
+  // 保存任务ID到环境变量供后续测试使用
+  if (response.status === 201 && response.body.id) {
+    client.global.set("testTaskId", response.body.id);
+    client.log("已创建测试任务，ID: " + response.body.id);
+  }
+%}
+
+### 更新任务 - 修改名称
+PUT {{baseUrl}}/api/tasks/{{testTaskId}}
+Content-Type: application/json
+
+{
+  "name": "更新后的任务名称"
+}
+
+> {%
+  client.test("状态码应为 200 或 404", () => {
+    client.assert(response.status === 200 || response.status === 404, "状态码应为 200 或 404");
+  });
+  client.test("如果任务存在，名称应已更新", () => {
+    if (response.status === 200) {
+      client.assert(response.body.name === "更新后的任务名称", "名称应已更新");
+      client.assert(response.body.updatedAt !== undefined, "应包含 updatedAt");
+    }
+  });
+  client.test("如果任务不存在，应返回错误", () => {
+    if (response.status === 404) {
+      client.assert(response.body.error === "任务不存在", "应返回任务不存在错误");
+    }
+  });
+%}
+
+### 更新任务 - 修改描述
+PUT {{baseUrl}}/api/tasks/{{testTaskId}}
+Content-Type: application/json
+
+{
+  "description": "这是更新后的任务描述"
+}
+
+> {%
+  client.test("状态码应为 200 或 404", () => {
+    client.assert(response.status === 200 || response.status === 404, "状态码应为 200 或 404");
+  });
+  client.test("如果任务存在，描述应已更新", () => {
+    if (response.status === 200) {
+      client.assert(response.body.description === "这是更新后的任务描述", "描述应已更新");
+    }
+  });
+%}
+
+### 更新任务 - 修改可执行路径
+PUT {{baseUrl}}/api/tasks/{{testTaskId}}
+Content-Type: application/json
+
+{
+  "executablePath": "C:\\updated\\path\\script.bat"
+}
+
+> {%
+  client.test("状态码应为 200 或 404", () => {
+    client.assert(response.status === 200 || response.status === 404, "状态码应为 200 或 404");
+  });
+  client.test("如果任务存在，可执行路径应已更新", () => {
+    if (response.status === 200) {
+      client.assert(response.body.executablePath === "C:\\updated\\path\\script.bat", "可执行路径应已更新");
+    }
+  });
+%}
+
+### 更新任务 - 修改参数
+PUT {{baseUrl}}/api/tasks/{{testTaskId}}
+Content-Type: application/json
+
+{
+  "arguments": "--new-arg --verbose"
+}
+
+> {%
+  client.test("状态码应为 200 或 404", () => {
+    client.assert(response.status === 200 || response.status === 404, "状态码应为 200 或 404");
+  });
+  client.test("如果任务存在，参数应已更新", () => {
+    if (response.status === 200) {
+      client.assert(response.body.arguments === "--new-arg --verbose", "参数应已更新");
+    }
+  });
+%}
+
+### 更新任务 - 修改触发类型
+PUT {{baseUrl}}/api/tasks/{{testTaskId}}
+Content-Type: application/json
+
+{
+  "triggerType": "weekly"
+}
+
+> {%
+  client.test("状态码应为 200 或 404", () => {
+    client.assert(response.status === 200 || response.status === 404, "状态码应为 200 或 404");
+  });
+  client.test("如果任务存在，触发类型应已更新", () => {
+    if (response.status === 200) {
+      client.assert(response.body.triggerType === "weekly", "触发类型应已更新");
+    }
+  });
+%}
+
+### 更新任务 - 修改启动时间
+PUT {{baseUrl}}/api/tasks/{{testTaskId}}
+Content-Type: application/json
+
+{
+  "startTime": "14:30"
+}
+
+> {%
+  client.test("状态码应为 200 或 404", () => {
+    client.assert(response.status === 200 || response.status === 404, "状态码应为 200 或 404");
+  });
+  client.test("如果任务存在，启动时间应已更新", () => {
+    if (response.status === 200) {
+      client.assert(response.body.startTime === "14:30", "启动时间应已更新");
+    }
+  });
+%}
+
+### 更新任务 - 启用任务
+PUT {{baseUrl}}/api/tasks/{{testTaskId}}
+Content-Type: application/json
+
+{
+  "enabled": true
+}
+
+> {%
+  client.test("状态码应为 200 或 404", () => {
+    client.assert(response.status === 200 || response.status === 404, "状态码应为 200 或 404");
+  });
+  client.test("如果任务存在，应已启用", () => {
+    if (response.status === 200) {
+      client.assert(response.body.enabled === true, "任务应已启用");
+    }
+  });
+%}
+
+### 更新任务 - 禁用任务
+PUT {{baseUrl}}/api/tasks/{{testTaskId}}
+Content-Type: application/json
+
+{
+  "enabled": false
+}
+
+> {%
+  client.test("状态码应为 200 或 404", () => {
+    client.assert(response.status === 200 || response.status === 404, "状态码应为 200 或 404");
+  });
+  client.test("如果任务存在，应已禁用", () => {
+    if (response.status === 200) {
+      client.assert(response.body.enabled === false, "任务应已禁用");
+    }
+  });
+%}
+
+### 更新任务 - 批量修改多个字段
+PUT {{baseUrl}}/api/tasks/{{testTaskId}}
+Content-Type: application/json
+
+{
+  "name": "批量更新测试任务",
+  "description": "测试批量更新多个字段",
+  "executablePath": "C:\\batch\\update.bat",
+  "arguments": "--batch --test",
+  "triggerType": "monthly",
+  "startTime": "23:59",
+  "enabled": true
+}
+
+> {%
+  client.test("状态码应为 200 或 404", () => {
+    client.assert(response.status === 200 || response.status === 404, "状态码应为 200 或 404");
+  });
+  client.test("如果任务存在，所有字段应已更新", () => {
+    if (response.status === 200) {
+      client.assert(response.body.name === "批量更新测试任务", "名称应已更新");
+      client.assert(response.body.description === "测试批量更新多个字段", "描述应已更新");
+      client.assert(response.body.executablePath === "C:\\batch\\update.bat", "可执行路径应已更新");
+      client.assert(response.body.arguments === "--batch --test", "参数应已更新");
+      client.assert(response.body.triggerType === "monthly", "触发类型应已更新");
+      client.assert(response.body.startTime === "23:59", "启动时间应已更新");
+      client.assert(response.body.enabled === true, "启用状态应已更新");
+    }
+  });
+%}
+
+### 更新任务 - 清空可选字段（描述）
+PUT {{baseUrl}}/api/tasks/{{testTaskId}}
+Content-Type: application/json
+
+{
+  "description": null
+}
+
+> {%
+  client.test("状态码应为 200 或 404", () => {
+    client.assert(response.status === 200 || response.status === 404, "状态码应为 200 或 404");
+  });
+  client.test("如果任务存在，描述应为空", () => {
+    if (response.status === 200) {
+      client.assert(response.body.description === null, "描述应为空");
+    }
+  });
+%}
+
+### 更新任务 - 清空可选字段（参数）
+PUT {{baseUrl}}/api/tasks/{{testTaskId}}
+Content-Type: application/json
+
+{
+  "arguments": null
+}
+
+> {%
+  client.test("状态码应为 200 或 404", () => {
+    client.assert(response.status === 200 || response.status === 404, "状态码应为 200 或 404");
+  });
+  client.test("如果任务存在，参数应为空", () => {
+    if (response.status === 200) {
+      client.assert(response.body.arguments === null, "参数应为空");
+    }
+  });
+%}
+
+### 错误测试 - 更新不存在的任务
+PUT {{baseUrl}}/api/tasks/99999
+Content-Type: application/json
+
+{
+  "name": "不存在的任务"
+}
+
+> {%
+  client.test("状态码应为 404", () => {
+    client.assert(response.status === 404, "状态码应为 404");
+  });
+  client.test("应返回错误信息", () => {
+    client.assert(response.body.error === "任务不存在", "应返回任务不存在错误");
+  });
+%}
+
+### 错误测试 - 无效的任务ID（非数字）
+PUT {{baseUrl}}/api/tasks/invalid_id
+Content-Type: application/json
+
+{
+  "name": "测试任务"
+}
+
+> {%
+  client.test("状态码应为 400", () => {
+    client.assert(response.status === 400, "状态码应为 400");
+  });
+  client.test("应返回错误信息", () => {
+    client.assert(response.body.error === "无效的任务ID", "应返回无效的任务ID错误");
+  });
+%}
+
+### 错误测试 - 空请求体
+PUT {{baseUrl}}/api/tasks/1
+Content-Type: application/json
+
+{}
+
+> {%
+  client.test("状态码应为 200 或 404", () => {
+    client.assert(response.status === 200 || response.status === 404, "状态码应为 200 或 404");
+  });
+  client.test("如果任务存在，应返回任务但不做修改", () => {
+    if (response.status === 200) {
+      client.assert(response.body.id !== undefined, "应返回任务对象");
+    }
+  });
+%}
+
+### 更新任务 - 修改为 PowerShell 脚本
+PUT {{baseUrl}}/api/tasks/{{testTaskId}}
+Content-Type: application/json
+
+{
+  "name": "PowerShell 监控任务",
+  "executablePath": "powershell.exe",
+  "arguments": "-ExecutionPolicy Bypass -File C:\\scripts\\monitor.ps1"
+}
+
+> {%
+  client.test("状态码应为 200 或 404", () => {
+    client.assert(response.status === 200 || response.status === 404, "状态码应为 200 或 404");
+  });
+  client.test("如果任务存在，应更新为 PowerShell 脚本", () => {
+    if (response.status === 200) {
+      client.assert(response.body.executablePath === "powershell.exe", "可执行路径应为 powershell.exe");
+      client.assert(response.body.arguments.includes("-ExecutionPolicy Bypass"), "参数应包含 ExecutionPolicy");
+    }
+  });
+%}
+
+### 更新任务 - 修改触发类型为开机启动
+PUT {{baseUrl}}/api/tasks/{{testTaskId}}
+Content-Type: application/json
+
+{
+  "triggerType": "boot"
+}
+
+> {%
+  client.test("状态码应为 200 或 404", () => {
+    client.assert(response.status === 200 || response.status === 404, "状态码应为 200 或 404");
+  });
+  client.test("如果任务存在，触发类型应为 boot", () => {
+    if (response.status === 200) {
+      client.assert(response.body.triggerType === "boot", "触发类型应为 boot");
+    }
+  });
+%}
+
+### 更新任务 - 修改触发类型为登录触发
+PUT {{baseUrl}}/api/tasks/{{testTaskId}}
+Content-Type: application/json
+
+{
+  "triggerType": "logon"
+}
+
+> {%
+  client.test("状态码应为 200 或 404", () => {
+    client.assert(response.status === 200 || response.status === 404, "状态码应为 200 或 404");
+  });
+  client.test("如果任务存在，触发类型应为 logon", () => {
+    if (response.status === 200) {
+      client.assert(response.body.triggerType === "logon", "触发类型应为 logon");
+    }
+  });
+%}

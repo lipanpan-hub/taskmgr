@@ -1,0 +1,86 @@
+@baseUrl = {{$dotenv BASE_URL}}
+
+### 查询所有任务
+GET {{baseUrl}}/api/tasks
+
+> {%
+  client.test("状态码应为 200", () => {
+    client.assert(response.status === 200, "状态码应为 200");
+  });
+  client.test("应返回数组", () => {
+    client.assert(Array.isArray(response.body), "应返回数组");
+  });
+  client.test("数组元素应包含必要字段", () => {
+    if (response.body.length > 0) {
+      const task = response.body[0];
+      client.assert(task.id !== undefined, "应包含 id");
+      client.assert(task.name !== undefined, "应包含 name");
+      client.assert(task.executablePath !== undefined, "应包含 executablePath");
+      client.assert(task.triggerType !== undefined, "应包含 triggerType");
+      client.assert(task.startTime !== undefined, "应包含 startTime");
+      client.assert(task.enabled !== undefined, "应包含 enabled");
+      client.assert(task.createdAt !== undefined, "应包含 createdAt");
+      client.assert(task.updatedAt !== undefined, "应包含 updatedAt");
+    }
+  });
+%}
+
+### 根据ID查询单个任务 - 存在的任务
+GET {{baseUrl}}/api/tasks/1
+
+> {%
+  client.test("状态码应为 200 或 404", () => {
+    client.assert(response.status === 200 || response.status === 404, "状态码应为 200 或 404");
+  });
+  client.test("如果任务存在，应返回任务对象", () => {
+    if (response.status === 200) {
+      client.assert(response.body.id === 1, "任务 ID 应为 1");
+      client.assert(response.body.name !== undefined, "应包含 name");
+      client.assert(response.body.executablePath !== undefined, "应包含 executablePath");
+    }
+  });
+  client.test("如果任务不存在，应返回错误信息", () => {
+    if (response.status === 404) {
+      client.assert(response.body.error === "任务不存在", "应返回任务不存在错误");
+    }
+  });
+%}
+
+### 根据ID查询单个任务 - 不存在的任务
+GET {{baseUrl}}/api/tasks/99999
+
+> {%
+  client.test("状态码应为 404", () => {
+    client.assert(response.status === 404, "状态码应为 404");
+  });
+  client.test("应返回错误信息", () => {
+    client.assert(response.body.error === "任务不存在", "应返回任务不存在错误");
+  });
+%}
+
+### 错误测试 - 无效的任务ID（非数字）
+GET {{baseUrl}}/api/tasks/invalid_id
+
+> {%
+  client.test("状态码应为 400", () => {
+    client.assert(response.status === 400, "状态码应为 400");
+  });
+  client.test("应返回错误信息", () => {
+    client.assert(response.body.error === "无效的任务ID", "应返回无效的任务ID错误");
+  });
+%}
+
+### 错误测试 - 负数任务ID
+GET {{baseUrl}}/api/tasks/-1
+
+> {%
+  client.test("状态码应为 404", () => {
+    client.assert(response.status === 404, "状态码应为 404");
+  });
+  client.test("应返回错误信息", () => {
+    client.assert(response.body.error === "任务不存在", "应返回任务不存在错误");
+  });
+%}
+
+
+

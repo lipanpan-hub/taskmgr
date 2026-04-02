@@ -1,0 +1,53 @@
+@baseUrl = {{$dotenv BASE_URL}}
+
+
+### 错误测试 - 删除不存在的任务
+DELETE {{baseUrl}}/api/tasks/99999
+
+> {%
+  client.test("状态码应为 404 或 500", () => {
+    client.assert(response.status === 404 || response.status === 500, "状态码应为 404 或 500");
+  });
+  client.test("应返回错误信息", () => {
+    client.assert(response.body.error !== undefined, "应返回错误信息");
+  });
+%}
+
+### 错误测试 - 无效的任务 ID（非数字）
+DELETE {{baseUrl}}/api/tasks/invalid_id
+
+> {%
+  client.test("状态码应为 400 或 500", () => {
+    client.assert(response.status === 400 || response.status === 500, "状态码应为 400 或 500");
+  });
+  client.test("应返回错误信息", () => {
+    client.assert(response.body.error !== undefined, "应返回错误信息");
+  });
+%}
+
+### 错误测试 - 空的任务 ID
+DELETE {{baseUrl}}/api/tasks/
+
+> {%
+  client.test("状态码应为 404", () => {
+    client.assert(response.status === 404, "状态码应为 404");
+  });
+%}
+
+### 删除所有任务
+DELETE {{baseUrl}}/api/tasks
+
+> {%
+  client.test("状态码应为 200", () => {
+    client.assert(response.status === 200, "状态码应为 200");
+  });
+  client.test("应返回成功消息", () => {
+    client.assert(response.body.message !== undefined, "应返回成功消息");
+  });
+  client.test("应返回删除的任务数量", () => {
+    client.assert(response.body.count !== undefined, "应返回删除的任务数量");
+  });
+  client.test("应返回删除的任务列表", () => {
+    client.assert(Array.isArray(response.body.tasks), "应返回删除的任务列表");
+  });
+%}

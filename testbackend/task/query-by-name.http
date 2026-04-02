@@ -1,0 +1,171 @@
+@baseUrl = {{$dotenv BASE_URL}}
+
+
+### 创建测试任务 - 用于名称查询测试
+POST {{baseUrl}}/api/tasks
+Content-Type: application/json
+
+{
+  "name": "名称查询测试任务",
+  "description": "用于测试根据名称查询功能",
+  "executablePath": "C:\\test\\query-test.bat",
+  "arguments": "--test",
+  "triggerType": "daily",
+  "startTime": "10:00",
+  "enabled": true
+}
+
+> {%
+  client.test("状态码应为 201", () => {
+    client.assert(response.status === 201, "状态码应为 201");
+  });
+  client.test("任务名称应正确", () => {
+    client.assert(response.body.name === "名称查询测试任务", "任务名称应正确");
+  });
+%}
+
+### 根据任务名称查询任务 - 存在的任务
+GET {{baseUrl}}/api/tasks/name/名称查询测试任务
+
+> {%
+  client.test("状态码应为 200", () => {
+    client.assert(response.status === 200, "状态码应为 200");
+  });
+  client.test("应返回任务对象", () => {
+    client.assert(response.body !== null, "应返回任务对象");
+  });
+  client.test("任务名称应匹配", () => {
+    client.assert(response.body.name === "名称查询测试任务", "任务名称应匹配");
+  });
+  client.test("应包含所有必要字段", () => {
+    client.assert(response.body.id !== undefined, "应包含 id");
+    client.assert(response.body.description !== undefined, "应包含 description");
+    client.assert(response.body.executablePath === "C:\\test\\query-test.bat", "可执行路径应正确");
+    client.assert(response.body.arguments === "--test", "参数应正确");
+    client.assert(response.body.triggerType === "daily", "触发类型应正确");
+    client.assert(response.body.startTime === "10:00", "启动时间应正确");
+    client.assert(response.body.enabled === true, "启用状态应正确");
+    client.assert(response.body.createdAt !== undefined, "应包含 createdAt");
+    client.assert(response.body.updatedAt !== undefined, "应包含 updatedAt");
+  });
+%}
+
+### 查询不存在的任务名称
+GET {{baseUrl}}/api/tasks/name/不存在的任务名称
+
+> {%
+  client.test("状态码应为 404", () => {
+    client.assert(response.status === 404, "状态码应为 404");
+  });
+  client.test("应返回错误信息", () => {
+    client.assert(response.body.error === "任务不存在", "应返回任务不存在错误");
+  });
+%}
+
+### 创建带特殊字符的任务名称
+POST {{baseUrl}}/api/tasks
+Content-Type: application/json
+
+{
+  "name": "特殊任务-2024_测试",
+  "executablePath": "C:\\test\\special.bat",
+  "triggerType": "weekly",
+  "startTime": "15:30"
+}
+
+> {%
+  client.test("状态码应为 201", () => {
+    client.assert(response.status === 201, "状态码应为 201");
+  });
+%}
+
+### 根据带特殊字符的名称查询任务
+GET {{baseUrl}}/api/tasks/name/特殊任务-2024_测试
+
+> {%
+  client.test("状态码应为 200", () => {
+    client.assert(response.status === 200, "状态码应为 200");
+  });
+  client.test("任务名称应匹配", () => {
+    client.assert(response.body.name === "特殊任务-2024_测试", "任务名称应匹配");
+  });
+  client.test("触发类型应为 weekly", () => {
+    client.assert(response.body.triggerType === "weekly", "触发类型应为 weekly");
+  });
+%}
+
+### 创建带空格的任务名称
+POST {{baseUrl}}/api/tasks
+Content-Type: application/json
+
+{
+  "name": "带 空格 的 任务",
+  "executablePath": "C:\\test\\space.bat"
+}
+
+> {%
+  client.test("状态码应为 201", () => {
+    client.assert(response.status === 201, "状态码应为 201");
+  });
+%}
+
+### 根据带空格的名称查询任务
+GET {{baseUrl}}/api/tasks/name/带 空格 的 任务
+
+> {%
+  client.test("状态码应为 200", () => {
+    client.assert(response.status === 200, "状态码应为 200");
+  });
+  client.test("任务名称应匹配", () => {
+    client.assert(response.body.name === "带 空格 的 任务", "任务名称应匹配");
+  });
+%}
+
+
+
+
+### 清理测试数据 - 删除"名称查询测试任务"
+DELETE {{baseUrl}}/api/tasks/name/名称查询测试任务
+
+> {%
+  client.test("状态码应为 200", () => {
+    client.assert(response.status === 200, "状态码应为 200");
+  });
+  client.test("应返回成功消息", () => {
+    client.assert(response.body.message === "任务删除成功", "应返回成功消息");
+  });
+  client.test("应返回被删除的任务", () => {
+    client.assert(response.body.task !== undefined, "应返回被删除的任务");
+    client.assert(response.body.task.name === "名称查询测试任务", "任务名称应匹配");
+  });
+%}
+
+### 清理测试数据 - 删除"特殊任务-2024_测试"
+DELETE {{baseUrl}}/api/tasks/name/特殊任务-2024_测试
+
+> {%
+  client.test("状态码应为 200", () => {
+    client.assert(response.status === 200, "状态码应为 200");
+  });
+  client.test("应返回成功消息", () => {
+    client.assert(response.body.message === "任务删除成功", "应返回成功消息");
+  });
+  client.test("应返回被删除的任务", () => {
+    client.assert(response.body.task.name === "特殊任务-2024_测试", "任务名称应匹配");
+  });
+%}
+
+### 清理测试数据 - 删除"带 空格 的 任务"
+DELETE {{baseUrl}}/api/tasks/name/带 空格 的 任务
+
+> {%
+  client.test("状态码应为 200", () => {
+    client.assert(response.status === 200, "状态码应为 200");
+  });
+  client.test("应返回成功消息", () => {
+    client.assert(response.body.message === "任务删除成功", "应返回成功消息");
+  });
+  client.test("应返回被删除的任务", () => {
+    client.assert(response.body.task.name === "带 空格 的 任务", "任务名称应匹配");
+  });
+%}

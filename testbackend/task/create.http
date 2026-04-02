@@ -1,0 +1,320 @@
+@baseUrl = {{$dotenv BASE_URL}}
+
+### 创建每日任务 - 基本测试
+POST {{baseUrl}}/api/tasks
+Content-Type: application/json
+
+{
+  "name": "每日备份任务",
+  "description": "每天早上9点执行数据备份",
+  "executablePath": "C:\\backup\\backup.bat",
+  "arguments": "--full",
+  "triggerType": "daily",
+  "startTime": "09:00",
+  "enabled": true
+}
+
+> {%
+  client.test("状态码应为 201", () => {
+    client.assert(response.status === 201, "状态码应为 201");
+  });
+  client.test("返回的任务应包含 id", () => {
+    client.assert(response.body.id !== undefined, "应包含 id");
+  });
+  client.test("任务名称应正确", () => {
+    client.assert(response.body.name === "每日备份任务", "任务名称应正确");
+  });
+  client.test("触发类型应为 daily", () => {
+    client.assert(response.body.triggerType === "daily", "触发类型应为 daily");
+  });
+  client.test("应该是启用状态", () => {
+    client.assert(response.body.enabled === true, "应该是启用状态");
+  });
+%}
+
+
+### 创建每周任务
+POST {{baseUrl}}/api/tasks
+Content-Type: application/json
+
+{
+  "name": "每周清理任务",
+  "description": "每周一清理临时文件",
+  "executablePath": "C:\\scripts\\cleanup.ps1",
+  "triggerType": "weekly",
+  "startTime": "08:00"
+}
+
+> {%
+  client.test("状态码应为 201", () => {
+    client.assert(response.status === 201, "状态码应为 201");
+  });
+  client.test("触发类型应为 weekly", () => {
+    client.assert(response.body.triggerType === "weekly", "触发类型应为 weekly");
+  });
+%}
+
+
+### 创建每月任务
+POST {{baseUrl}}/api/tasks
+Content-Type: application/json
+
+{
+  "name": "月度报表生成",
+  "executablePath": "C:\\reports\\generate.exe",
+  "arguments": "--monthly",
+  "triggerType": "monthly",
+  "startTime": "00:00"
+}
+
+> {%
+  client.test("状态码应为 201", () => {
+    client.assert(response.status === 201, "状态码应为 201");
+  });
+  client.test("触发类型应为 monthly", () => {
+    client.assert(response.body.triggerType === "monthly", "触发类型应为 monthly");
+  });
+%}
+
+
+### 创建一次性任务
+POST {{baseUrl}}/api/tasks
+Content-Type: application/json
+
+{
+  "name": "系统更新任务",
+  "description": "执行一次系统更新",
+  "executablePath": "C:\\Windows\\System32\\WindowsUpdate.exe",
+  "triggerType": "once",
+  "startTime": "23:00"
+}
+
+> {%
+  client.test("状态码应为 201", () => {
+    client.assert(response.status === 201, "状态码应为 201");
+  });
+  client.test("触发类型应为 once", () => {
+    client.assert(response.body.triggerType === "once", "触发类型应为 once");
+  });
+%}
+
+### 创建开机启动任务
+POST {{baseUrl}}/api/tasks
+Content-Type: application/json
+
+{
+  "name": "开机初始化",
+  "description": "系统启动时执行初始化脚本",
+  "executablePath": "C:\\startup\\init.bat",
+  "triggerType": "boot",
+  "startTime": "00:00"
+}
+
+> {%
+  client.test("状态码应为 201", () => {
+    client.assert(response.status === 201, "状态码应为 201");
+  });
+  client.test("触发类型应为 boot", () => {
+    client.assert(response.body.triggerType === "boot", "触发类型应为 boot");
+  });
+%}
+
+### 创建登录触发任务
+POST {{baseUrl}}/api/tasks
+Content-Type: application/json
+
+{
+  "name": "用户登录脚本",
+  "executablePath": "C:\\scripts\\user-login.ps1",
+  "triggerType": "logon",
+  "startTime": "00:00"
+}
+
+> {%
+  client.test("状态码应为 201", () => {
+    client.assert(response.status === 201, "状态码应为 201");
+  });
+  client.test("触发类型应为 logon", () => {
+    client.assert(response.body.triggerType === "logon", "触发类型应为 logon");
+  });
+%}
+
+### 创建禁用状态的任务
+POST {{baseUrl}}/api/tasks
+Content-Type: application/json
+
+{
+  "name": "待激活任务",
+  "description": "暂时禁用的任务",
+  "executablePath": "C:\\tasks\\pending.exe",
+  "triggerType": "daily",
+  "startTime": "12:00",
+  "enabled": false
+}
+
+> {%
+  client.test("状态码应为 201", () => {
+    client.assert(response.status === 201, "状态码应为 201");
+  });
+  client.test("应该是禁用状态", () => {
+    client.assert(response.body.enabled === false, "应该是禁用状态");
+  });
+%}
+
+### 创建最小字段任务（仅必填字段）
+POST {{baseUrl}}/api/tasks
+Content-Type: application/json
+
+{
+  "name": "简单任务",
+  "executablePath": "C:\\simple.bat"
+}
+
+> {%
+  client.test("状态码应为 201", () => {
+    client.assert(response.status === 201, "状态码应为 201");
+  });
+  client.test("应使用默认触发类型 daily", () => {
+    client.assert(response.body.triggerType === "daily", "应使用默认触发类型 daily");
+  });
+  client.test("应使用默认启动时间 09:00", () => {
+    client.assert(response.body.startTime === "09:00", "应使用默认启动时间 09:00");
+  });
+  client.test("应默认启用", () => {
+    client.assert(response.body.enabled === true, "应默认启用");
+  });
+%}
+
+### 创建带复杂参数的任务
+POST {{baseUrl}}/api/tasks
+Content-Type: application/json
+
+{
+  "name": "数据同步任务",
+  "description": "同步数据到远程服务器",
+  "executablePath": "C:\\sync\\rsync.exe",
+  "arguments": "-avz --delete /source/ user@remote:/dest/",
+  "triggerType": "daily",
+  "startTime": "02:30"
+}
+
+> {%
+  client.test("状态码应为 201", () => {
+    client.assert(response.status === 201, "状态码应为 201");
+  });
+  client.test("参数应正确保存", () => {
+    client.assert(response.body.arguments === "-avz --delete /source/ user@remote:/dest/", "参数应正确保存");
+  });
+%}
+
+### 创建 PowerShell 脚本任务
+POST {{baseUrl}}/api/tasks
+Content-Type: application/json
+
+{
+  "name": "系统监控脚本",
+  "description": "监控系统资源使用情况",
+  "executablePath": "powershell.exe",
+  "arguments": "-ExecutionPolicy Bypass -File C:\\scripts\\monitor.ps1",
+  "triggerType": "daily",
+  "startTime": "00:00"
+}
+
+> {%
+  client.test("状态码应为 201", () => {
+    client.assert(response.status === 201, "状态码应为 201");
+  });
+  client.test("可执行路径应为 powershell.exe", () => {
+    client.assert(response.body.executablePath === "powershell.exe", "可执行路径应为 powershell.exe");
+  });
+%}
+
+### 错误测试 - 缺少必填字段 name
+POST {{baseUrl}}/api/tasks
+Content-Type: application/json
+
+{
+  "executablePath": "C:\\test.bat"
+}
+
+> {%
+  client.test("状态码应为 400", () => {
+    client.assert(response.status === 400, "状态码应为 400");
+  });
+  client.test("应返回错误信息", () => {
+    client.assert(response.body.error === "缺少必填字段", "应返回错误信息");
+  });
+%}
+
+### 错误测试 - 缺少必填字段 executablePath
+POST {{baseUrl}}/api/tasks
+Content-Type: application/json
+
+{
+  "name": "无效任务"
+}
+
+> {%
+  client.test("状态码应为 400", () => {
+    client.assert(response.status === 400, "状态码应为 400");
+  });
+  client.test("应返回错误信息", () => {
+    client.assert(response.body.error === "缺少必填字段", "应返回错误信息");
+  });
+%}
+
+### 错误测试 - 无效的 triggerType
+POST {{baseUrl}}/api/tasks
+Content-Type: application/json
+
+{
+  "name": "无效触发类型任务",
+  "executablePath": "C:\\test.bat",
+  "triggerType": "invalid_type"
+}
+
+> {%
+  client.test("状态码应为 400", () => {
+    client.assert(response.status === 400, "状态码应为 400");
+  });
+  client.test("应返回错误信息", () => {
+    client.assert(response.body.error === "无效的触发类型", "应返回错误信息");
+  });
+%}
+
+### 错误测试 - 重复的任务名称（需要先创建一个任务）
+POST {{baseUrl}}/api/tasks
+Content-Type: application/json
+
+{
+  "name": "每日备份任务",
+  "executablePath": "C:\\duplicate.bat"
+}
+
+> {%
+  client.test("状态码应为 500", () => {
+    client.assert(response.status === 500, "状态码应为 500");
+  });
+  client.test("应返回错误信息", () => {
+    client.assert(response.body.error !== undefined, "应返回错误信息");
+  });
+%}
+
+### 清理测试数据 - 删除所有测试任务
+DELETE {{baseUrl}}/api/tasks
+
+> {%
+  client.test("状态码应为 200", () => {
+    client.assert(response.status === 200, "状态码应为 200");
+  });
+  client.test("应返回成功消息", () => {
+    client.assert(response.body.message !== undefined, "应返回成功消息");
+  });
+  client.test("应返回删除的任务数量", () => {
+    client.assert(response.body.count !== undefined, "应返回删除的任务数量");
+  });
+  client.test("应返回删除的任务列表", () => {
+    client.assert(Array.isArray(response.body.tasks), "应返回删除的任务列表");
+  });
+  client.log("已删除 " + response.body.count + " 个测试任务");
+%}
