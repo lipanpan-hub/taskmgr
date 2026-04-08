@@ -15,12 +15,54 @@ using System.Threading.Tasks;
 public class Startup {
     public async Task<object> Invoke(dynamic input) {
         try {
+            await System.Threading.Tasks.Task.Delay(0);
             string taskName = (string)input.taskName;
             string executablePath = (string)input.executablePath;
             string arguments = input.arguments != null ? (string)input.arguments : "";
             string description = input.description != null ? (string)input.description : "";
             string triggerType = input.triggerType != null ? (string)input.triggerType : "Daily";
             string startTime = input.startTime != null ? (string)input.startTime : "09:00";
+            int[] weekdays = new int[0];
+            if (input.weekdays != null) {
+                if (input.weekdays is int[]) weekdays = (int[])input.weekdays;
+                else if (input.weekdays is object[]) {
+                    object[] arr = (object[])input.weekdays;
+                    weekdays = new int[arr.Length];
+                    for (int i = 0; i < arr.Length; i++) weekdays[i] = Convert.ToInt32(arr[i]);
+                }
+            }
+
+            int[] months = new int[0];
+            if (input.months != null) {
+                if (input.months is int[]) months = (int[])input.months;
+                else if (input.months is object[]) {
+                    object[] arr = (object[])input.months;
+                    months = new int[arr.Length];
+                    for (int i = 0; i < arr.Length; i++) months[i] = Convert.ToInt32(arr[i]);
+                }
+            }
+
+            int[] monthdays = new int[0];
+            if (input.monthdays != null) {
+                if (input.monthdays is int[]) monthdays = (int[])input.monthdays;
+                else if (input.monthdays is object[]) {
+                    object[] arr = (object[])input.monthdays;
+                    monthdays = new int[arr.Length];
+                    for (int i = 0; i < arr.Length; i++) monthdays[i] = Convert.ToInt32(arr[i]);
+                }
+            }
+
+            int[] weeksOfMonth = new int[0];
+            if (input.weeksOfMonth != null) {
+                if (input.weeksOfMonth is int[]) weeksOfMonth = (int[])input.weeksOfMonth;
+                else if (input.weeksOfMonth is object[]) {
+                    object[] arr = (object[])input.weeksOfMonth;
+                    weeksOfMonth = new int[arr.Length];
+                    for (int i = 0; i < arr.Length; i++) weeksOfMonth[i] = Convert.ToInt32(arr[i]);
+                }
+            }
+            short interval = input.interval != null ? (short)(int)input.interval : (short)1;
+
             
             bool enabled = input.enabled != null ? (bool)input.enabled : true;
             bool startWhenAvailable = input.startWhenAvailable != null ? (bool)input.startWhenAvailable : false;
@@ -53,19 +95,105 @@ public class Startup {
                 {
                     case "daily":
                         td.Triggers.Add(new DailyTrigger { 
-                            StartBoundary = DateTime.Today.Add(TimeSpan.Parse(startTime))
+                            StartBoundary = DateTime.Parse(startTime),
+                            DaysInterval = interval
                         });
                         break;
                     case "weekly":
+                        DaysOfTheWeek weeklyDow = 0;
+                        foreach (int d in weekdays) {
+                            switch (d) {
+                                case 0: weeklyDow |= DaysOfTheWeek.Sunday; break;
+                                case 1: weeklyDow |= DaysOfTheWeek.Monday; break;
+                                case 2: weeklyDow |= DaysOfTheWeek.Tuesday; break;
+                                case 3: weeklyDow |= DaysOfTheWeek.Wednesday; break;
+                                case 4: weeklyDow |= DaysOfTheWeek.Thursday; break;
+                                case 5: weeklyDow |= DaysOfTheWeek.Friday; break;
+                                case 6: weeklyDow |= DaysOfTheWeek.Saturday; break;
+                            }
+                        }
+                        if (weeklyDow == 0) weeklyDow = DaysOfTheWeek.Monday;
                         td.Triggers.Add(new WeeklyTrigger { 
-                            StartBoundary = DateTime.Today.Add(TimeSpan.Parse(startTime)),
-                            DaysOfWeek = DaysOfTheWeek.Monday | DaysOfTheWeek.Wednesday | DaysOfTheWeek.Friday
+                            StartBoundary = DateTime.Parse(startTime),
+                            DaysOfWeek = weeklyDow,
+                            WeeksInterval = interval
                         });
                         break;
                     case "monthly":
-                        td.Triggers.Add(new MonthlyTrigger { 
-                            StartBoundary = DateTime.Today.Add(TimeSpan.Parse(startTime))
-                        });
+                        if (weeksOfMonth.Length > 0) {
+                            MonthlyDOWTrigger mtDow = new MonthlyDOWTrigger();
+                            mtDow.StartBoundary = DateTime.Parse(startTime);
+                            DaysOfTheWeek monthlyDow = 0;
+                            foreach (int d in weekdays) {
+                                switch (d) {
+                                    case 0: monthlyDow |= DaysOfTheWeek.Sunday; break;
+                                    case 1: monthlyDow |= DaysOfTheWeek.Monday; break;
+                                    case 2: monthlyDow |= DaysOfTheWeek.Tuesday; break;
+                                    case 3: monthlyDow |= DaysOfTheWeek.Wednesday; break;
+                                    case 4: monthlyDow |= DaysOfTheWeek.Thursday; break;
+                                    case 5: monthlyDow |= DaysOfTheWeek.Friday; break;
+                                    case 6: monthlyDow |= DaysOfTheWeek.Saturday; break;
+                                }
+                            }
+                            if (monthlyDow == 0) monthlyDow = DaysOfTheWeek.Monday;
+                            mtDow.DaysOfWeek = monthlyDow;
+
+                            WhichWeek ww = 0;
+                            foreach (int w in weeksOfMonth) {
+                                switch (w) {
+                                    case 1: ww |= WhichWeek.FirstWeek; break;
+                                    case 2: ww |= WhichWeek.SecondWeek; break;
+                                    case 3: ww |= WhichWeek.ThirdWeek; break;
+                                    case 4: ww |= WhichWeek.FourthWeek; break;
+                                    case 5: ww |= WhichWeek.LastWeek; break;
+                                }
+                            }
+                            if (ww == 0) ww = WhichWeek.FirstWeek;
+                            mtDow.WeeksOfMonth = ww;
+
+                            MonthsOfTheYear moyDow = 0;
+                            if (months.Length > 0) {
+                                foreach (int m in months) {
+                                    if (m >= 1 && m <= 12) {
+                                        moyDow |= (MonthsOfTheYear)(1 << (m - 1));
+                                    }
+                                }
+                            } else {
+                                int currentMonthDow = DateTime.Now.Month;
+                                for (int i = 1; i <= 12; i++) {
+                                    if (Math.Abs(i - currentMonthDow) % interval == 0) {
+                                        moyDow |= (MonthsOfTheYear)(1 << (i - 1));
+                                    }
+                                }
+                                if (interval == 1) moyDow = MonthsOfTheYear.AllMonths;
+                            }
+                            mtDow.MonthsOfYear = moyDow;
+                            td.Triggers.Add(mtDow);
+                        } else {
+                            MonthlyTrigger mt = new MonthlyTrigger();
+                            mt.StartBoundary = DateTime.Parse(startTime);
+                            if (monthdays.Length > 0) {
+                                mt.DaysOfMonth = monthdays;
+                            }
+                            MonthsOfTheYear moy = 0;
+                            if (months.Length > 0) {
+                                foreach (int m in months) {
+                                    if (m >= 1 && m <= 12) {
+                                        moy |= (MonthsOfTheYear)(1 << (m - 1));
+                                    }
+                                }
+                            } else {
+                                int currentMonth = DateTime.Now.Month;
+                                for (int i = 1; i <= 12; i++) {
+                                    if (Math.Abs(i - currentMonth) % interval == 0) {
+                                        moy |= (MonthsOfTheYear)(1 << (i - 1));
+                                    }
+                                }
+                                if (interval == 1) moy = MonthsOfTheYear.AllMonths;
+                            }
+                            mt.MonthsOfYear = moy;
+                            td.Triggers.Add(mt);
+                        }
                         break;
                     case "once":
                         td.Triggers.Add(new TimeTrigger { 
@@ -80,7 +208,7 @@ public class Startup {
                         break;
                     default:
                         td.Triggers.Add(new DailyTrigger { 
-                            StartBoundary = DateTime.Today.Add(TimeSpan.Parse(startTime))
+                            StartBoundary = DateTime.Parse(startTime)
                         });
                         break;
                 }
@@ -113,6 +241,7 @@ using System.Threading.Tasks;
 public class Startup {
     public async Task<object> Invoke(dynamic input) {
         try {
+            await System.Threading.Tasks.Task.Delay(0);
             string taskName = (string)input.taskName;
             
             using (TaskService ts = new TaskService())
@@ -147,6 +276,7 @@ using System.Web.Script.Serialization;
 public class Startup {
     public async Task<object> Invoke(dynamic input) {
         try {
+            await System.Threading.Tasks.Task.Delay(0);
             using (TaskService ts = new TaskService())
             {
                 TaskFolder taskFolder;
@@ -197,6 +327,7 @@ using System.Web.Script.Serialization;
 public class Startup {
     public async Task<object> Invoke(dynamic input) {
         try {
+            await System.Threading.Tasks.Task.Delay(0);
             string taskName = (string)input.taskName;
             
             using (TaskService ts = new TaskService())
@@ -244,6 +375,7 @@ using System.Threading.Tasks;
 public class Startup {
     public async Task<object> Invoke(dynamic input) {
         try {
+            await System.Threading.Tasks.Task.Delay(0);
             string taskName = (string)input.taskName;
             
             using (TaskService ts = new TaskService())
@@ -321,12 +453,17 @@ export interface CreateTaskOptions {
   enabled?: boolean
   executablePath: string
   hidden?: boolean
+  interval?: number
+  months?: number[]
+  monthdays?: number[]  // 每月执行日期 (1-31)，仅 monthly 触发器使用
   startTime?: string
   startWhenAvailable?: boolean
   stopIfGoingOnBatteries?: boolean
   taskName: string
   triggerType?: 'boot' | 'daily' | 'logon' | 'monthly' | 'once' | 'weekly'
   wakeToRun?: boolean
+  weekdays?: number[]   // 每周执行星期 (0=周日, 1=周一 ... 6=周六)，仅 weekly 触发器使用
+  weeksOfMonth?: number[] // 第几周执行 (1-4为1-4周，5为最后一周)，仅 monthly 且按周触发使用
 }
 
 export interface TaskInfo {

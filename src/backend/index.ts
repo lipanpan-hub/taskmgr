@@ -11,6 +11,6 @@ export function startServer(port?: number) {
 
   return app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`)
-    exec(`start http://localhost:${PORT}/api/tasks`)
+    exec(`start http://localhost:${PORT}`)
   })
 }

@@ -1,9 +1,9 @@
 import {Args, Command, Flags} from '@oclif/core'
-import {copyFileSync, readdirSync} from 'node:fs'
+import {copyFileSync} from 'node:fs'
 import {basename, join} from 'node:path'
-import prompts from 'prompts'
 
 import {createScheduledTask} from '../../lib/task-scheduler.js'
+import {handlePsiInteractive} from '../../lib/task/psi-handler.js'
 
 export default class Add extends Command {
   static args = {
@@ -40,8 +40,12 @@ export default class Add extends Command {
       description: '任务描述'
     }),
     time: Flags.string({
-      default: '09:00', 
-      description: '任务开始时间 (HH:mm)'
+      default: `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')} 09:00`, 
+      description: '任务开始时间 (YYYY-MM-DD HH:mm 或 HH:mm)'
+    }),
+    interval: Flags.integer({
+      default: 1,
+      description: '触发间隔 (N天/N周/N月)',
     }),
     trigger: Flags.string({
       default: 'daily',
@@ -65,6 +69,11 @@ export default class Add extends Command {
 
     let executablePath = flags.path
     let execArguments = flags.arguments
+    let weekdays: number[] | undefined
+    let monthdays: number[] | undefined
+    let months: number[] | undefined
+    let weeksOfMonth: number[] | undefined
+    let {interval} = flags
 
     // 如果用户使用 ps-script 参数
     if (flags['ps-script']) {
@@ -79,50 +88,20 @@ export default class Add extends Command {
     }
 
     if (flags.psi) {
-      const scriptsDir = join(this.config.configDir, 'scripts')
-      const scripts = readdirSync(scriptsDir).filter(f => f.endsWith('.ps1'))
-
-      if (scripts.length === 0) {
-        this.error('scripts 目录下没有 PowerShell 脚本')
+      try {
+        const result = await handlePsiInteractive(this.config.configDir)
+        executablePath = result.executablePath
+        execArguments = result.execArguments
+        flags.trigger = result.trigger
+        flags.time = result.time
+        weekdays = result.weekdays
+        monthdays = result.monthdays
+        months = result.months
+        weeksOfMonth = result.weeksOfMonth
+        if (result.interval !== undefined) interval = result.interval
+      } catch (err: any) {
+        this.error(err.message)
       }
-
-      const response = await prompts([
-        {
-          type: 'select',
-          name: 'selected',
-          message: '选择要执行的脚本',
-          choices: scripts.map(s => ({ title: s, value: s })),
-        },
-        {
-          type: 'select',
-          name: 'trigger',
-          message: '选择触发类型',
-          choices: [
-            { title: '每天', value: 'daily' },
-            { title: '每周', value: 'weekly' },
-            { title: '每月', value: 'monthly' },
-            { title: '一次', value: 'once' },
-            { title: '启动时', value: 'boot' },
-            { title: '登录时', value: 'logon' },
-          ],
-          initial: 0,
-        },
-        {
-          type: 'text',
-          name: 'time',
-          message: '输入开始时间 (HH:mm)',
-          initial: '09:00',
-          validate: (value: string) => /^\d{2}:\d{2}$/.test(value) || '请输入有效的时间格式 (HH:mm)',
-        },
-      ])
-
-      executablePath = 'cmd.exe'
-      execArguments = `/c start /min "" powershell.exe -ExecutionPolicy Bypass -NoProfile -WindowStyle Hidden -File "${join(scriptsDir, response.selected)}"`
-      // execArguments = `-ExecutionPolicy Bypass -File "${join(scriptsDir, response.selected)}"`
-
-      // 覆盖 flags 中的值
-      flags.trigger = response.trigger
-      flags.time = response.time
     }
 
     const result = await createScheduledTask({
@@ -132,12 +111,17 @@ export default class Add extends Command {
       enabled: true,
       executablePath: executablePath!,
       hidden: false,
+      interval,
+      months,
+      monthdays,
+      weeksOfMonth,
       startTime: flags.time,
       startWhenAvailable: flags['start-when-available'],
       stopIfGoingOnBatteries: false,  // 电池供电时是否停止任务
       taskName: args.taskName,
       triggerType: flags.trigger as 'boot' | 'daily' | 'logon' | 'monthly' | 'once' | 'weekly',
       wakeToRun: true,
+      weekdays,
     })
 
     this.log(result)

@@ -76,8 +76,7 @@
       "@oclif/plugin-autocomplete",
       "@oclif/plugin-not-found",
       "@oclif/plugin-warn-if-update-available",
-      "@oclif/plugin-version",
-      "@oclif/plugin-which"
+      "@oclif/plugin-version"
     ],
     "topicSeparator": " ",
     "topics": {
