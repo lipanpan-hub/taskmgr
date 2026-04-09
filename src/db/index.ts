@@ -3,8 +3,8 @@ import { homedir } from 'node:os'
 import Database from 'better-sqlite3'
 import { drizzle } from 'drizzle-orm/better-sqlite3'
 import { Config } from '@oclif/core'
-import { tasks } from '../model/schema.js'
-import { envConfig as envConfig } from '../../lib/env.js'
+import { tasks } from './schema.js'
+import { envConfig as envConfig } from '../lib/env.js'
 
 // 直接从 oclif 获取配置目录
 const configDir = process.platform === 'win32'

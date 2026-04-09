@@ -1,5 +1,7 @@
 import edge from 'edge-js'
 
+import {normalizeStartTime} from './trigger-utils.js'
+
 const TASK_SCHEDULER_DLL = `${process.cwd()}/TaskScheduler.2.12.2/lib/net45/Microsoft.Win32.TaskScheduler.dll`
 const TASK_FOLDER = 'taskmgr'
 
@@ -10,9 +12,41 @@ function getCreateTaskCs() {
 
 using Microsoft.Win32.TaskScheduler;
 using System;
+using System.Collections;
 using System.Threading.Tasks;
 
 public class Startup {
+    private static int[] ReadIntArray(object value) {
+        if (value == null) return new int[0];
+
+        if (value is int[]) return (int[])value;
+        if (value is object[]) {
+            object[] arr = (object[])value;
+            int[] parsed = new int[arr.Length];
+            for (int i = 0; i < arr.Length; i++) parsed[i] = Convert.ToInt32(arr[i]);
+            return parsed;
+        }
+
+        if (value is string) {
+            string text = ((string)value).Trim();
+            if (string.IsNullOrWhiteSpace(text)) return new int[0];
+            string[] parts = text.Split(',');
+            int[] parsed = new int[parts.Length];
+            for (int i = 0; i < parts.Length; i++) parsed[i] = Convert.ToInt32(parts[i].Trim());
+            return parsed;
+        }
+
+        if (value is IEnumerable) {
+            var list = new System.Collections.Generic.List<int>();
+            foreach (var item in (IEnumerable)value) {
+                list.Add(Convert.ToInt32(item));
+            }
+            return list.ToArray();
+        }
+
+        return new[] { Convert.ToInt32(value) };
+    }
+
     public async Task<object> Invoke(dynamic input) {
         try {
             await System.Threading.Tasks.Task.Delay(0);
@@ -22,45 +56,10 @@ public class Startup {
             string description = input.description != null ? (string)input.description : "";
             string triggerType = input.triggerType != null ? (string)input.triggerType : "Daily";
             string startTime = input.startTime != null ? (string)input.startTime : "09:00";
-            int[] weekdays = new int[0];
-            if (input.weekdays != null) {
-                if (input.weekdays is int[]) weekdays = (int[])input.weekdays;
-                else if (input.weekdays is object[]) {
-                    object[] arr = (object[])input.weekdays;
-                    weekdays = new int[arr.Length];
-                    for (int i = 0; i < arr.Length; i++) weekdays[i] = Convert.ToInt32(arr[i]);
-                }
-            }
-
-            int[] months = new int[0];
-            if (input.months != null) {
-                if (input.months is int[]) months = (int[])input.months;
-                else if (input.months is object[]) {
-                    object[] arr = (object[])input.months;
-                    months = new int[arr.Length];
-                    for (int i = 0; i < arr.Length; i++) months[i] = Convert.ToInt32(arr[i]);
-                }
-            }
-
-            int[] monthdays = new int[0];
-            if (input.monthdays != null) {
-                if (input.monthdays is int[]) monthdays = (int[])input.monthdays;
-                else if (input.monthdays is object[]) {
-                    object[] arr = (object[])input.monthdays;
-                    monthdays = new int[arr.Length];
-                    for (int i = 0; i < arr.Length; i++) monthdays[i] = Convert.ToInt32(arr[i]);
-                }
-            }
-
-            int[] weeksOfMonth = new int[0];
-            if (input.weeksOfMonth != null) {
-                if (input.weeksOfMonth is int[]) weeksOfMonth = (int[])input.weeksOfMonth;
-                else if (input.weeksOfMonth is object[]) {
-                    object[] arr = (object[])input.weeksOfMonth;
-                    weeksOfMonth = new int[arr.Length];
-                    for (int i = 0; i < arr.Length; i++) weeksOfMonth[i] = Convert.ToInt32(arr[i]);
-                }
-            }
+            int[] weekdays = ReadIntArray((object)input.weekdays);
+            int[] months = ReadIntArray((object)input.months);
+            int[] monthdays = ReadIntArray((object)input.monthdays);
+            int[] weeksOfMonth = ReadIntArray((object)input.weeksOfMonth);
             short interval = input.interval != null ? (short)(int)input.interval : (short)1;
 
             
@@ -488,9 +487,13 @@ export interface TaskDetail extends TaskInfo {
 
 export async function createScheduledTask(options: CreateTaskOptions): Promise<string> {
   const fn = getCreateTask()
+  const normalizedOptions = {
+    ...options,
+    startTime: options.startTime ? normalizeStartTime(options.startTime) : options.startTime,
+  }
 
   return new Promise((resolve, reject) => {
-    fn(options, (error: Error | null, result: string) => {
+    fn(normalizedOptions, (error: Error | null, result: string) => {
       if (error) reject(error)
       else resolve(result)
     })

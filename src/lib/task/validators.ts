@@ -1,4 +1,4 @@
-import type { NewTask } from '../../backend/model/schema.js'
+import type { NewTask } from '../../db/schema.js'
 
 export interface ValidationError {
   error: string

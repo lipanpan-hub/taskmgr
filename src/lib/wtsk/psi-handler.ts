@@ -3,6 +3,8 @@ import { readdirSync } from 'node:fs'
 import { join } from 'node:path'
 import prompts from 'prompts'
 
+import {normalizeStartTime} from './trigger-utils.js'
+
 export async function handlePsiInteractive(configDir: string) {
   const scriptsDir = join(configDir, 'scripts')
   
@@ -78,7 +80,7 @@ export async function handlePsiInteractive(configDir: string) {
     executablePath,
     execArguments,
     trigger: baseResponse.trigger,
-    time: triggerConfig.time,
+    time: triggerConfig.time ? normalizeStartTime(triggerConfig.time) : triggerConfig.time,
     weekdays: triggerConfig.weekdays,
     monthdays: triggerConfig.monthdays,
     months: triggerConfig.months,

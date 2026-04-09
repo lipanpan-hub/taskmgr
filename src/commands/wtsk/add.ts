@@ -2,8 +2,9 @@ import {Args, Command, Flags} from '@oclif/core'
 import {copyFileSync} from 'node:fs'
 import {basename, join} from 'node:path'
 
-import {createScheduledTask} from '../../lib/task-scheduler.js'
-import {handlePsiInteractive} from '../../lib/task/psi-handler.js'
+import {handlePsiInteractive} from '../../lib/wtsk/psi-handler.js'
+import {createScheduledTask} from '../../lib/wtsk/task-scheduler.js'
+import {normalizeStartTime, parseNumberList} from '../../lib/wtsk/trigger-utils.js'
 
 export default class Add extends Command {
   static args = {
@@ -15,6 +16,22 @@ export default class Add extends Command {
       description: '交互式选择现有 PowerShell 脚本创建任务',
       command: String.raw`<%= config.bin %> <%= command.id %> testTask --psi`,
     },
+    {
+      description: '创建每天运行的定时任务，每隔1天触发一次',
+      command: String.raw`<%= config.bin %> <%= command.id %> testTask --path="notepad.exe" --trigger=daily --interval=1 --start-time="09:00"`,
+    },
+    {
+      description: '创建每周一、周三、周五运行的定时任务',
+      command: String.raw`<%= config.bin %> <%= command.id %> testTask --path="notepad.exe" --trigger=weekly --weekdays="1,3,5" --start-time="14:30"`,
+    },
+    {
+      description: '创建每月1号、15号运行的定时任务',
+      command: String.raw`<%= config.bin %> <%= command.id %> testTask --path="notepad.exe" --trigger=monthly --months="1,2,3,4,5,6,7,8,9,10,11,12" --monthdays="1,15" --start-time="20:00"`,
+    },
+    {
+      description: '创建按照月、周、星期几的组合来运行的定时任务(例如:每季度最后一周的周五)',
+      command: String.raw`<%= config.bin %> <%= command.id %> testTask --path="notepad.exe" --trigger=monthly --months="3,6,9,12" --weeks-of-month="5" --weekdays="5" --start-time="23:59"`,
+    },
   ]
   static flags = {
     path: Flags.string({
@@ -24,7 +41,6 @@ export default class Add extends Command {
       dependsOn: ['path'],
       description: '执行参数',
     }),
-
     'ps-script': Flags.file({
       char: 'p',
       description: '指定PowerShell 脚本路径，自动使用 powershell.exe 执行',
@@ -39,18 +55,30 @@ export default class Add extends Command {
     description: Flags.string({
       description: '任务描述'
     }),
-    time: Flags.string({
+    'start-time': Flags.string({
       default: `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')} 09:00`, 
       description: '任务开始时间 (YYYY-MM-DD HH:mm 或 HH:mm)'
     }),
     interval: Flags.integer({
       default: 1,
-      description: '触发间隔 (N天/N周/N月)',
+      description: '触发间隔 (N天/N周)',
     }),
     trigger: Flags.string({
       default: 'daily',
       description: '触发类型: daily, weekly, monthly, once, boot, logon',
       options: ['boot', 'daily', 'logon', 'monthly', 'once', 'weekly'],
+    }),
+    weekdays: Flags.string({
+      description: '星期几 (0-6，0为周日，用逗号分隔，仅 weekly/monthly 生效)',
+    }),
+    months: Flags.string({
+      description: '月份 (1-12，用逗号分隔，仅 monthly 生效)',
+    }),
+    monthdays: Flags.string({
+      description: '每月的几号 (1-31，用逗号分隔，仅 monthly 生效)',
+    }),
+    'weeks-of-month': Flags.string({
+      description: '第几周 (1-4, 5表示最后一周，用逗号分隔，仅 monthly 配合 weekdays 生效)',
     }),
     'start-when-available': Flags.boolean({
       default: false,
@@ -93,14 +121,34 @@ export default class Add extends Command {
         executablePath = result.executablePath
         execArguments = result.execArguments
         flags.trigger = result.trigger
-        flags.time = result.time
+        flags['start-time'] = result.time
         weekdays = result.weekdays
         monthdays = result.monthdays
         months = result.months
         weeksOfMonth = result.weeksOfMonth
         if (result.interval !== undefined) interval = result.interval
-      } catch (err: any) {
-        this.error(err.message)
+      } catch (error: unknown) {
+        this.error((error as Error).message)
+      }
+    } else {
+      if (flags.trigger === 'weekly') {
+        if (!flags.weekdays) this.error('创建周触发任务必须指定 --weekdays 参数')
+      } else if (flags.trigger === 'monthly') {
+        if (!flags.months) this.error('创建月触发任务必须指定 --months 参数')
+        if (!flags.monthdays && !flags['weeks-of-month']) {
+          this.error('创建月触发任务必须指定 --monthdays 或 --weeks-of-month (配合 --weekdays) 参数')
+        }
+
+        if (flags['weeks-of-month'] && !flags.weekdays) {
+          this.error('指定按周触发时，必须提供 --weekdays 参数')
+        }
+      }
+
+      if (flags.weekdays) weekdays = parseNumberList(flags.weekdays, '--weekdays', {min: 0, max: 6})
+      if (flags.monthdays) monthdays = parseNumberList(flags.monthdays, '--monthdays', {min: 1, max: 31})
+      if (flags.months) months = parseNumberList(flags.months, '--months', {min: 1, max: 12})
+      if (flags['weeks-of-month']) {
+        weeksOfMonth = parseNumberList(flags['weeks-of-month'], '--weeks-of-month', {min: 1, max: 5})
       }
     }
 
@@ -115,7 +163,7 @@ export default class Add extends Command {
       months,
       monthdays,
       weeksOfMonth,
-      startTime: flags.time,
+      startTime: normalizeStartTime(flags['start-time']),
       startWhenAvailable: flags['start-when-available'],
       stopIfGoingOnBatteries: false,  // 电池供电时是否停止任务
       taskName: args.taskName,

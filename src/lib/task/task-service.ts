@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm'
-import { getDb } from '../../backend/lib/db.js'
-import { tasks, type NewTask, type Task } from '../../backend/model/schema.js'
+import { getDb } from '../../db/index.js'
+import { tasks, type NewTask, type Task } from '../../db/schema.js'
 
 export class TaskService {
   private db = getDb()

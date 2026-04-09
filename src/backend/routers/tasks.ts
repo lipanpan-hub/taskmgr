@@ -1,5 +1,5 @@
 import { type Request, type Response, Router } from 'express'
-import type { NewTask } from '../model/schema.js'
+import type { NewTask } from '../../db/schema.js'
 import { TaskService } from '../../lib/task/task-service.js'
 import { validateNewTask, validateTaskId } from '../../lib/task/validators.js'
 

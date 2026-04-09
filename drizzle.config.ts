@@ -12,8 +12,8 @@ const configDir = process.platform === 'win32'
 
 export default defineConfig({
   dialect: 'sqlite',
-  schema: './src/backend/model/schema.ts',
-  out: './drizzle',
+  schema: './src/db/schema.ts',
+  out: './src/db/migrations',
   dbCredentials: {
     url: join(configDir, envConfig.dbName),
   },

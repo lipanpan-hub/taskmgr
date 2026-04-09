@@ -1,6 +1,6 @@
 import {Command, Flags} from '@oclif/core'
 
-import {getAllTasks, TaskInfo} from '../../lib/task-scheduler.js'
+import {getAllTasks, TaskInfo} from '../../lib/wtsk/task-scheduler.js'
 
 export default class List extends Command {
   static description = '手动列出所有定时任务'

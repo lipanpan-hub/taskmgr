@@ -1,7 +1,7 @@
 import {Command, Flags} from '@oclif/core'
 import prompts from 'prompts'
 
-import {deleteScheduledTask, getAllTasks} from '../../lib/task-scheduler.js'
+import {deleteScheduledTask, getAllTasks} from '../../lib/wtsk/task-scheduler.js'
 
 export default class Del extends Command {
   static description = '手动删除定时任务'
@@ -15,7 +15,7 @@ export default class Del extends Command {
     const {flags} = await this.parse(Del)
     const {taskName: initialTaskName} = flags
 
-    let taskName = initialTaskName
+    let taskNames = initialTaskName ? [initialTaskName] : []
 
     if (flags.interactive) {
       const tasks = await getAllTasks()
@@ -28,24 +28,31 @@ export default class Del extends Command {
       }
 
       const response = await prompts({
-        type: 'select',
+        type: 'multiselect',
         name: 'selected',
-        message: '选择要删除的任务',
+        message: '选择要删除的任务（空格选中，回车确认）',
         choices: tasks.map(t => ({title: t.name, value: t.name})),
+        min: 1,
       })
 
-      if (!response.selected) {
+      if (!Array.isArray(response.selected) || response.selected.length === 0) {
         this.error('未选择任务')
       }
 
-      taskName = response.selected
+      taskNames = response.selected
     }
 
-    if (!taskName) {
+    if (taskNames.length === 0) {
       this.error('必须指定 -n 或 -i')
     }
 
-    const result = await deleteScheduledTask(taskName)
-    this.log(result)
+    const results = await Promise.all(taskNames.map(async taskName => ({
+      result: await deleteScheduledTask(taskName),
+      taskName,
+    })))
+
+    for (const {result} of results) {
+      this.log(result)
+    }
   }
 }

@@ -5,7 +5,7 @@ import {copyFileSync, existsSync, mkdirSync, readdirSync} from 'node:fs'
 import {platform} from 'node:os'
 import {join} from 'node:path'
 
-import {initializeDatabase} from '../backend/model/schema.js'
+import {initializeDatabase} from '../db/schema.js'
 import {envConfig} from '../lib/env.js'
 
 const hook: Hook.Init = async function (options) {
