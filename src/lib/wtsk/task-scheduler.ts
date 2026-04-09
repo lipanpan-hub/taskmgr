@@ -14,6 +14,7 @@ using Microsoft.Win32.TaskScheduler;
 using System;
 using System.Collections;
 using System.Threading.Tasks;
+using System.Security.Principal;
 
 public class Startup {
     private static int[] ReadIntArray(object value) {
@@ -69,6 +70,9 @@ public class Startup {
             bool wakeToRun = input.wakeToRun != null ? (bool)input.wakeToRun : true;
             bool disallowStartIfOnBatteries = input.disallowStartIfOnBatteries != null ? (bool)input.disallowStartIfOnBatteries : false;
             bool stopIfGoingOnBatteries = input.stopIfGoingOnBatteries != null ? (bool)input.stopIfGoingOnBatteries : false;
+            string currentUser = WindowsIdentity.GetCurrent().Name;
+            bool isAdministrator = new WindowsPrincipal(WindowsIdentity.GetCurrent())
+                .IsInRole(WindowsBuiltInRole.Administrator);
             
             using (TaskService ts = new TaskService())
             {
@@ -89,6 +93,8 @@ public class Startup {
                 td.Settings.WakeToRun = wakeToRun;
                 td.Settings.DisallowStartIfOnBatteries = disallowStartIfOnBatteries;
                 td.Settings.StopIfGoingOnBatteries = stopIfGoingOnBatteries;
+                td.Principal.UserId = currentUser;
+                td.Principal.LogonType = TaskLogonType.InteractiveToken;
                 
                 switch (triggerType.ToLower())
                 {
@@ -200,10 +206,16 @@ public class Startup {
                         });
                         break;
                     case "boot":
+                        if (!isAdministrator) {
+                            return "Error: 启动时任务需要管理员权限。请使用“以管理员身份运行”的终端后重试，或改用“登录时任务”。";
+                        }
+                        td.Principal.UserId = "SYSTEM";
+                        td.Principal.LogonType = TaskLogonType.ServiceAccount;
+                        td.Principal.RunLevel = TaskRunLevel.Highest;
                         td.Triggers.Add(new BootTrigger());
                         break;
                     case "logon":
-                        td.Triggers.Add(new LogonTrigger());
+                        td.Triggers.Add(new LogonTrigger { UserId = currentUser });
                         break;
                     default:
                         td.Triggers.Add(new DailyTrigger { 

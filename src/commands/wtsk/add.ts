@@ -102,6 +102,7 @@ export default class Add extends Command {
     let months: number[] | undefined
     let weeksOfMonth: number[] | undefined
     let {interval} = flags
+    let startTime: string | undefined = flags['start-time']
 
     // 如果用户使用 ps-script 参数
     if (flags['ps-script']) {
@@ -121,7 +122,11 @@ export default class Add extends Command {
         executablePath = result.executablePath
         execArguments = result.execArguments
         flags.trigger = result.trigger
-        flags['start-time'] = result.time
+        if (result.time !== undefined) {
+          startTime = result.time
+        } else if (['boot', 'logon'].includes(result.trigger)) {
+          startTime = undefined
+        }
         weekdays = result.weekdays
         monthdays = result.monthdays
         months = result.months
@@ -163,7 +168,7 @@ export default class Add extends Command {
       months,
       monthdays,
       weeksOfMonth,
-      startTime: normalizeStartTime(flags['start-time']),
+      startTime: ['boot', 'logon'].includes(flags.trigger) ? undefined : normalizeStartTime(startTime!),
       startWhenAvailable: flags['start-when-available'],
       stopIfGoingOnBatteries: false,  // 电池供电时是否停止任务
       taskName: args.taskName,
