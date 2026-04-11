@@ -61,6 +61,7 @@ export default class Add extends Command {
     }),
     interval: Flags.integer({
       default: 1,
+      dependsOn: ['trigger'],
       description: '触发间隔 (N天/N周)',
     }),
     trigger: Flags.string({
@@ -69,16 +70,22 @@ export default class Add extends Command {
       options: ['boot', 'daily', 'logon', 'monthly', 'once', 'weekly'],
     }),
     weekdays: Flags.string({
+      dependsOn: ['trigger'],
       description: '星期几 (0-6，0为周日，用逗号分隔，仅 weekly/monthly 生效)',
     }),
     months: Flags.string({
+      dependsOn: ['trigger'],
       description: '月份 (1-12，用逗号分隔，仅 monthly 生效)',
     }),
     monthdays: Flags.string({
+      dependsOn: ['months'],
       description: '每月的几号 (1-31，用逗号分隔，仅 monthly 生效)',
+      exclusive: ['weeks-of-month'],
     }),
     'weeks-of-month': Flags.string({
+      dependsOn: ['months'],
       description: '第几周 (1-4, 5表示最后一周，用逗号分隔，仅 monthly 配合 weekdays 生效)',
+      exclusive: ['monthdays'],
     }),
     'start-when-available': Flags.boolean({
       default: false,

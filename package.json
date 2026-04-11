@@ -4,6 +4,7 @@
   "version": "1.0.3",
   "author": "lppx",
   "bin": {
+    "ttt": "./bin/run.js",
     "tm": "./bin/run.js"
   },
   "bugs": "https://github.com/lipanpan-hub/taskmgr/issues",
@@ -67,6 +68,7 @@
   "type": "module",
   "oclif": {
     "bin": "tm",
+    "binAliases": ["ttt"],
     "commands": "./dist/commands",
     "hooks": {
       "init": "./dist/hooks/init"

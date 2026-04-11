@@ -12,7 +12,7 @@ export const tasks = sqliteTable('tasks', {
   triggerType: text('trigger_type', { 
     enum: ['daily', 'weekly', 'monthly', 'once', 'boot', 'logon'] 
   }).notNull().default('daily'),
-  startTime: text('start_time').notNull().default('09:00'),
+  startTime: text('start_time'),
   startWhenAvailable: integer('start_when_available', { mode: 'boolean' }).notNull().default(false),
   enabled: integer('enabled', { mode: 'boolean' }).notNull().default(true),
   createdAt: text('created_at').notNull().default(sql`(datetime('now', 'localtime'))`),
@@ -21,6 +21,8 @@ export const tasks = sqliteTable('tasks', {
 
 export type Task = typeof tasks.$inferSelect
 export type NewTask = typeof tasks.$inferInsert
+
+
 
 
 // 初始化数据库表结构
@@ -33,7 +35,7 @@ export function initializeDatabase(db: Database.Database): void {
       executable_path TEXT NOT NULL,
       arguments TEXT,
       trigger_type TEXT NOT NULL DEFAULT 'daily',
-      start_time TEXT NOT NULL DEFAULT '09:00',
+      start_time TEXT,
       start_when_available INTEGER NOT NULL DEFAULT 0,
       enabled INTEGER NOT NULL DEFAULT 1,
       created_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
