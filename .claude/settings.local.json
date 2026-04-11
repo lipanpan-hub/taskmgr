@@ -4,7 +4,8 @@
       "Bash(npx eslint:*)",
       "Bash(cd:*)",
       "mcp__ide__getDiagnostics",
-      "Skill(git-commit)"
+      "Skill(git-commit)",
+      "Bash(sqlite3 --version)"
     ]
   }
 }
