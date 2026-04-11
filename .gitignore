@@ -21,3 +21,6 @@ pnpm-lock.yaml
 !.env.example
 
 .kiro/skills/
+
+# # Drizzle migrations
+# .drizzle/

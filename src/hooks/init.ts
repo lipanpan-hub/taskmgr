@@ -1,11 +1,12 @@
 import {Hook} from '@oclif/core'
 import Database from 'better-sqlite3'
+import {drizzle} from 'drizzle-orm/better-sqlite3'
+import {migrate} from 'drizzle-orm/better-sqlite3/migrator'
 import {execSync} from 'node:child_process'
 import {copyFileSync, existsSync, mkdirSync, readdirSync} from 'node:fs'
 import {platform} from 'node:os'
 import {join} from 'node:path'
 
-import {initializeDatabase} from '../db/schema.js'
 import {envConfig} from '../lib/env.js'
 
 const hook: Hook.Init = async function (options) {
@@ -36,11 +37,16 @@ const hook: Hook.Init = async function (options) {
     copyFileSync(join(templatesDir, file), join(scriptsDir, file))
   }
 
-  // 初始化数据库，如果表不存在则创建
+  // 初始化数据库，执行迁移文件
   const dbPath = join(options.config.configDir, envConfig.dbName)
-  const db = new Database(dbPath)
-  initializeDatabase(db)
-  db.close()
+  const sqlite = new Database(dbPath)
+  const db = drizzle(sqlite)
+  
+  // 执行迁移
+  const migrationsFolder = join(options.config.root, '.drizzle', 'migrations')
+  migrate(db, {migrationsFolder})
+  
+  sqlite.close()
 }
 
 export default hook
