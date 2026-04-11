@@ -68,7 +68,9 @@
   "type": "module",
   "oclif": {
     "bin": "tm",
-    "binAliases": ["ttt"],
+    "binAliases": [
+      "ttt"
+    ],
     "commands": "./dist/commands",
     "hooks": {
       "init": "./dist/hooks/init"
@@ -82,8 +84,8 @@
     ],
     "topicSeparator": " ",
     "topics": {
-      "tsk": {
-        "description": "定时任务管理"
+      "wtsk": {
+        "description": "win定时任务管理"
       },
       "scripts": {
         "description": "脚本管理"
