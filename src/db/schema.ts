@@ -16,7 +16,9 @@ export const tasks = sqliteTable('tasks', {
   updatedAt: text('updated_at').notNull().default(sql`(datetime('now', 'localtime'))`),
 })
 
+// Task: 从数据库查询返回的完整记录类型（包含所有字段及默认值）
 export type Task = typeof tasks.$inferSelect
+// NewTask: 插入数据库时需要的类型（自动生成字段如 id、createdAt 等可选）
 export type NewTask = typeof tasks.$inferInsert
 
 // 天触发任务配置表

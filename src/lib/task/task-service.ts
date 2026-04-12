@@ -23,6 +23,7 @@ export class TaskService {
 
   // #region 创建操作
   async createTask(newTask: NewTask): Promise<Task> {
+    // returning() 返回插入的记录数组 Task[]，取第一个元素即为新创建的任务
     const result = await this.db.insert(tasks).values(newTask).returning()
     return result[0]
   }

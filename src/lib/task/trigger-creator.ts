@@ -73,8 +73,8 @@ async function createDailyTriggerInteractive(db: any, taskId: number): Promise<v
     startWhenAvailable: config.startWhenAvailable,
   }
 
-  await db.insert(dailyTriggers).values(trigger)
-  console.log('✓ 天触发配置已创建')
+  const result = await db.insert(dailyTriggers).values(trigger)
+  if (result) console.log('✓ 天触发配置已创建')
 }
 
 async function createWeeklyTriggerInteractive(db: any, taskId: number): Promise<void> {
@@ -130,8 +130,8 @@ async function createWeeklyTriggerInteractive(db: any, taskId: number): Promise<
     startWhenAvailable: config.startWhenAvailable,
   }
 
-  await db.insert(weeklyTriggers).values(trigger)
-  console.log('✓ 周触发配置已创建')
+  const result = await db.insert(weeklyTriggers).values(trigger)
+  if (result) console.log('✓ 周触发配置已创建')
 }
 
 async function createMonthlyTriggerInteractive(db: any, taskId: number): Promise<void> {
@@ -237,8 +237,8 @@ async function createMonthlyTriggerInteractive(db: any, taskId: number): Promise
     startWhenAvailable: config.startWhenAvailable,
   }
 
-  await db.insert(monthlyTriggers).values(trigger)
-  console.log('✓ 月触发配置已创建')
+  const result = await db.insert(monthlyTriggers).values(trigger)
+  if (result) console.log('✓ 月触发配置已创建')
 }
 
 async function createOnceTriggerInteractive(db: any, taskId: number): Promise<void> {
@@ -271,8 +271,8 @@ async function createOnceTriggerInteractive(db: any, taskId: number): Promise<vo
     startWhenAvailable: config.startWhenAvailable,
   }
 
-  await db.insert(onceTriggers).values(trigger)
-  console.log('✓ 一次性触发配置已创建')
+  const result = await db.insert(onceTriggers).values(trigger)
+  if (result) console.log('✓ 一次性触发配置已创建')
 }
 // #endregion
 
@@ -286,13 +286,13 @@ export async function createTriggerDirect(taskId: number, triggerType: string, f
         throw new Error('daily 触发类型需要 --start-time 参数')
       }
 
-      await db.insert(dailyTriggers).values({
+      const result = await db.insert(dailyTriggers).values({
         taskId,
         startTime: flags['start-time'],
         intervalDays: 1,
         startWhenAvailable: false,
       })
-      return '✓ 天触发配置已创建'
+      return result ? '✓ 天触发配置已创建' : '✗ 天触发配置创建失败'
     case 'weekly':
     case 'monthly':
     case 'once':

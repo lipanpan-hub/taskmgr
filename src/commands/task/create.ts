@@ -114,6 +114,7 @@ export default class Create extends Command {
 
     if (!basicInfo.name || !basicInfo.executablePath || !basicInfo.triggerType) {
       this.error('操作已取消')
+      return 
     }
 
     // 创建任务
