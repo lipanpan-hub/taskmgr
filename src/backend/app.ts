@@ -1,14 +1,23 @@
 import express, { type Request, type Response } from 'express'
+import { createServer } from 'node:http'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { Server } from 'socket.io'
 
-import { createTasksRouter } from './routers/tasks.js'
+import { setupWebSocketHandlers } from './websocket/index.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 export function createApp() {
   const app = express()
+  const httpServer = createServer(app)
+  const io = new Server(httpServer, {
+    cors: {
+      origin: '*',
+      methods: ['GET', 'POST'],
+    },
+  })
 
   app.use(express.json())
 
@@ -19,7 +28,7 @@ export function createApp() {
     res.json({ status: 'ok' })
   })
 
-  app.use('/api/tasks', createTasksRouter())
+  setupWebSocketHandlers(io)
 
-  return app
+  return { app, httpServer, io }
 }

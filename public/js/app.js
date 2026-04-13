@@ -1,197 +1,164 @@
-// 主题切换
-const themeToggle = document.getElementById('themeToggle');
-const body = document.body;
+// Alpine.js 主应用
+function taskManager() {
+  return {
+    // #region 状态管理
+    isDark: false,
+    tasks: [],
+    loading: false,
+    socket: null,
+    connectionStatus: 'disconnected',
+    toast: {
+      show: false,
+      message: '',
+      type: 'info',
+      icon: 'fa-info-circle'
+    },
+    // #endregion
 
-themeToggle.addEventListener('click', () => {
-  body.classList.toggle('dark-theme');
-  localStorage.setItem('theme', body.classList.contains('dark-theme') ? 'dark' : 'light');
-});
+    // #region 初始化
+    init() {
+      this.loadTheme();
+      this.initWebSocket();
+    },
 
-// 加载保存的主题
-const savedTheme = localStorage.getItem('theme');
-if (savedTheme === 'dark') {
-  body.classList.add('dark-theme');
-}
+    initWebSocket() {
+      this.socket = io();
 
-// 模态框控制
-const modal = document.getElementById('taskModal');
-const addTaskBtn = document.getElementById('addTaskBtn');
-const taskNameInput = document.getElementById('taskNameInput');
-const closeBtn = document.querySelector('.close-btn');
-const cancelBtn = document.querySelector('.btn-cancel');
-const taskForm = document.getElementById('taskForm');
-const formTaskName = document.getElementById('formTaskName');
+      this.socket.on('connect', () => {
+        console.log('WebSocket 已连接');
+        this.connectionStatus = 'connected';
+        this.showMessage('实时连接已建立', 'success');
+        this.loadTasks(); // 连接成功后再加载任务
+      });
 
-// 打开模态框
-addTaskBtn.addEventListener('click', () => {
-  const taskName = taskNameInput.value.trim();
-  if (!taskName) {
-    alert('请输入任务名称');
-    return;
-  }
-  formTaskName.value = taskName;
-  modal.classList.add('active');
-});
+      this.socket.on('disconnect', () => {
+        console.log('WebSocket 已断开');
+        this.connectionStatus = 'disconnected';
+        this.showMessage('实时连接已断开', 'warning');
+      });
 
-// 关闭模态框
-const closeModal = () => {
-  modal.classList.remove('active');
-  taskForm.reset();
-  taskNameInput.value = '';
-};
+      this.socket.on('task:updated', (data) => {
+        console.log('收到任务更新:', data);
+        this.loadTasks();
+      });
 
-closeBtn.addEventListener('click', closeModal);
-cancelBtn.addEventListener('click', closeModal);
+      this.socket.on('task:created', (data) => {
+        console.log('收到新任务:', data);
+        this.showMessage('新任务已创建', 'info');
+        this.loadTasks();
+      });
 
-modal.addEventListener('click', (e) => {
-  if (e.target === modal) {
-    closeModal();
-  }
-});
+      this.socket.on('task:deleted', (data) => {
+        console.log('任务已删除:', data);
+        this.showMessage('任务已删除', 'info');
+        this.loadTasks();
+      });
+    },
 
-// 表单提交
-taskForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  
-  const taskData = {
-    name: formTaskName.value,
-    description: document.getElementById('formDescription').value,
-    executable: document.getElementById('formExecutable').value,
-    arguments: document.getElementById('formArguments').value,
-    triggerType: document.getElementById('formTriggerType').value,
-    startTime: document.getElementById('formStartTime').value,
-    allowMissed: document.getElementById('formAllowMissed').checked
-  };
+    loadTheme() {
+      const savedTheme = localStorage.getItem('theme');
+      this.isDark = savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      if (this.isDark) {
+        document.documentElement.classList.add('dark');
+      }
+    },
+    // #endregion
 
-  try {
-    const response = await fetch('/api/tasks', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(taskData)
-    });
+    // #region 主题切换
+    toggleTheme() {
+      this.isDark = !this.isDark;
+      document.documentElement.classList.toggle('dark');
+      localStorage.setItem('theme', this.isDark ? 'dark' : 'light');
+    },
+    // #endregion
 
-    if (response.ok) {
-      closeModal();
-      loadTasks();
-    } else {
-      alert('创建任务失败');
+    // #region 计算属性
+    get filteredTasks() {
+      return this.tasks;
+    },
+    // #endregion
+
+    // #region 任务操作
+    loadTasks() {
+      this.loading = true;
+      this.socket.emit('task:getAll', (response) => {
+        this.loading = false;
+        if (response.success) {
+          this.tasks = response.data;
+        } else {
+          console.error('加载任务失败:', response);
+          this.showMessage('加载任务失败: ' + (response.message || response.error), 'error');
+        }
+      });
+    },
+
+    deleteTask(taskId) {
+      if (!confirm('确定要删除这个任务吗？此操作不可恢复。')) {
+        return;
+      }
+
+      this.socket.emit('task:delete', taskId, (response) => {
+        if (response.success) {
+          this.showMessage('任务已删除', 'success');
+        } else {
+          console.error('删除任务失败:', response);
+          this.showMessage('删除任务失败: ' + (response.message || response.error), 'error');
+        }
+      });
+    },
+
+    toggleTask(task) {
+      this.socket.emit('task:update', {
+        id: task.id,
+        updates: { enabled: !task.enabled }
+      }, (response) => {
+        if (response.success) {
+          this.showMessage(`任务已${task.enabled ? '禁用' : '启用'}`, 'success');
+        } else {
+          console.error('切换任务状态失败:', response);
+          this.showMessage('操作失败: ' + (response.message || response.error), 'error');
+        }
+      });
+    },
+    // #endregion
+
+    // #region 工具函数
+    getTriggerTypeText(type) {
+      const types = {
+        once: '一次性',
+        daily: '每天',
+        weekly: '每周',
+        monthly: '每月',
+        boot: '系统启动',
+        logon: '用户登录'
+      };
+      return types[type] || type;
+    },
+
+    formatDateTime(dateTimeStr) {
+      const date = new Date(dateTimeStr);
+      return date.toLocaleString('zh-CN');
+    },
+
+    showMessage(message, type = 'info') {
+      const icons = {
+        success: 'fa-check-circle',
+        error: 'fa-exclamation-circle',
+        warning: 'fa-exclamation-triangle',
+        info: 'fa-info-circle'
+      };
+      
+      this.toast = {
+        show: true,
+        message,
+        type,
+        icon: icons[type]
+      };
+      
+      setTimeout(() => {
+        this.toast.show = false;
+      }, 3000);
     }
-  } catch (error) {
-    console.error('创建任务出错:', error);
-    alert('创建任务出错');
-  }
-});
-
-// 加载任务列表
-async function loadTasks() {
-  try {
-    const response = await fetch('/api/tasks');
-    const tasks = await response.json();
-    renderTasks(tasks);
-  } catch (error) {
-    console.error('加载任务失败:', error);
-  }
-}
-
-// 渲染任务列表
-function renderTasks(tasks) {
-  const taskList = document.getElementById('taskList');
-  taskList.innerHTML = '';
-
-  if (tasks.length === 0) {
-    taskList.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">暂无任务</p>';
-    return;
-  }
-
-  tasks.forEach(task => {
-    const taskItem = document.createElement('div');
-    taskItem.className = 'task-item';
-    taskItem.innerHTML = `
-      <div class="task-header">
-        <div class="task-name">${task.name}</div>
-        <div class="task-actions">
-          <button class="task-btn" onclick="editTask('${task.id}')" title="编辑">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-            </svg>
-          </button>
-          <button class="task-btn" onclick="deleteTask('${task.id}')" title="删除">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="3 6 5 6 21 6"/>
-              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-            </svg>
-          </button>
-        </div>
-      </div>
-      <div class="task-description">${task.description || '无描述'}</div>
-      <div class="task-details">
-        <div>执行文件: ${task.executable}</div>
-        <div>触发类型: ${getTriggerTypeText(task.triggerType)}</div>
-        <div>开始时间: ${formatDateTime(task.startTime)}</div>
-      </div>
-    `;
-    taskList.appendChild(taskItem);
-  });
-}
-
-// 获取触发类型文本
-function getTriggerTypeText(type) {
-  const types = {
-    once: '一次性',
-    daily: '每天',
-    weekly: '每周',
-    monthly: '每月'
+    // #endregion
   };
-  return types[type] || type;
 }
-
-// 格式化日期时间
-function formatDateTime(dateTimeStr) {
-  const date = new Date(dateTimeStr);
-  return date.toLocaleString('zh-CN');
-}
-
-// 删除任务
-async function deleteTask(taskId) {
-  if (!confirm('确定要删除这个任务吗?')) {
-    return;
-  }
-
-  try {
-    const response = await fetch(`/api/tasks/${taskId}`, {
-      method: 'DELETE'
-    });
-
-    if (response.ok) {
-      loadTasks();
-    } else {
-      alert('删除任务失败');
-    }
-  } catch (error) {
-    console.error('删除任务出错:', error);
-    alert('删除任务出错');
-  }
-}
-
-// 编辑任务
-function editTask(taskId) {
-  alert('编辑功能待实现');
-}
-
-// 任务过滤
-const taskFilter = document.getElementById('taskFilter');
-taskFilter.addEventListener('change', () => {
-  loadTasks();
-});
-
-// 设置按钮
-const settingsBtn = document.getElementById('settingsBtn');
-settingsBtn.addEventListener('click', () => {
-  alert('设置功能待实现');
-});
-
-// 页面加载时加载任务
-loadTasks();

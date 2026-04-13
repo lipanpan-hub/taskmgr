@@ -1,1 +1,12 @@
-"@oclif/prettier-config"
+{
+  "extends": "@oclif/prettier-config",
+  "overrides": [
+    {
+      "files": ["public/**/*.{html,css,js,jsx,ts,tsx}"],
+      "options": {
+        "extends": null,
+        "plugins": ["prettier-plugin-tailwindcss"]
+      }
+    }
+  ]
+}
