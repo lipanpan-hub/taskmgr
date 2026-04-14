@@ -24,3 +24,6 @@ pnpm-lock.yaml
 
 # # Drizzle migrations
 # .drizzle/
+
+# Tailwind 生成的 CSS 文件
+public/css/style.css
