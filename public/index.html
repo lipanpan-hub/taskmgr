@@ -4,12 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>定时任务管理器</title>
-  <script src="https://registry.npmmirror.com/tailwindcss-cdn/3.4.10/files/tailwindcss.js"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class'
-    }
-  </script>
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <script src="https://cdn.socket.io/4.8.3/socket.io.min.js"></script>
   <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -17,7 +11,7 @@
 </head>
 <body class="flex flex-col h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white transition-colors duration-300" x-data="taskManager()" x-init="init()">
   <!-- 页眉 -->
-  <header class="flex justify-between items-center px-8 py-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm">
+  <header class="flex justify-between items-center px-8 py-4 bg-white dark:bg-gray-800 border-b border-blue-200 dark:border-gray-700 shadow-sm">
     <div class="flex items-center gap-3">
       <i class="fas fa-tasks text-2xl text-blue-500"></i>
       <h1 class="text-2xl font-semibold">定时任务管理器</h1>
