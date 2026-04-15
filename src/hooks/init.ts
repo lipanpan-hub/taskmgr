@@ -8,6 +8,7 @@ import {platform} from 'node:os'
 import {join} from 'node:path'
 
 import {envConfig} from '../lib/env.js'
+import {createAutoSyncTask} from '../lib/wtsk/autosync.js'
 
 const hook: Hook.Init = async function (options) {
   // 首先检查当前系统是否是Windows系统，如果不是Windows系统，则直接给出警告并退出
@@ -47,6 +48,19 @@ const hook: Hook.Init = async function (options) {
   migrate(db, {migrationsFolder})
   
   sqlite.close()
+
+  // 创建自动同步任务
+  try {
+    const result = await createAutoSyncTask()
+    if (result.startsWith('Error:')) {
+      this.warn(`创建自动同步任务失败: ${result}`)
+    } else {
+      this.log(`创建自动同步任务成功: ${result}`)
+    }
+  } catch (error) {
+    this.warn(`创建自动同步任务失败: ${error instanceof Error ? error.message : String(error)}`)
+  }
+
 }
 
 export default hook

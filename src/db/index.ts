@@ -12,7 +12,7 @@ const configDir = process.platform === 'win32'
   : join(homedir(), '.config', '@lppx', 'taskmgr')
 
 const dbPath = join(configDir, envConfig.dbName)
-console.log(dbPath)
+console.log(`数据库地址：${dbPath}`)
 
 let dbInstance: ReturnType<typeof drizzle> | null = null
 
