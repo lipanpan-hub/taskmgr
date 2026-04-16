@@ -1,6 +1,6 @@
 {
   "name": "@lppx/taskmgr",
-  "description": "定时任务管理器",
+  "description": "my taskmgr cli",
   "version": "2.2.0",
   "author": "lppx",
   "bin": {
@@ -76,6 +76,7 @@
   "type": "module",
   "oclif": {
     "bin": "tm",
+    "dirname":"lppxtaskmgr",
     "binAliases": [
       "ttt"
     ],
@@ -113,6 +114,7 @@
     "debug": "cross-env DEBUG=* node --inspect bin/dev.js",
     "lint": "eslint",
     "pack:tarballs": "oclif pack tarballs",
+    "pack:wintest":"oclif pack win --targets win32-x64",
     "pack:win": "npm run rebuild:native && oclif pack win",
     "rebuild:native": "npm rebuild edge-js better-sqlite3",
     "postpack": "shx rm -f oclif.manifest.json",

@@ -20,7 +20,7 @@ $ npm install -g @lppx/taskmgr
 $ tm COMMAND
 running command...
 $ tm (--version)
-@lppx/taskmgr/2.2.0 win32-x64 node-v24.11.0
+@lppx/taskmgr/2.2.0 win32-x64 node-v24.14.1
 $ tm --help [COMMAND]
 USAGE
   $ tm COMMAND
