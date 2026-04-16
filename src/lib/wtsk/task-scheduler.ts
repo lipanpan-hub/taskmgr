@@ -1,6 +1,11 @@
+import {exec} from 'node:child_process'
+import {promisify} from 'node:util'
+
 import edge from 'edge-js'
 
 import {normalizeStartTime} from './trigger-utils.js'
+
+const execAsync = promisify(exec)
 
 const TASK_SCHEDULER_DLL = `${process.cwd()}/TaskScheduler.2.12.2/lib/net45/Microsoft.Win32.TaskScheduler.dll`
 const TASK_FOLDER = 'taskmgr'
@@ -308,7 +313,11 @@ public class Startup {
                         lastTaskResult = t.LastTaskResult,
                         numberOfMissedRuns = t.NumberOfMissedRuns,
                         actions = t.Definition.Actions.Select(a => a.ToString()).ToList(),
-                        triggers = t.Definition.Triggers.Select(tr => tr.ToString()).ToList()
+                        triggers = t.Definition.Triggers.Select(tr => tr.ToString()).ToList(),
+                        registrationDate = t.Definition.RegistrationInfo.Date != null ? t.Definition.RegistrationInfo.Date.ToString("yyyy-MM-dd HH:mm:ss") : "",
+                        uri = t.Definition.RegistrationInfo.URI != null ? t.Definition.RegistrationInfo.URI : "",
+                        version = t.Definition.RegistrationInfo.Version != null ? t.Definition.RegistrationInfo.Version.ToString() : "",
+                        author = t.Definition.RegistrationInfo.Author != null ? t.Definition.RegistrationInfo.Author : ""
                     })
                     .ToList();
                 
@@ -480,6 +489,7 @@ export interface CreateTaskOptions {
 
 export interface TaskInfo {
   actions: string[]
+  author: string
   enabled: boolean
   lastRunTime: string
   lastTaskResult: number
@@ -487,8 +497,11 @@ export interface TaskInfo {
   nextRunTime: string
   numberOfMissedRuns: number
   path: string
+  registrationDate: string
   state: string
   triggers: string[]
+  uri: string
+  version: string
 }
 
 export interface TaskDetail extends TaskInfo {
@@ -552,6 +565,19 @@ export async function getAllTasks(): Promise<string | TaskInfo[]> {
       resolve(JSON.parse(result) as TaskInfo[])
     })
   })
+}
+
+// 使用 schtasks 命令快速检查任务是否存在（比 edge-js 调用更快）
+export async function taskExists(taskName: string): Promise<boolean> {
+  try {
+    await execAsync(`schtasks /query /tn "\\${TASK_FOLDER}\\${taskName}"`, {
+      encoding: 'utf8',
+      windowsHide: true,
+    })
+    return true
+  } catch {
+    return false
+  }
 }
 
 export async function getScheduledTask(taskName: string): Promise<string | TaskDetail> {

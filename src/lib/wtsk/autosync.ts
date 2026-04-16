@@ -1,12 +1,12 @@
-import {createScheduledTask, getScheduledTask} from './task-scheduler.js'
+import {createScheduledTask, taskExists} from './task-scheduler.js'
 
 // 创建自动同步任务，在用户登录时自动执行 tm task sync2schd 命令
 export async function createAutoSyncTask(): Promise<string> {
   const taskName = 'AutoSync'
 
   // 检查任务是否已存在
-  const existingTask = await getScheduledTask(taskName)
-  if (typeof existingTask === 'object') {
+  const exists = await taskExists(taskName)
+  if (exists) {
     return `任务 ${taskName} 已存在，无需重复创建`
   }
 
