@@ -332,6 +332,7 @@ function getGetTaskCs() {
 
 using Microsoft.Win32.TaskScheduler;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 
@@ -344,7 +345,7 @@ public class Startup {
             using (TaskService ts = new TaskService())
             {
                 TaskFolder taskFolder = ts.GetFolder("${TASK_FOLDER}");
-                var task = taskFolder.GetTask(taskName);
+                var task = taskFolder.GetTasks().FirstOrDefault(t => t.Name == taskName);
                 if (task == null)
                 {
                     return "Task '" + taskName + "' not found.";

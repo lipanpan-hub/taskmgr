@@ -102,10 +102,11 @@
   },
   "repository": "lipanpan-hub/taskmgr",
   "scripts": {
+    "start": "node bin/run.js",
     "build": "npm run build:css && shx rm -rf dist tsconfig.tsbuildinfo && tsc -b",
     "build:css": "npx tailwindcss -i ./public/css/input.css -o ./public/css/style.css --minify --content \"./public/**/*.{html,js}\"",
     "watch:css": "npx tailwindcss -i ./public/css/input.css -o ./public/css/style.css --watch --content \"./public/**/*.{html,js}\"",
-    "debug": "cross-env DEBUG=* node --inspect bin/run.js",
+    "debug": "cross-env DEBUG=* node --inspect bin/dev.js",
     "lint": "eslint",
     "pack:tarballs": "oclif pack tarballs",
     "pack:win": "oclif pack win",
