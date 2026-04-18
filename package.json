@@ -117,7 +117,7 @@
     "lint": "eslint",
     "pack:tarballs": "oclif pack tarballs",
     "pack:wintest": "oclif pack win --targets win32-x64",
-    "pack:win": "npm run rebuild:native && oclif pack win",
+    "pack:win": "oclif pack win",
     "rebuild:native": "npm rebuild edge-js better-sqlite3",
     "postpack": "shx rm -f oclif.manifest.json",
     "posttest": "npm run lint",

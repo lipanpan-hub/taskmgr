@@ -44,7 +44,7 @@ jobs:
             echo "tag=v$package_version" >> $GITHUB_OUTPUT
           fi
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
       # 步骤4：配置 Git 用户信息（仅在版本不存在时执行）
       - name: Setup git
@@ -150,7 +150,7 @@ jobs:
           echo "$commit_message" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
       # 步骤13：创建 GitHub Release 并上传所有安装包（仅在版本不存在时执行）
       - name: Create Github Release
@@ -160,7 +160,7 @@ jobs:
           name: ${{ steps.version-check.outputs.tag }}
           tag: ${{ steps.version-check.outputs.tag }}
           commit: ${{ github.ref_name }}
-          token: ${{ secrets.GH_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           skipIfReleaseExists: true
           artifacts: "dist/*.tar.gz,dist/*.tar.xz,dist/win32*/*.exe,dist/deb/*.deb"
           body: ${{ steps.release-notes.outputs.notes }}
