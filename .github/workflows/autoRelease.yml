@@ -97,13 +97,16 @@ jobs:
         with:
           nsis-version: '3.11'
 
-      # 步骤10：安装 GNU tar（替换 Windows 自带的 BSD tar）
-      - name: Install GNU tar
+      # 步骤10：配置 GNU tar（使用 msys2 的 tar 替换系统默认的 BSD tar）
+      - name: Setup GNU tar
         if: ${{ steps.version-check.outputs.skipped == 'false' }}
         shell: bash
         run: |
-          choco install gnuwin32-coreutils.install -y
-          echo "C:\Program Files (x86)\GnuWin32\bin" >> $GITHUB_PATH
+          # 将 msys2 的 bin 目录添加到 PATH 最前面，确保优先使用 GNU tar
+          echo "C:\msys64\usr\bin" >> $GITHUB_PATH
+          # 验证 tar 版本
+          export PATH="/c/msys64/usr/bin:$PATH"
+          tar --version
 
       # 步骤11：打包 Windows 安装包
       - name: Pack Windows installers
