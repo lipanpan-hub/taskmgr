@@ -20,7 +20,7 @@ $ npm install -g taskmgr
 $ tm COMMAND
 running command...
 $ tm (--version)
-taskmgr/2.3.5 win32-x64 node-v24.14.1
+taskmgr/2.3.6 win32-x64 node-v24.14.1
 $ tm --help [COMMAND]
 USAGE
   $ tm COMMAND
@@ -113,7 +113,7 @@ EXAMPLES
   $ tm scripts add ./script.ps1
 ```
 
-_See code: [src/commands/scripts/add.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.5/src/commands/scripts/add.ts)_
+_See code: [src/commands/scripts/add.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.6/src/commands/scripts/add.ts)_
 
 ## `tm scripts list`
 
@@ -130,7 +130,7 @@ EXAMPLES
   $ tm scripts list
 ```
 
-_See code: [src/commands/scripts/list.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.5/src/commands/scripts/list.ts)_
+_See code: [src/commands/scripts/list.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.6/src/commands/scripts/list.ts)_
 
 ## `tm scripts open`
 
@@ -147,7 +147,7 @@ EXAMPLES
   $ tm scripts open
 ```
 
-_See code: [src/commands/scripts/open.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.5/src/commands/scripts/open.ts)_
+_See code: [src/commands/scripts/open.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.6/src/commands/scripts/open.ts)_
 
 ## `tm task create [NAME]`
 
@@ -184,7 +184,7 @@ EXAMPLES
     $ tm task create myTask --path="notepad.exe" --trigger=daily --start-time="09:00"
 ```
 
-_See code: [src/commands/task/create.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.5/src/commands/task/create.ts)_
+_See code: [src/commands/task/create.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.6/src/commands/task/create.ts)_
 
 ## `tm task delete [NAME]`
 
@@ -223,7 +223,7 @@ EXAMPLES
     $ tm task delete myTask --force
 ```
 
-_See code: [src/commands/task/delete.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.5/src/commands/task/delete.ts)_
+_See code: [src/commands/task/delete.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.6/src/commands/task/delete.ts)_
 
 ## `tm task list`
 
@@ -267,7 +267,7 @@ EXAMPLES
     $ tm task list --enabled
 ```
 
-_See code: [src/commands/task/list.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.5/src/commands/task/list.ts)_
+_See code: [src/commands/task/list.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.6/src/commands/task/list.ts)_
 
 ## `tm task sync2schd`
 
@@ -293,7 +293,7 @@ EXAMPLES
     $ tm task sync2schd --name="myTask"
 ```
 
-_See code: [src/commands/task/sync2schd.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.5/src/commands/task/sync2schd.ts)_
+_See code: [src/commands/task/sync2schd.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.6/src/commands/task/sync2schd.ts)_
 
 ## `tm ui`
 
@@ -315,7 +315,7 @@ EXAMPLES
   $ tm ui --port 8080
 ```
 
-_See code: [src/commands/ui/index.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.5/src/commands/ui/index.ts)_
+_See code: [src/commands/ui/index.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.6/src/commands/ui/index.ts)_
 
 ## `tm version`
 
@@ -393,7 +393,7 @@ EXAMPLES
       --weekdays="5" --start-time="23:59"
 ```
 
-_See code: [src/commands/wtsk/add.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.5/src/commands/wtsk/add.ts)_
+_See code: [src/commands/wtsk/add.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.6/src/commands/wtsk/add.ts)_
 
 ## `tm wtsk del`
 
@@ -414,7 +414,7 @@ EXAMPLES
   $ tm wtsk del -n myTask
 ```
 
-_See code: [src/commands/wtsk/del.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.5/src/commands/wtsk/del.ts)_
+_See code: [src/commands/wtsk/del.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.6/src/commands/wtsk/del.ts)_
 
 ## `tm wtsk list`
 
@@ -441,5 +441,5 @@ EXAMPLES
   $ tm wtsk list -l 5 --block
 ```
 
-_See code: [src/commands/wtsk/list.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.5/src/commands/wtsk/list.ts)_
+_See code: [src/commands/wtsk/list.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.6/src/commands/wtsk/list.ts)_
 <!-- commandsstop -->
