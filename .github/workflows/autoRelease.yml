@@ -93,7 +93,7 @@ jobs:
       # 步骤9：安装 NSIS
       - name: Install NSIS
         if: ${{ steps.version-check.outputs.skipped == 'false' }}
-        uses: repolevedavaj/install-nsis@v1.0.1
+        uses: repolevedavaj/install-nsis
         with:
           nsis-version: '3.11'
 
