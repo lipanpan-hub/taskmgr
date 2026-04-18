@@ -20,7 +20,7 @@ $ npm install -g taskmgr
 $ tm COMMAND
 running command...
 $ tm (--version)
-taskmgr/2.3.0 win32-x64 node-v24.14.1
+taskmgr/2.3.1 win32-x64 node-v24.14.1
 $ tm --help [COMMAND]
 USAGE
   $ tm COMMAND
@@ -31,7 +31,18 @@ USAGE
 <!-- commands -->
 * [`tm autocomplete [SHELL]`](#tm-autocomplete-shell)
 * [`tm help [COMMAND]`](#tm-help-command)
+* [`tm scripts add PATH`](#tm-scripts-add-path)
+* [`tm scripts list`](#tm-scripts-list)
+* [`tm scripts open`](#tm-scripts-open)
+* [`tm task create [NAME]`](#tm-task-create-name)
+* [`tm task delete [NAME]`](#tm-task-delete-name)
+* [`tm task list`](#tm-task-list)
+* [`tm task sync2schd`](#tm-task-sync2schd)
+* [`tm ui`](#tm-ui)
 * [`tm version`](#tm-version)
+* [`tm wtsk add TASKNAME`](#tm-wtsk-add-taskname)
+* [`tm wtsk del`](#tm-wtsk-del)
+* [`tm wtsk list`](#tm-wtsk-list)
 
 ## `tm autocomplete [SHELL]`
 
@@ -102,7 +113,7 @@ EXAMPLES
   $ tm scripts add ./script.ps1
 ```
 
-_See code: [src/commands/scripts/add.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.0/src/commands/scripts/add.ts)_
+_See code: [src/commands/scripts/add.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.1/src/commands/scripts/add.ts)_
 
 ## `tm scripts list`
 
@@ -119,7 +130,7 @@ EXAMPLES
   $ tm scripts list
 ```
 
-_See code: [src/commands/scripts/list.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.0/src/commands/scripts/list.ts)_
+_See code: [src/commands/scripts/list.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.1/src/commands/scripts/list.ts)_
 
 ## `tm scripts open`
 
@@ -136,7 +147,7 @@ EXAMPLES
   $ tm scripts open
 ```
 
-_See code: [src/commands/scripts/open.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.0/src/commands/scripts/open.ts)_
+_See code: [src/commands/scripts/open.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.1/src/commands/scripts/open.ts)_
 
 ## `tm task create [NAME]`
 
@@ -173,7 +184,7 @@ EXAMPLES
     $ tm task create myTask --path="notepad.exe" --trigger=daily --start-time="09:00"
 ```
 
-_See code: [src/commands/task/create.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.0/src/commands/task/create.ts)_
+_See code: [src/commands/task/create.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.1/src/commands/task/create.ts)_
 
 ## `tm task delete [NAME]`
 
@@ -212,7 +223,7 @@ EXAMPLES
     $ tm task delete myTask --force
 ```
 
-_See code: [src/commands/task/delete.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.0/src/commands/task/delete.ts)_
+_See code: [src/commands/task/delete.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.1/src/commands/task/delete.ts)_
 
 ## `tm task list`
 
@@ -256,7 +267,7 @@ EXAMPLES
     $ tm task list --enabled
 ```
 
-_See code: [src/commands/task/list.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.0/src/commands/task/list.ts)_
+_See code: [src/commands/task/list.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.1/src/commands/task/list.ts)_
 
 ## `tm task sync2schd`
 
@@ -282,7 +293,7 @@ EXAMPLES
     $ tm task sync2schd --name="myTask"
 ```
 
-_See code: [src/commands/task/sync2schd.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.0/src/commands/task/sync2schd.ts)_
+_See code: [src/commands/task/sync2schd.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.1/src/commands/task/sync2schd.ts)_
 
 ## `tm ui`
 
@@ -304,7 +315,7 @@ EXAMPLES
   $ tm ui --port 8080
 ```
 
-_See code: [src/commands/ui/index.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.0/src/commands/ui/index.ts)_
+_See code: [src/commands/ui/index.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.1/src/commands/ui/index.ts)_
 
 ## `tm version`
 
@@ -325,4 +336,110 @@ FLAG DESCRIPTIONS
 ```
 
 _See code: [@oclif/plugin-version](https://github.com/oclif/plugin-version/blob/2.2.37/src/commands/version.ts)_
+
+## `tm wtsk add TASKNAME`
+
+手动创建定时任务
+
+```
+USAGE
+  $ tm wtsk add TASKNAME [-i |  |  | [-p <value> |  | [--arguments <value> --path <value>]]] [--description
+    <value>] [--start-time <value>] [--interval <value> --trigger boot|daily|logon|monthly|once|weekly] [--weekdays
+    <value> ] [--monthdays <value> [--months <value> ]] [--weeks-of-month <value> ] [--start-when-available]
+
+ARGUMENTS
+  TASKNAME  任务名称
+
+FLAGS
+  -i, --psi                     交互式方式选择现有 PowerShell 脚本创建任务
+  -p, --ps-script=<value>       指定PowerShell 脚本路径，自动使用 powershell.exe 执行
+      --arguments=<value>       执行参数
+      --description=<value>     任务描述
+      --interval=<value>        [default: 1] 触发间隔 (N天/N周)
+      --monthdays=<value>       每月的几号 (1-31，用逗号分隔，仅 monthly 生效)
+      --months=<value>          月份 (1-12，用逗号分隔，仅 monthly 生效)
+      --path=<value>            可执行文件路径
+      --start-time=<value>      [default: 2026-04-18 09:00] 任务开始时间 (YYYY-MM-DD HH:mm 或 HH:mm)
+      --start-when-available    错过启动时间后是否补运行
+      --trigger=<option>        [default: daily] 触发类型: daily, weekly, monthly, once, boot, logon
+                                <options: boot|daily|logon|monthly|once|weekly>
+      --weekdays=<value>        星期几 (0-6，0为周日，用逗号分隔，仅 weekly/monthly 生效)
+      --weeks-of-month=<value>  第几周 (1-4, 5表示最后一周，用逗号分隔，仅 monthly 配合 weekdays 生效)
+
+DESCRIPTION
+  手动创建定时任务
+
+EXAMPLES
+  交互式选择现有 PowerShell 脚本创建任务
+
+    $ tm wtsk add testTask --psi
+
+  创建每天运行的定时任务，每隔1天触发一次
+
+    $ tm wtsk add testTask --path="notepad.exe" --trigger=daily --interval=1 --start-time="09:00"
+
+  创建每周一、周三、周五运行的定时任务
+
+    $ tm wtsk add testTask --path="notepad.exe" --trigger=weekly --weekdays="1,3,5" --start-time="14:30"
+
+  创建每月1号、15号运行的定时任务
+
+    $ tm wtsk add testTask --path="notepad.exe" --trigger=monthly --months="1,2,3,4,5,6,7,8,9,10,11,12" ^
+      --monthdays="1,15" --start-time="20:00"
+
+  创建按照月、周、星期几的组合来运行的定时任务(例如:每季度最后一周的周五)
+
+    $ tm wtsk add testTask --path="notepad.exe" --trigger=monthly --months="3,6,9,12" --weeks-of-month="5" ^
+      --weekdays="5" --start-time="23:59"
+```
+
+_See code: [src/commands/wtsk/add.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.1/src/commands/wtsk/add.ts)_
+
+## `tm wtsk del`
+
+手动删除定时任务
+
+```
+USAGE
+  $ tm wtsk del [-i | -n <value>]
+
+FLAGS
+  -i, --interactive       交互式选择任务
+  -n, --taskName=<value>  任务名称
+
+DESCRIPTION
+  手动删除定时任务
+
+EXAMPLES
+  $ tm wtsk del -n myTask
+```
+
+_See code: [src/commands/wtsk/del.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.1/src/commands/wtsk/del.ts)_
+
+## `tm wtsk list`
+
+手动列出所有定时任务
+
+```
+USAGE
+  $ tm wtsk list [-b] [-l <value>]
+
+FLAGS
+  -b, --[no-]block     使用块状格式显示任务详情
+  -l, --limit=<value>  限制输出的任务数量
+
+DESCRIPTION
+  手动列出所有定时任务
+
+EXAMPLES
+  $ tm wtsk list
+
+  $ tm wtsk list --block
+
+  $ tm wtsk list --limit 10
+
+  $ tm wtsk list -l 5 --block
+```
+
+_See code: [src/commands/wtsk/list.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.1/src/commands/wtsk/list.ts)_
 <!-- commandsstop -->
