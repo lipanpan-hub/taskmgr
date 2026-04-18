@@ -97,7 +97,15 @@ jobs:
         with:
           nsis-version: '3.11'
 
-      # 步骤10：打包 Windows 安装包
+      # 步骤10：安装 GNU tar（替换 Windows 自带的 BSD tar）
+      - name: Install GNU tar
+        if: ${{ steps.version-check.outputs.skipped == 'false' }}
+        shell: bash
+        run: |
+          choco install gnuwin32-coreutils.install -y
+          echo "C:\Program Files (x86)\GnuWin32\bin" >> $GITHUB_PATH
+
+      # 步骤11：打包 Windows 安装包
       - name: Pack Windows installers
         if: ${{ steps.version-check.outputs.skipped == 'false' }}
         run: npm run pack:win
@@ -107,7 +115,7 @@ jobs:
       #   if: ${{ steps.version-check.outputs.skipped == 'false' }}
       #   run: npm run pack:deb
       
-      # 步骤11：生成 Release Notes（从上一个 release 到当前的所有 commit message）
+      # 步骤12：生成 Release Notes（从上一个 release 到当前的所有 commit message）
       - name: Generate Release Notes
         if: ${{ steps.version-check.outputs.skipped == 'false' }}
         id: release-notes
@@ -141,7 +149,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
       
-      # 步骤12：创建 GitHub Release 并上传所有安装包（仅在版本不存在时执行）
+      # 步骤13：创建 GitHub Release 并上传所有安装包（仅在版本不存在时执行）
       - name: Create Github Release
         uses: ncipollo/release-action@2c591bcc8ecdcd2db72b97d6147f871fcd833ba5
         if: ${{ steps.version-check.outputs.skipped == 'false' }}
