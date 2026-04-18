@@ -16,11 +16,11 @@
 # Usage
 <!-- usage -->
 ```sh-session
-$ npm install -g @lppx/taskmgr
+$ npm install -g taskmgr
 $ tm COMMAND
 running command...
 $ tm (--version)
-@lppx/taskmgr/2.3.0 win32-x64 node-v24.14.1
+taskmgr/2.3.0 win32-x64 node-v24.14.1
 $ tm --help [COMMAND]
 USAGE
   $ tm COMMAND
@@ -93,7 +93,7 @@ DESCRIPTION
   Display help for tm.
 ```
 
-_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v6.2.37/src/commands/help.ts)_
+_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/6.2.44/src/commands/help.ts)_
 
 ## `tm scripts add PATH`
 

@@ -1,5 +1,5 @@
 {
-  "name": "@lppx/taskmgr",
+  "name": "taskmgr",
   "description": "my taskmgr cli",
   "version": "2.3.0",
   "author": "lppx",
@@ -16,7 +16,7 @@
     "@oclif/plugin-version": "^2.2.37",
     "@oclif/plugin-warn-if-update-available": "^3.1.55",
     "@oclif/plugin-which": "^3.2.46",
-    "better-sqlite3": "^12.8.0",
+    "better-sqlite3": "^12.9.0",
     "drizzle-orm": "^0.45.2",
     "edge-js": "^25.0.1",
     "express": "^5.2.1",
@@ -44,7 +44,7 @@
     "eslint-config-oclif": "^6",
     "eslint-config-prettier": "^10",
     "mocha": "^10",
-    "oclif": "^4",
+    "oclif": "^4.23.0",
     "postcss": "^8.5.9",
     "prettier": "^3.8.2",
     "prettier-plugin-tailwindcss": "^0.7.2",
@@ -59,6 +59,7 @@
   },
   "files": [
     "./bin",
+    "./public",
     "./dist",
     "./Templates",
     "./TaskScheduler.2.12.2",
@@ -102,7 +103,8 @@
     },
     "additionalFiles": [
       "node_modules/edge-js/**/*",
-      "node_modules/better-sqlite3/**/*"
+      "node_modules/better-sqlite3/**/*",
+      "TaskScheduler.2.12.2/**/*"
     ]
   },
   "repository": "lipanpan-hub/taskmgr",
