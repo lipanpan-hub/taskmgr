@@ -20,6 +20,8 @@ jobs:
       
       # 步骤2：设置 Node.js 环境
       - uses: actions/setup-node@v4
+        with:
+          node-version: 24
       
       # 步骤3：检查当前版本是否已存在
       - name: Check if version already exists
