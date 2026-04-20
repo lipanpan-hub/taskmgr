@@ -64,6 +64,7 @@
     "./dist",
     "./Templates",
     "./TaskScheduler.2.12.2",
+    ".oclifrc.mjs",
     "./oclif.manifest.json"
   ],
   "homepage": "https://github.com/lipanpan-hub/taskmgr",

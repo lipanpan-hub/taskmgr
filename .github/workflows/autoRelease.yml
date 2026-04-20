@@ -54,28 +54,31 @@ jobs:
           git config --global user.email ${{ secrets.GH_EMAIL }}
           git config --global user.name ${{ secrets.GH_USERNAME }}
       
-      # 步骤5：生成 oclif README 文档（仅在版本不存在时执行）
-      - name: Generate oclif README
+      # 步骤5：安装依赖（仅在版本不存在时执行）
+      - name: Install dependencies
         if: ${{ steps.version-check.outputs.skipped == 'false' }}
-        id: oclif-readme
-        shell: bash
-        run: |
-          # 安装依赖
-          npm install
-          # 执行 oclif readme 命令自动生成/更新 README.md
-          npm exec oclif readme
-          # 检查是否有文件变更
-          if [ -n "$(git status --porcelain)" ]; then
-            # 如果 README.md 有更新，提交并推送到远程仓库
-            git add .
-            git commit -am "chore: update README.md"
-            git push -u origin ${{ github.ref_name }}
-          fi
+        run: npm install
       
       # 步骤6：构建项目（仅在版本不存在时执行）
       - name: Build project
         if: ${{ steps.version-check.outputs.skipped == 'false' }}
         run: npm run build
+      
+      # 步骤7：生成 manifest 和 README（仅在版本不存在时执行）
+      - name: Generate manifest and README
+        if: ${{ steps.version-check.outputs.skipped == 'false' }}
+        id: prepack
+        shell: bash
+        run: |
+          # 执行 prepack 命令（包含 manifest 生成和 README 更新）
+          npm run prepack
+          # 检查是否有文件变更
+          if [ -n "$(git status --porcelain)" ]; then
+            # 如果有更新，提交并推送到远程仓库
+            git add .
+            git commit -am "chore: update manifest and README"
+            git push -u origin ${{ github.ref_name }}
+          fi
       
       # 步骤7：清理临时文件和缓存
       - name: Clean temporary files
