@@ -2,13 +2,12 @@ import { defineConfig } from 'drizzle-kit'
 import { join } from 'node:path'
 import { homedir } from 'node:os'
 import { envConfig } from './src/lib/env.js'
+import oclifConfig from './.oclifrc.mjs'
 
-// 手动计算 oclif 配置目录（与 oclif 的 configDir 保持一致）
-// Windows: %LOCALAPPDATA%\@lppx\taskmgr
-// macOS/Linux: ~/.config/@lppx/taskmgr
+// 从 .oclifrc.mjs 获取 dirname 配置
 const configDir = process.platform === 'win32'
-  ? join(process.env.LOCALAPPDATA || join(homedir(), 'AppData', 'Local'), '@lppx', 'taskmgr')
-  : join(homedir(), '.config', '@lppx', 'taskmgr')
+  ? join(process.env.LOCALAPPDATA || join(homedir(), 'AppData', 'Local'), oclifConfig.dirname)
+  : join(homedir(), '.config', oclifConfig.dirname)
 
 export default defineConfig({
   dialect: 'sqlite',

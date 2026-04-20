@@ -2,14 +2,15 @@ import { join } from 'node:path'
 import { homedir } from 'node:os'
 import Database from 'better-sqlite3'
 import { drizzle } from 'drizzle-orm/better-sqlite3'
-import { Config } from '@oclif/core'
 import { tasks } from './schema.js'
 import { envConfig as envConfig } from '../lib/env.js'
+// @ts-expect-error - .mjs 文件的类型声明
+import oclifConfig from '../../.oclifrc.mjs'
 
-// 直接从 oclif 获取配置目录
+// 从 .oclifrc.mjs 获取 dirname 配置
 const configDir = process.platform === 'win32'
-  ? join(process.env.LOCALAPPDATA || join(homedir(), 'AppData', 'Local'), '@lppx', 'taskmgr')
-  : join(homedir(), '.config', '@lppx', 'taskmgr')
+  ? join(process.env.LOCALAPPDATA || join(homedir(), 'AppData', 'Local'), oclifConfig.dirname as string)
+  : join(homedir(), '.config', oclifConfig.dirname as string)
 
 const dbPath = join(configDir, envConfig.dbName)
 console.log(`数据库地址：${dbPath}`)
