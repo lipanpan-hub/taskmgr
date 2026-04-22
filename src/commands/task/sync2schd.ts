@@ -2,8 +2,7 @@ import {Command, Flags} from '@oclif/core'
 import {eq} from 'drizzle-orm'
 import {getDb} from '../../db/index.js'
 import {tasks} from '../../db/schema.js'
-import {createScheduledTask} from '../../lib/wtsk/task-scheduler.js'
-import {buildTaskOptions} from '../../lib/task/task-options-builder.js'
+import {syncTasksToScheduler} from '../../lib/task/task-sync-handler.js'
 
 export default class Sync2Schd extends Command {
   static description = '将数据库中的任务同步到 Windows Task Scheduler'
@@ -44,32 +43,21 @@ export default class Sync2Schd extends Command {
     if (taskList.length === 0) {
       this.log('数据库中没有任务')
       return
-    } else {
-        this.log(`开始同步 ${taskList.length} 个任务...`)
+    }
 
-        // 同步每个任务
-        let successCount = 0
-        let failCount = 0
+    this.log(`开始同步 ${taskList.length} 个任务...`)
 
-        for (const task of taskList) {
-          try {
-            const options = await buildTaskOptions(task)
-            const result = await createScheduledTask(options)
+    const {successCount, failCount, results} = await syncTasksToScheduler(taskList)
 
-            if (result.startsWith('Error:')) {
-              this.warn(`✗ ${task.name}: ${result}`)
-              failCount++
-            } else {
-              this.log(`✓ ${task.name}: 同步成功`)
-              successCount++
-            }
-          } catch (error) {
-            this.warn(`✗ ${task.name}: ${error instanceof Error ? error.message : String(error)}`)
-            failCount++
-          }
-        }
-
-        this.log(`\n同步完成: 成功 ${successCount} 个, 失败 ${failCount} 个`)
+    // 输出同步结果
+    for (const result of results) {
+      if (result.success) {
+        this.log(`✓ ${result.taskName}: ${result.message}`)
+      } else {
+        this.warn(`✗ ${result.taskName}: ${result.message}`)
       }
+    }
+
+    this.log(`\n同步完成: 成功 ${successCount} 个, 失败 ${failCount} 个`)
   }
 }

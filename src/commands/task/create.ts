@@ -3,6 +3,7 @@ import prompts from 'prompts'
 import {TaskService} from '../../lib/task/task-service.js'
 import type {NewTask} from '../../db/schema.js'
 import {createTriggerInteractive, createTriggerDirect} from '../../lib/task/trigger-creator.js'
+import {syncTaskToScheduler} from '../../lib/task/task-sync-handler.js'
 
 export default class Create extends Command {
   static args = {
@@ -114,7 +115,6 @@ export default class Create extends Command {
 
     if (!basicInfo.name || !basicInfo.executablePath || !basicInfo.triggerType) {
       this.error('操作已取消')
-      return 
     }
 
     // 创建任务
@@ -131,7 +131,19 @@ export default class Create extends Command {
     this.log(`✓ 任务创建成功: ${task.name} (ID: ${task.id})`)
 
     // 根据触发类型创建触发器配置
-    await createTriggerInteractive(task.id, basicInfo.triggerType)
+    const success = await createTriggerInteractive(task.id, basicInfo.triggerType)
+    if (!success) {
+      this.warn('任务已创建，但触发器配置未完成')
+      return
+    }
+
+    // 同步到 Windows Task Scheduler
+    const syncResult = await syncTaskToScheduler(task)
+    if (syncResult.success) {
+      this.log(`✓ 已同步到 Windows Task Scheduler`)
+    } else {
+      this.warn(`✗ 同步到 Windows Task Scheduler 失败: ${syncResult.message}`)
+    }
   }
   // #endregion
 
@@ -166,6 +178,14 @@ export default class Create extends Command {
     // 根据触发类型创建触发器配置
     const message = await createTriggerDirect(task.id, flags.trigger, flags)
     this.log(message)
+
+    // 同步到 Windows Task Scheduler
+    const syncResult = await syncTaskToScheduler(task)
+    if (syncResult.success) {
+      this.log(`✓ 已同步到 Windows Task Scheduler`)
+    } else {
+      this.warn(`✗ 同步到 Windows Task Scheduler 失败: ${syncResult.message}`)
+    }
   }
   // #endregion
 }

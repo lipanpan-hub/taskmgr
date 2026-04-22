@@ -1,5 +1,6 @@
 import prompts from 'prompts'
 import {TaskService} from './task-service.js'
+import {deleteScheduledTask, taskExists} from '../wtsk/task-scheduler.js'
 
 export interface DeleteResult {
   success: boolean
@@ -63,9 +64,26 @@ export class TaskDeleteHandler {
     const deleted = await this.taskService.deleteTask(id)
 
     if (deleted) {
+      let schedulerMessage = ''
+
+      // 同步删除 Windows Task Scheduler 中的任务
+      try {
+        const exists = await taskExists(deleted.name)
+        if (exists) {
+          const result = await deleteScheduledTask(deleted.name)
+          if (result.startsWith('Error:')) {
+            schedulerMessage = `\n  ⚠ Windows Task Scheduler 中的任务删除失败: ${result}`
+          } else {
+            schedulerMessage = '\n  ✓ 已从 Windows Task Scheduler 中删除'
+          }
+        }
+      } catch (error) {
+        schedulerMessage = `\n  ⚠ Windows Task Scheduler 同步失败: ${error instanceof Error ? error.message : String(error)}`
+      }
+
       return {
         success: true,
-        message: `✓ 任务已删除: ${deleted.name} (ID: ${deleted.id})\n  关联的触发器配置已自动删除`,
+        message: `✓ 任务已删除: ${deleted.name} (ID: ${deleted.id})\n  关联的触发器配置已自动删除${schedulerMessage}`,
         taskName: deleted.name,
         taskId: deleted.id,
       }
@@ -95,9 +113,26 @@ export class TaskDeleteHandler {
     const deleted = await this.taskService.deleteTaskByName(name)
 
     if (deleted) {
+      let schedulerMessage = ''
+
+      // 同步删除 Windows Task Scheduler 中的任务
+      try {
+        const exists = await taskExists(deleted.name)
+        if (exists) {
+          const result = await deleteScheduledTask(deleted.name)
+          if (result.startsWith('Error:')) {
+            schedulerMessage = `\n  ⚠ Windows Task Scheduler 中的任务删除失败: ${result}`
+          } else {
+            schedulerMessage = '\n  ✓ 已从 Windows Task Scheduler 中删除'
+          }
+        }
+      } catch (error) {
+        schedulerMessage = `\n  ⚠ Windows Task Scheduler 同步失败: ${error instanceof Error ? error.message : String(error)}`
+      }
+
       return {
         success: true,
-        message: `✓ 任务已删除: ${deleted.name} (ID: ${deleted.id})\n  关联的触发器配置已自动删除`,
+        message: `✓ 任务已删除: ${deleted.name} (ID: ${deleted.id})\n  关联的触发器配置已自动删除${schedulerMessage}`,
         taskName: deleted.name,
         taskId: deleted.id,
       }

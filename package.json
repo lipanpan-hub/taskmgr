@@ -103,11 +103,6 @@
     "additionalFiles": [
       "node_modules/edge-js/**/*",
       "node_modules/better-sqlite3/**/*",
-      "node_modules/@oclif/plugin-help/**/*",
-      "node_modules/@oclif/plugin-autocomplete/**/*",
-      "node_modules/@oclif/plugin-not-found/**/*",
-      "node_modules/@oclif/plugin-warn-if-update-available/**/*",
-      "node_modules/@oclif/plugin-version/**/*",
       "TaskScheduler.2.12.2/**/*"
     ],
     "update": {

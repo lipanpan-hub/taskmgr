@@ -25,6 +25,7 @@ const hook: Hook.Init = async function (options) {
     return
   }
 
+  // console.log(options.config.configDir)
   const scriptsDir = join(options.config.configDir, 'scripts')
   const templatesDir = join(options.config.root, 'Templates')
 

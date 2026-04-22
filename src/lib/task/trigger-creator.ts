@@ -13,26 +13,35 @@ import {
 } from '../../db/schema.js'
 
 // #region 交互式创建触发器
-export async function createTriggerInteractive(taskId: number, triggerType: string): Promise<void> {
+export async function createTriggerInteractive(taskId: number, triggerType: string): Promise<boolean> {
   const db = getDb()
 
-  switch (triggerType) {
-    case 'daily':
-      await createDailyTriggerInteractive(db, taskId)
-      break
-    case 'weekly':
-      await createWeeklyTriggerInteractive(db, taskId)
-      break
-    case 'monthly':
-      await createMonthlyTriggerInteractive(db, taskId)
-      break
-    case 'once':
-      await createOnceTriggerInteractive(db, taskId)
-      break
-    case 'boot':
-    case 'logon':
-      console.log('启动/登录触发任务无需额外配置')
-      break
+  try {
+    switch (triggerType) {
+      case 'daily':
+        await createDailyTriggerInteractive(db, taskId)
+        break
+      case 'weekly':
+        await createWeeklyTriggerInteractive(db, taskId)
+        break
+      case 'monthly':
+        await createMonthlyTriggerInteractive(db, taskId)
+        break
+      case 'once':
+        await createOnceTriggerInteractive(db, taskId)
+        break
+      case 'boot':
+      case 'logon':
+        console.log('启动/登录触发任务无需额外配置')
+        break
+    }
+    return true
+  } catch (error) {
+    if (error instanceof Error && error.message === '操作已取消') {
+      console.log('✗ 触发器配置已取消')
+      return false
+    }
+    throw error
   }
 }
 
