@@ -50,9 +50,9 @@ async function createDailyTriggerInteractive(db: any, taskId: number): Promise<v
     {
       type: 'text',
       name: 'startTime',
-      message: '开始时间 (HH:mm)',
-      initial: '09:00',
-      validate: (value: string) => /^\d{2}:\d{2}$/.test(value) || '请输入有效的时间格式 (HH:mm)',
+      message: '开始时间 (YYYY-MM-DD HH:mm)',
+      initial: `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')} 09:00`,
+      validate: (value: string) => /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/.test(value) || '请输入有效的时间格式 (YYYY-MM-DD HH:mm)',
     },
     {
       type: 'number',
@@ -91,9 +91,9 @@ async function createWeeklyTriggerInteractive(db: any, taskId: number): Promise<
     {
       type: 'text',
       name: 'startTime',
-      message: '开始时间 (HH:mm)',
-      initial: '09:00',
-      validate: (value: string) => /^\d{2}:\d{2}$/.test(value) || '请输入有效的时间格式 (HH:mm)',
+      message: '开始时间 (YYYY-MM-DD HH:mm)',
+      initial: `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')} 09:00`,
+      validate: (value: string) => /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/.test(value) || '请输入有效的时间格式 (YYYY-MM-DD HH:mm)',
     },
     {
       type: 'number',
@@ -148,9 +148,9 @@ async function createMonthlyTriggerInteractive(db: any, taskId: number): Promise
     {
       type: 'text',
       name: 'startTime',
-      message: '开始时间 (HH:mm)',
-      initial: '09:00',
-      validate: (value: string) => /^\d{2}:\d{2}$/.test(value) || '请输入有效的时间格式 (HH:mm)',
+      message: '开始时间 (YYYY-MM-DD HH:mm)',
+      initial: `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')} 09:00`,
+      validate: (value: string) => /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/.test(value) || '请输入有效的时间格式 (YYYY-MM-DD HH:mm)',
     },
     {
       type: 'multiselect',

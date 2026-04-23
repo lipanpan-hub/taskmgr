@@ -1,9 +1,13 @@
 import {Args, Command, Flags} from '@oclif/core'
 import prompts from 'prompts'
+import Fuse from 'fuse.js'
 import {TaskService} from '../../lib/task/task-service.js'
 import type {NewTask} from '../../db/schema.js'
 import {createTriggerInteractive, createTriggerDirect} from '../../lib/task/trigger-creator.js'
 import {syncTaskToScheduler} from '../../lib/task/task-sync-handler.js'
+import {getAvailableRuntimeNames} from '../../lib/utils/runtime-detector.js'
+import {scanScripts} from '../../lib/utils/script-scanner.js'
+import {optimizeTaskInput} from '../../lib/task/task-input-optimizer.js'
 
 export default class Create extends Command {
   static args = {
@@ -65,6 +69,27 @@ export default class Create extends Command {
   private async interactiveCreate(): Promise<void> {
     const taskService = new TaskService()
 
+    // 获取可用运行时列表
+    const availableRuntimes = await getAvailableRuntimeNames()
+    const runtimeChoices = availableRuntimes.map((runtime) => ({title: runtime, value: runtime}))
+
+    // 获取脚本文件列表
+    const scripts = scanScripts()
+    const scriptChoices = scripts.map((script) => ({title: script.path, value: script.path}))
+
+    // 配置 Fuse.js 用于模糊搜索
+    const runtimeFuse = new Fuse(runtimeChoices, {
+      keys: ['title'],
+      threshold: 0.3,
+      distance: 100,
+    })
+
+    const scriptFuse = new Fuse(scriptChoices, {
+      keys: ['title'],
+      threshold: 0.3,
+      distance: 100,
+    })
+
     // 基础信息
     const basicInfo = await prompts([
       {
@@ -74,15 +99,37 @@ export default class Create extends Command {
         validate: (value: string) => value.trim() ? true : '任务名称不能为空',
       },
       {
-        type: 'text',
+        type: 'autocomplete',
         name: 'executablePath',
         message: '可执行文件路径',
+        choices: runtimeChoices,
+        suggest: async (input: string, choices: any[]) => {
+          if (!input) return choices
+          const results = runtimeFuse.search(input)
+          // 如果有匹配结果，返回匹配项；否则返回用户输入作为自定义选项
+          if (results.length > 0) {
+            return results.map((r) => r.item)
+          }
+          // 返回用户输入作为自定义选项，同时保留所有原始选项
+          return [{title: input, value: input}, ...choices]
+        },
         validate: (value: string) => value.trim() ? true : '可执行文件路径不能为空',
       },
       {
-        type: 'text',
+        type: 'autocomplete',
         name: 'arguments',
         message: '执行参数（可选）',
+        choices: scriptChoices,
+        suggest: async (input: string, choices: any[]) => {
+          if (!input) return choices
+          const results = scriptFuse.search(input)
+          // 如果有匹配结果，返回匹配项；否则返回用户输入作为自定义选项
+          if (results.length > 0) {
+            return results.map((r) => r.item)
+          }
+          // 返回用户输入作为自定义选项，同时保留所有原始选项
+          return [{title: input, value: input}, ...choices]
+        },
       },
       {
         type: 'text',
@@ -117,11 +164,14 @@ export default class Create extends Command {
       this.error('操作已取消')
     }
 
+    // 优化任务输入
+    const optimized = await optimizeTaskInput(basicInfo.executablePath, basicInfo.arguments)
+
     // 创建任务
     const newTask: NewTask = {
       name: basicInfo.name,
-      executablePath: basicInfo.executablePath,
-      arguments: basicInfo.arguments || undefined,
+      executablePath: optimized.executablePath,
+      arguments: optimized.arguments,
       description: basicInfo.description || undefined,
       triggerType: basicInfo.triggerType,
       enabled: basicInfo.enabled,
@@ -163,10 +213,13 @@ export default class Create extends Command {
 
     const taskService = new TaskService()
 
+    // 优化任务输入
+    const optimized = await optimizeTaskInput(flags.path, flags.arguments)
+
     const newTask: NewTask = {
       name,
-      executablePath: flags.path,
-      arguments: flags.arguments || undefined,
+      executablePath: optimized.executablePath,
+      arguments: optimized.arguments,
       description: flags.description || undefined,
       triggerType: flags.trigger,
       enabled: flags.enabled,
