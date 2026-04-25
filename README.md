@@ -20,7 +20,7 @@ $ npm install -g taskmgr
 $ tm COMMAND
 running command...
 $ tm (--version)
-taskmgr/2.3.11 win32-x64 node-v24.14.1
+taskmgr/2.3.12 win32-x64 node-v24.14.1
 $ tm --help [COMMAND]
 USAGE
   $ tm COMMAND
@@ -113,7 +113,7 @@ EXAMPLES
   $ tm scripts add ./script.ps1
 ```
 
-_See code: [src/commands/scripts/add.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.11/src/commands/scripts/add.ts)_
+_See code: [src/commands/scripts/add.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.12/src/commands/scripts/add.ts)_
 
 ## `tm scripts list`
 
@@ -130,7 +130,7 @@ EXAMPLES
   $ tm scripts list
 ```
 
-_See code: [src/commands/scripts/list.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.11/src/commands/scripts/list.ts)_
+_See code: [src/commands/scripts/list.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.12/src/commands/scripts/list.ts)_
 
 ## `tm scripts open`
 
@@ -147,7 +147,7 @@ EXAMPLES
   $ tm scripts open
 ```
 
-_See code: [src/commands/scripts/open.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.11/src/commands/scripts/open.ts)_
+_See code: [src/commands/scripts/open.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.12/src/commands/scripts/open.ts)_
 
 ## `tm task create [NAME]`
 
@@ -184,7 +184,7 @@ EXAMPLES
     $ tm task create myTask --path="notepad.exe" --trigger=daily --start-time="09:00"
 ```
 
-_See code: [src/commands/task/create.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.11/src/commands/task/create.ts)_
+_See code: [src/commands/task/create.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.12/src/commands/task/create.ts)_
 
 ## `tm task delete [NAME]`
 
@@ -223,7 +223,7 @@ EXAMPLES
     $ tm task delete myTask --force
 ```
 
-_See code: [src/commands/task/delete.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.11/src/commands/task/delete.ts)_
+_See code: [src/commands/task/delete.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.12/src/commands/task/delete.ts)_
 
 ## `tm task list`
 
@@ -231,16 +231,15 @@ _See code: [src/commands/task/delete.ts](https://github.com/lipanpan-hub/taskmgr
 
 ```
 USAGE
-  $ tm task list [-d] [-b] [-f <value>] [--enabled | --disabled] [-t daily|weekly|monthly|once|boot|logon]
+  $ tm task list [-b] [-n <value>] [--enabled | --disabled] [-t daily|weekly|monthly|once|boot|logon]
 
 FLAGS
-  -b, --block           以块状格式显示详细信息（需配合 --detail 使用）
-  -d, --detail          显示任务详细信息
-  -f, --filter=<value>  按任务名称过滤（支持部分匹配）
-  -t, --type=<option>   按触发类型过滤
-                        <options: daily|weekly|monthly|once|boot|logon>
-      --disabled        仅显示禁用的任务
-      --enabled         仅显示启用的任务
+  -b, --block          以块状格式显示详细信息
+  -n, --name=<value>   按任务名称过滤（支持部分匹配）
+  -t, --type=<option>  按触发类型过滤
+                       <options: daily|weekly|monthly|once|boot|logon>
+      --disabled       仅显示禁用的任务
+      --enabled        仅显示启用的任务
 
 DESCRIPTION
   列出数据库中的所有定时任务
@@ -250,24 +249,20 @@ EXAMPLES
 
     $ tm task list
 
-  显示详细信息（单行）
+  以块状格式显示
 
-    $ tm task list --detail
-
-  显示详细信息（块状）
-
-    $ tm task list --detail --block
+    $ tm task list --block
 
   过滤特定任务
 
-    $ tm task list --filter="myTask"
+    $ tm task list --name="myTask"
 
   过滤启用的任务
 
     $ tm task list --enabled
 ```
 
-_See code: [src/commands/task/list.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.11/src/commands/task/list.ts)_
+_See code: [src/commands/task/list.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.12/src/commands/task/list.ts)_
 
 ## `tm task sync2schd`
 
@@ -293,7 +288,7 @@ EXAMPLES
     $ tm task sync2schd --name="myTask"
 ```
 
-_See code: [src/commands/task/sync2schd.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.11/src/commands/task/sync2schd.ts)_
+_See code: [src/commands/task/sync2schd.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.12/src/commands/task/sync2schd.ts)_
 
 ## `tm ui`
 
@@ -315,7 +310,7 @@ EXAMPLES
   $ tm ui --port 8080
 ```
 
-_See code: [src/commands/ui/index.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.11/src/commands/ui/index.ts)_
+_See code: [src/commands/ui/index.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.12/src/commands/ui/index.ts)_
 
 ## `tm version`
 
@@ -359,7 +354,7 @@ FLAGS
       --monthdays=<value>       每月的几号 (1-31，用逗号分隔，仅 monthly 生效)
       --months=<value>          月份 (1-12，用逗号分隔，仅 monthly 生效)
       --path=<value>            可执行文件路径
-      --start-time=<value>      [default: 2026-04-23 09:00] 任务开始时间 (YYYY-MM-DD HH:mm 或 HH:mm)
+      --start-time=<value>      [default: 2026-04-25 09:00] 任务开始时间 (YYYY-MM-DD HH:mm 或 HH:mm)
       --start-when-available    错过启动时间后是否补运行
       --trigger=<option>        [default: daily] 触发类型: daily, weekly, monthly, once, boot, logon
                                 <options: boot|daily|logon|monthly|once|weekly>
@@ -393,7 +388,7 @@ EXAMPLES
       --weekdays="5" --start-time="23:59"
 ```
 
-_See code: [src/commands/wtsk/add.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.11/src/commands/wtsk/add.ts)_
+_See code: [src/commands/wtsk/add.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.12/src/commands/wtsk/add.ts)_
 
 ## `tm wtsk del`
 
@@ -414,7 +409,7 @@ EXAMPLES
   $ tm wtsk del -n myTask
 ```
 
-_See code: [src/commands/wtsk/del.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.11/src/commands/wtsk/del.ts)_
+_See code: [src/commands/wtsk/del.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.12/src/commands/wtsk/del.ts)_
 
 ## `tm wtsk list`
 
@@ -441,5 +436,5 @@ EXAMPLES
   $ tm wtsk list -l 5 --block
 ```
 
-_See code: [src/commands/wtsk/list.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.11/src/commands/wtsk/list.ts)_
+_See code: [src/commands/wtsk/list.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.12/src/commands/wtsk/list.ts)_
 <!-- commandsstop -->
