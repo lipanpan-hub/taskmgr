@@ -1,6 +1,18 @@
 import { eq } from 'drizzle-orm'
 import { getDb } from '../../db/index.js'
-import { tasks, type NewTask, type Task } from '../../db/schema.js'
+import { 
+  tasks, 
+  dailyTriggers,
+  weeklyTriggers,
+  monthlyTriggers,
+  onceTriggers,
+  type NewTask, 
+  type Task,
+  type DailyTrigger,
+  type WeeklyTrigger,
+  type MonthlyTrigger,
+  type OnceTrigger
+} from '../../db/schema.js'
 
 export class TaskService {
   private db = getDb()
@@ -17,6 +29,26 @@ export class TaskService {
 
   async getTaskByName(name: string): Promise<Task | null> {
     const result = await this.db.select().from(tasks).where(eq(tasks.name, name))
+    return result[0] || null
+  }
+
+  async getDailyTriggerByTaskId(taskId: number): Promise<DailyTrigger | null> {
+    const result = await this.db.select().from(dailyTriggers).where(eq(dailyTriggers.taskId, taskId))
+    return result[0] || null
+  }
+
+  async getWeeklyTriggerByTaskId(taskId: number): Promise<WeeklyTrigger | null> {
+    const result = await this.db.select().from(weeklyTriggers).where(eq(weeklyTriggers.taskId, taskId))
+    return result[0] || null
+  }
+
+  async getMonthlyTriggerByTaskId(taskId: number): Promise<MonthlyTrigger | null> {
+    const result = await this.db.select().from(monthlyTriggers).where(eq(monthlyTriggers.taskId, taskId))
+    return result[0] || null
+  }
+
+  async getOnceTriggerByTaskId(taskId: number): Promise<OnceTrigger | null> {
+    const result = await this.db.select().from(onceTriggers).where(eq(onceTriggers.taskId, taskId))
     return result[0] || null
   }
   // #endregion

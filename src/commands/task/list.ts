@@ -65,7 +65,7 @@ export default class List extends Command {
     // 根据标志选择输出格式并输出
     let lines: string[]
     if (flags.block) {
-      lines = formatBlock(tasks)
+      lines = await formatBlock(tasks)
     } else {
       lines = formatDetailedLine(tasks)
     }
