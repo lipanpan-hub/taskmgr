@@ -11,7 +11,11 @@ import {
   type DailyTrigger,
   type WeeklyTrigger,
   type MonthlyTrigger,
-  type OnceTrigger
+  type OnceTrigger,
+  type NewDailyTrigger,
+  type NewWeeklyTrigger,
+  type NewMonthlyTrigger,
+  type NewOnceTrigger
 } from '../../db/schema.js'
 
 export class TaskService {
@@ -59,12 +63,52 @@ export class TaskService {
     const result = await this.db.insert(tasks).values(newTask).returning()
     return result[0]
   }
+
+  async createDailyTrigger(newTrigger: NewDailyTrigger): Promise<DailyTrigger> {
+    const result = await this.db.insert(dailyTriggers).values(newTrigger).returning()
+    return result[0]
+  }
+
+  async createWeeklyTrigger(newTrigger: NewWeeklyTrigger): Promise<WeeklyTrigger> {
+    const result = await this.db.insert(weeklyTriggers).values(newTrigger).returning()
+    return result[0]
+  }
+
+  async createMonthlyTrigger(newTrigger: NewMonthlyTrigger): Promise<MonthlyTrigger> {
+    const result = await this.db.insert(monthlyTriggers).values(newTrigger).returning()
+    return result[0]
+  }
+
+  async createOnceTrigger(newTrigger: NewOnceTrigger): Promise<OnceTrigger> {
+    const result = await this.db.insert(onceTriggers).values(newTrigger).returning()
+    return result[0]
+  }
   // #endregion
 
   // #region 更新操作
   async updateTask(id: number, updateData: Partial<NewTask>): Promise<Task | null> {
     const data = { ...updateData, updatedAt: new Date().toISOString() }
     const result = await this.db.update(tasks).set(data).where(eq(tasks.id, id)).returning()
+    return result[0] || null
+  }
+
+  async updateDailyTrigger(id: number, updateData: Partial<NewDailyTrigger>): Promise<DailyTrigger | null> {
+    const result = await this.db.update(dailyTriggers).set(updateData).where(eq(dailyTriggers.id, id)).returning()
+    return result[0] || null
+  }
+
+  async updateWeeklyTrigger(id: number, updateData: Partial<NewWeeklyTrigger>): Promise<WeeklyTrigger | null> {
+    const result = await this.db.update(weeklyTriggers).set(updateData).where(eq(weeklyTriggers.id, id)).returning()
+    return result[0] || null
+  }
+
+  async updateMonthlyTrigger(id: number, updateData: Partial<NewMonthlyTrigger>): Promise<MonthlyTrigger | null> {
+    const result = await this.db.update(monthlyTriggers).set(updateData).where(eq(monthlyTriggers.id, id)).returning()
+    return result[0] || null
+  }
+
+  async updateOnceTrigger(id: number, updateData: Partial<NewOnceTrigger>): Promise<OnceTrigger | null> {
+    const result = await this.db.update(onceTriggers).set(updateData).where(eq(onceTriggers.id, id)).returning()
     return result[0] || null
   }
   // #endregion
