@@ -1,13 +1,12 @@
 import prompts from 'prompts'
 import Fuse from 'fuse.js'
-import {TaskService} from './task-service.js'
-import type {NewTask} from '../../db/schema.js'
-import {createTriggerDirect, createTriggerInteractive} from './trigger-creator.js'
-import {syncTaskToScheduler} from './task-sync-handler.js'
-import {getAvailableRuntimeNames} from '../utils/runtime-detector.js'
-import {optimizeTaskInput} from './task-input-optimizer.js'
-import {scanScripts} from '../utils/script-scanner.js'
-import { log } from 'node:console'
+import { TaskService } from './task-service.js'
+import type { NewTask } from '../../db/schema.js'
+import { createTriggerDirect, createTriggerInteractive } from './trigger-creator.js'
+import { syncTaskToScheduler } from './task-sync-handler.js'
+import { getAvailableRuntimeNames } from '../utils/runtime-detector.js'
+import { optimizeTaskInput } from './task-input-optimizer.js'
+import { scanScripts } from '../utils/script-scanner.js'
 
 // #region 交互式创建
 export async function interactiveCreateTask(): Promise<void> {
@@ -18,7 +17,7 @@ export async function interactiveCreateTask(): Promise<void> {
 
   // 获取脚本文件列表（已经是 Choice 格式）
   const scriptChoices = [
-    {title: '跳过 - 不填写参数', value: null , description: ''},
+    { title: '跳过不填写参数', value: " ", description: '' },
     ...scanScripts(),
   ]
 
@@ -49,14 +48,12 @@ export async function interactiveCreateTask(): Promise<void> {
       message: '可执行文件路径',
       choices: runtimeChoices,
       suggest: async (input: string, choices: any[]) => {
-        if (!input) return choices
-        const results = runtimeFuse.search(input)
-        // 如果有匹配结果，返回匹配项；否则返回用户输入作为自定义选项
-        if (results.length > 0) {
-          return results.map((r) => r.item)
-        }
-        // 返回用户输入作为自定义选项，同时保留所有原始选项
-        return [{title: input, value: input}, ...choices]
+        const keyword = input.trim()
+        if (!keyword) return choices
+        const results = runtimeFuse.search(keyword).slice(0, 20).map((r) => r.item)
+        const hasExactMatch = choices.some((choice) => choice.title === keyword || choice.value === keyword)
+        if (hasExactMatch) return results
+        return [{ title: `自定义路径：${keyword}`, value: keyword }, ...results]
       },
       validate: (value: string) => value.trim() ? true : '可执行文件路径不能为空',
     },
@@ -66,14 +63,12 @@ export async function interactiveCreateTask(): Promise<void> {
       message: '执行参数（可选）',
       choices: scriptChoices,
       suggest: async (input: string, choices: any[]) => {
-        if (!input) return choices
-        const results = scriptFuse.search(input)
-        // 如果有匹配结果，返回匹配项；否则返回用户输入作为自定义选项
-        if (results.length > 0) {
-          return results.map((r) => r.item)
-        }
-        // 返回用户输入作为自定义选项，同时保留所有原始选项
-        return [{title: input, value: input}, ...choices]
+        const keyword = input.trim()
+        if (!keyword) return choices
+        const results = scriptFuse.search(keyword).slice(0, 20).map((r) => r.item)
+        const hasExactMatch = choices.some((choice) => choice.title === keyword || choice.value === keyword)
+        if (hasExactMatch) return results
+        return [{ title: `自定义参数：${keyword}`, value: keyword }, ...results]
       },
     },
     {
@@ -86,12 +81,12 @@ export async function interactiveCreateTask(): Promise<void> {
       name: 'triggerType',
       message: '触发类型',
       choices: [
-        {title: '天触发任务', value: 'daily'},
-        {title: '周触发任务', value: 'weekly'},
-        {title: '月触发任务', value: 'monthly'},
-        {title: '一次性任务', value: 'once'},
-        {title: '启动时任务', value: 'boot'},
-        {title: '登录时任务', value: 'logon'},
+        { title: '天触发任务', value: 'daily' },
+        { title: '周触发任务', value: 'weekly' },
+        { title: '月触发任务', value: 'monthly' },
+        { title: '一次性任务', value: 'once' },
+        { title: '启动时任务', value: 'boot' },
+        { title: '登录时任务', value: 'logon' },
       ],
       initial: 0,
     },
@@ -108,20 +103,10 @@ export async function interactiveCreateTask(): Promise<void> {
   if (!basicInfo.name || !basicInfo.executablePath || !basicInfo.triggerType) {
     throw new Error('操作已取消')
   }
-
-  // 处理 arguments：将 title 映射为 value
-  // let argumentsValue = basicInfo.arguments
-  // if (argumentsValue) {
-  //   const matchedChoice = scriptChoices.find(c => c.title === argumentsValue)
-  //   // console.log(matchedChoice)
-  //   if (matchedChoice) {
-  //     argumentsValue = matchedChoice.value
-  //   }
-  // }
+  console.log(basicInfo.arguments)
 
   // 优化任务输入
   const optimized = await optimizeTaskInput(basicInfo.executablePath, basicInfo.arguments)
-  // const optimized = await optimizeTaskInput(basicInfo.executablePath, argumentsValue)
 
   // 创建任务
   const newTask: NewTask = {
