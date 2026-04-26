@@ -2,10 +2,12 @@ import type { Server, Socket } from 'socket.io'
 
 import type { NewTask } from '../../db/schema.js'
 import { TaskService } from '../../lib/task/task-service.js'
+import { TaskDeleteHandler } from '../../lib/task/task-delete-handler.js'
 import { validateNewTask, validateTaskId } from '../../lib/task/validators.js'
 
 export function registerTaskHandlers(io: Server, socket: Socket) {
   const taskService = new TaskService()
+  const deleteHandler = new TaskDeleteHandler()
 
   // #region 查询操作
   socket.on('task:getAll', async (callback) => {
@@ -107,14 +109,14 @@ export function registerTaskHandlers(io: Server, socket: Socket) {
         return
       }
 
-      const result = await taskService.deleteTask(idResult)
-      if (!result) {
-        callback({ success: false, error: '任务不存在' })
+      const result = await deleteHandler.deleteById(idResult, true)
+      if (!result.success) {
+        callback({ success: false, error: result.message })
         return
       }
 
       io.emit('task:deleted', { id: idResult })
-      callback({ success: true, data: result })
+      callback({ success: true, message: result.message, taskId: result.taskId, taskName: result.taskName })
     } catch (error) {
       callback({ success: false, error: '删除任务失败', message: (error as Error).message })
     }
@@ -127,14 +129,14 @@ export function registerTaskHandlers(io: Server, socket: Socket) {
         return
       }
 
-      const result = await taskService.deleteTaskByName(name)
-      if (!result) {
-        callback({ success: false, error: '任务不存在' })
+      const result = await deleteHandler.deleteByName(name, true)
+      if (!result.success) {
+        callback({ success: false, error: result.message })
         return
       }
 
       io.emit('task:deleted', { name })
-      callback({ success: true, data: result })
+      callback({ success: true, message: result.message, taskId: result.taskId, taskName: result.taskName })
     } catch (error) {
       callback({ success: false, error: '删除任务失败', message: (error as Error).message })
     }
