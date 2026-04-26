@@ -4,14 +4,14 @@ declare module 'edge-js' {
     source: string
   }
 
-  interface EdgeFunction<TOutput> {
-    (input: unknown, callback: (error: Error | null, result: TOutput) => void): void
-    (input: unknown): Promise<TOutput>
+  interface EdgeFunction<TInput, TOutput> {
+    (input: TInput, callback: (error: Error | null, result: TOutput) => void): void
+    (input: TInput): Promise<TOutput>
   }
 
   interface Edge {
-    func<TOutput>(code: string): EdgeFunction<TOutput>
-    func<TOutput>(options: EdgeOptions): EdgeFunction<TOutput>
+    func<TInput = unknown, TOutput = unknown>(code: string): EdgeFunction<TInput, TOutput>
+    func<TInput = unknown, TOutput = unknown>(options: EdgeOptions): EdgeFunction<TInput, TOutput>
   }
 
   const edge: Edge

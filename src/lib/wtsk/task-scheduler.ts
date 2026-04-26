@@ -427,15 +427,15 @@ public class Startup {
 `
 }
 
-let _createTask: null | ReturnType<typeof edge.func<string>> = null
-let _deleteTask: null | ReturnType<typeof edge.func<string>> = null
-let _getTasks: null | ReturnType<typeof edge.func<string>> = null
-let _getTask: null | ReturnType<typeof edge.func<string>> = null
-let _runTask: null | ReturnType<typeof edge.func<string>> = null
+let _createTask: null | ReturnType<typeof edge.func<unknown, string>> = null
+let _deleteTask: null | ReturnType<typeof edge.func<unknown, string>> = null
+let _getTasks: null | ReturnType<typeof edge.func<unknown, string>> = null
+let _getTask: null | ReturnType<typeof edge.func<unknown, string>> = null
+let _runTask: null | ReturnType<typeof edge.func<unknown, string>> = null
 
 function getCreateTask() {
   if (!_createTask) {
-    _createTask = edge.func<string>(getCreateTaskCs())
+    _createTask = edge.func<unknown, string>(getCreateTaskCs())
   }
 
   return _createTask
@@ -443,7 +443,7 @@ function getCreateTask() {
 
 function getDeleteTask() {
   if (!_deleteTask) {
-    _deleteTask = edge.func<string>(getDeleteTaskCs())
+    _deleteTask = edge.func<unknown, string>(getDeleteTaskCs())
   }
 
   return _deleteTask
@@ -451,7 +451,7 @@ function getDeleteTask() {
 
 function getGetTasks() {
   if (!_getTasks) {
-    _getTasks = edge.func<string>(getGetTasksCs())
+    _getTasks = edge.func<unknown, string>(getGetTasksCs())
   }
 
   return _getTasks
@@ -459,7 +459,7 @@ function getGetTasks() {
 
 function getGetTask() {
   if (!_getTask) {
-    _getTask = edge.func<string>(getGetTaskCs())
+    _getTask = edge.func<unknown, string>(getGetTaskCs())
   }
 
   return _getTask
@@ -467,7 +467,7 @@ function getGetTask() {
 
 function getRunTask() {
   if (!_runTask) {
-    _runTask = edge.func<string>(getRunTaskCs())
+    _runTask = edge.func<unknown, string>(getRunTaskCs())
   }
 
   return _runTask
