@@ -2,16 +2,16 @@ import { existsSync, readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { getOclifConfigDir } from './oclif-config-dir.js'
 
+// prompts 库的 Choice 对象格式
 export interface ScriptInfo {
-  name: string
-  path: string
-  size: number
+  title: string // 显示的脚本名称
+  value: string // 脚本的完整路径
+  description?: string // 脚本大小等描述信息
+  disabled?: boolean
+  selected?: boolean
 }
 
-/**
- * 扫描用户配置目录下的 scripts 目录中的所有脚本文件
- * @returns 脚本信息列表
- */
+// 扫描用户配置目录下的 scripts 目录中的所有脚本文件 
 export function scanScripts(): ScriptInfo[] {
   const scriptsDir = join(getOclifConfigDir(), 'scripts')
 
@@ -30,9 +30,9 @@ export function scanScripts(): ScriptInfo[] {
       // 只返回文件，跳过目录
       if (stats.isFile()) {
         scripts.push({
-          name: file,
-          path: filePath,
-          size: stats.size,
+          title: file,
+          value: filePath,
+          description: `${(stats.size / 1024).toFixed(2)} KB`,
         })
       }
     }
@@ -43,11 +43,7 @@ export function scanScripts(): ScriptInfo[] {
   }
 }
 
-/**
- * 获取脚本文件名列表（用于 prompts 自动补全）
- * @returns 脚本文件名数组
- */
-export function getScriptNames(): string[] {
-  const scripts = scanScripts()
-  return scripts.map((s) => s.name)
+// 获取脚本 Choice 列表（用于 prompts 自动补全）
+export function getScriptNames(): ScriptInfo[] {
+  return scanScripts()
 }

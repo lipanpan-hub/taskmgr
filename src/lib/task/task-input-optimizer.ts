@@ -14,7 +14,7 @@ export async function optimizeTaskInput(
   args?: string,
 ): Promise<OptimizedTaskInput> {
   const trimmedPath = executablePath.trim()
-  const trimmedArgs = args?.trim()
+  const trimmedArgs = args?.trim() || undefined // 空字符串转为 undefined
 
   // 如果是绝对路径且文件存在，说明为用户自定义可执行文件  直接返回原参数
   if (isAbsolute(trimmedPath) && existsSync(trimmedPath)) {
@@ -26,7 +26,7 @@ export async function optimizeTaskInput(
 
   // 检查是否选择运行时 如果选择运行时 才会进行优化 
   const runtimes = await detectAvailableRuntimes()
-  const availableRuntimeNames = runtimes.filter((r) => r.available).map((r) => r.name)
+  const availableRuntimeNames = runtimes.filter((r) => !r.disabled).map((r) => r.value || r.title)
 
   if (availableRuntimeNames.includes(trimmedPath.toLowerCase()) && trimmedArgs) {
     // 检查参数是否为单个脚本路径（不包含额外参数）

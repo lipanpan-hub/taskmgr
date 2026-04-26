@@ -7,18 +7,20 @@ import {syncTaskToScheduler} from './task-sync-handler.js'
 import {getAvailableRuntimeNames} from '../utils/runtime-detector.js'
 import {optimizeTaskInput} from './task-input-optimizer.js'
 import {scanScripts} from '../utils/script-scanner.js'
+import { log } from 'node:console'
 
 // #region 交互式创建
 export async function interactiveCreateTask(): Promise<void> {
   const taskService = new TaskService()
 
   // 获取可用运行时列表
-  const availableRuntimes = await getAvailableRuntimeNames()
-  const runtimeChoices = availableRuntimes.map((runtime) => ({title: runtime, value: runtime}))
+  const runtimeChoices = await getAvailableRuntimeNames()
 
-  // 获取脚本文件列表
-  const scripts = scanScripts()
-  const scriptChoices = scripts.map((script) => ({title: script.path, value: script.path}))
+  // 获取脚本文件列表（已经是 Choice 格式）
+  const scriptChoices = [
+    {title: '跳过 - 不填写参数', value: null , description: ''},
+    ...scanScripts(),
+  ]
 
   // 配置 Fuse.js 用于模糊搜索
   const runtimeFuse = new Fuse(runtimeChoices, {
@@ -107,14 +109,25 @@ export async function interactiveCreateTask(): Promise<void> {
     throw new Error('操作已取消')
   }
 
+  // 处理 arguments：将 title 映射为 value
+  // let argumentsValue = basicInfo.arguments
+  // if (argumentsValue) {
+  //   const matchedChoice = scriptChoices.find(c => c.title === argumentsValue)
+  //   // console.log(matchedChoice)
+  //   if (matchedChoice) {
+  //     argumentsValue = matchedChoice.value
+  //   }
+  // }
+
   // 优化任务输入
   const optimized = await optimizeTaskInput(basicInfo.executablePath, basicInfo.arguments)
+  // const optimized = await optimizeTaskInput(basicInfo.executablePath, argumentsValue)
 
   // 创建任务
   const newTask: NewTask = {
     name: basicInfo.name,
     executablePath: optimized.executablePath,
-    arguments: optimized.arguments,
+    arguments: optimized.arguments || undefined, // 空字符串转为 undefined
     description: basicInfo.description || undefined,
     triggerType: basicInfo.triggerType,
     enabled: basicInfo.enabled,
@@ -183,7 +196,7 @@ export async function directCreateTask(
   const newTask: NewTask = {
     name: name!,
     executablePath: optimized.executablePath,
-    arguments: optimized.arguments,
+    arguments: optimized.arguments || undefined, // 空字符串转为 undefined
     description: flags.description || undefined,
     triggerType: flags.trigger,
     enabled: flags.enabled,

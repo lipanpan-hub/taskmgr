@@ -1,9 +1,12 @@
 import {execSync} from 'node:child_process'
 
+// prompts 库的 Choice 对象格式
 export interface RuntimeInfo {
-  name: string
-  available: boolean
-  version?: string
+  title: string
+  value?: string
+  description?: string
+  disabled?: boolean
+  selected?: boolean
 }
 
 // 检测系统中可用的运行时环境  返回一个 RuntimeInfo列表 
@@ -19,16 +22,13 @@ export async function detectAvailableRuntimes(): Promise<RuntimeInfo[]> {
   return results
 }
 
-/**
- * 获取可用的运行时名称列表（用于 prompts 自动补全）
- * @returns 可用运行时名称数组
- */
-export async function getAvailableRuntimeNames(): Promise<string[]> {
+// 获取可用的运行时选项列表（用于 prompts 自动补全）
+export async function getAvailableRuntimeNames(): Promise<RuntimeInfo[]> {
   const runtimes = await detectAvailableRuntimes()
-  return runtimes.filter((r) => r.available).map((r) => r.name)
+  return runtimes
 }
 
-// 检查单个运行时环境是否可用  返回一个对象 
+// 检查单个运行时环境是否可用，返回 Choice 对象
 async function checkRuntime(runtime: string): Promise<RuntimeInfo> {
   try {
     let versionCommand: string
@@ -67,7 +67,7 @@ async function checkRuntime(runtime: string): Promise<RuntimeInfo> {
         break
       }
       default: {
-        return {name: runtime, available: false}
+        return {title: runtime, value: runtime, disabled: true}
       }
     }
 
@@ -77,15 +77,18 @@ async function checkRuntime(runtime: string): Promise<RuntimeInfo> {
       timeout: 3000,
     }).trim()
 
+    const version = output.split('\n')[0]
     return {
-      name: runtime,
-      available: true,
-      version: output.split('\n')[0],
+      title: runtime,
+      value: runtime,
+      description: version,
     }
   } catch {
     return {
-      name: runtime,
-      available: false,
+      title: runtime,
+      value: runtime,
+      disabled: true,
+      description: '不可用',
     }
   }
 }
