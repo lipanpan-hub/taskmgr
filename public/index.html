@@ -62,9 +62,6 @@
               <button @click="toggleTask(task)" class="bg-transparent border-0 cursor-pointer p-2 text-gray-500 dark:text-gray-400 text-base transition-all rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-blue-500 dark:hover:text-blue-400" :title="task.enabled ? '禁用' : '启用'">
                 <i :class="task.enabled ? 'fas fa-pause' : 'fas fa-play'"></i>
               </button>
-              <button @click="showMessage('编辑功能开发中', 'info')" class="bg-transparent border-0 cursor-pointer p-2 text-gray-500 dark:text-gray-400 text-base transition-all rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-purple-500 dark:hover:text-purple-400" title="编辑">
-                <i class="fas fa-edit"></i>
-              </button>
               <button @click="deleteTask(task.id)" class="bg-transparent border-0 cursor-pointer p-2 text-gray-500 dark:text-gray-400 text-base transition-all rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-red-500 dark:hover:text-red-400" title="删除">
                 <i class="fas fa-trash-alt"></i>
               </button>
