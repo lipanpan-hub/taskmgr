@@ -9,6 +9,7 @@ export default class List extends Command {
   ]
 
   async run(): Promise<void> {
+    await this.parse(List)
     const scriptsDir = join(this.config.configDir, 'scripts')
     const files = readdirSync(scriptsDir)
 
@@ -24,7 +25,7 @@ export default class List extends Command {
       const filePath = join(scriptsDir, file)
       const stats = statSync(filePath)
       const size = (stats.size / 1024).toFixed(2)
-      this.log(`  ${file} (${size} KB)`)
+      this.log(`  ${filePath} (${size} KB)`)
     }
   }
 }

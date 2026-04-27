@@ -10,6 +10,7 @@ export default class Open extends Command {
   ]
 
   async run(): Promise<void> {
+    await this.parse(Open)
     const scriptsDir = join(this.config.configDir, 'scripts')
 
     if (!existsSync(scriptsDir)) {

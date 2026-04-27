@@ -290,25 +290,146 @@ export async function createTriggerDirect(taskId: number, triggerType: string, f
   const db = getDb()
 
   switch (triggerType) {
-    case 'daily':
+    case 'daily': {
       if (!flags['start-time']) {
         throw new Error('daily 触发类型需要 --start-time 参数')
       }
 
-      const result = await db.insert(dailyTriggers).values({
+      const dailyTrigger: NewDailyTrigger = {
         taskId,
         startTime: flags['start-time'],
-        intervalDays: 1,
+        intervalDays: flags.interval || 1,
         startWhenAvailable: false,
-      })
+      }
+
+      const result = await db.insert(dailyTriggers).values(dailyTrigger)
       return result ? '✓ 天触发配置已创建' : '✗ 天触发配置创建失败'
-    case 'weekly':
-    case 'monthly':
-    case 'once':
-      return `${triggerType} 触发类型需要更多参数，请使用 --interactive 模式`
+    }
+
+    case 'weekly': {
+      if (!flags['start-time']) {
+        throw new Error('weekly 触发类型需要 --start-time 参数')
+      }
+      if (!flags.weekdays) {
+        throw new Error('weekly 触发类型需要 --weekdays 参数 (例如: 1,3,5)')
+      }
+
+      // 解析 weekdays 字符串为数组
+      const daysOfWeek = flags.weekdays.split(',').map((d: string) => Number.parseInt(d.trim(), 10))
+      if (daysOfWeek.some((d: number) => Number.isNaN(d) || d < 0 || d > 6)) {
+        throw new Error('weekdays 必须是 0-6 之间的数字，用逗号分隔 (0=周日, 1=周一...6=周六)')
+      }
+
+      const weeklyTrigger: NewWeeklyTrigger = {
+        taskId,
+        startTime: flags['start-time'],
+        intervalWeeks: flags.interval || 1,
+        daysOfWeek: JSON.stringify(daysOfWeek),
+        startWhenAvailable: false,
+      }
+
+      const result = await db.insert(weeklyTriggers).values(weeklyTrigger)
+      return result ? '✓ 周触发配置已创建' : '✗ 周触发配置创建失败'
+    }
+
+    case 'monthly': {
+      if (!flags['start-time']) {
+        throw new Error('monthly 触发类型需要 --start-time 参数')
+      }
+      if (!flags.months) {
+        throw new Error('monthly 触发类型需要 --months 参数 (例如: 1,6,12)')
+      }
+
+      // 解析 months 字符串为数组
+      const months = flags.months.split(',').map((m: string) => Number.parseInt(m.trim(), 10))
+      if (months.some((m: number) => Number.isNaN(m) || m < 1 || m > 12)) {
+        throw new Error('months 必须是 1-12 之间的数字，用逗号分隔')
+      }
+
+      // 判断触发模式：按天还是按周
+      const hasMonthdays = !!flags.monthdays
+      const hasWeeksOfMonth = !!flags['weeks-of-month']
+
+      if (!hasMonthdays && !hasWeeksOfMonth) {
+        throw new Error('monthly 触发类型需要 --monthdays 或 --weeks-of-month 参数')
+      }
+
+      if (hasMonthdays && hasWeeksOfMonth) {
+        throw new Error('--monthdays 和 --weeks-of-month 不能同时使用')
+      }
+
+      let monthlyTrigger: NewMonthlyTrigger
+
+      if (hasMonthdays) {
+        // 按天模式
+        const daysOfMonth = flags.monthdays.split(',').map((d: string) => Number.parseInt(d.trim(), 10))
+        if (daysOfMonth.some((d: number) => Number.isNaN(d) || d < 1 || d > 31)) {
+          throw new Error('monthdays 必须是 1-31 之间的数字，用逗号分隔')
+        }
+
+        monthlyTrigger = {
+          taskId,
+          startTime: flags['start-time'],
+          months: JSON.stringify(months),
+          triggerMode: 'days',
+          daysOfMonth: JSON.stringify(daysOfMonth),
+          startWhenAvailable: false,
+        }
+      } else {
+        // 按周模式
+        if (!flags.weekdays) {
+          throw new Error('使用 --weeks-of-month 时必须同时指定 --weekdays 参数')
+        }
+
+        const weeksOfMonth = flags['weeks-of-month'].split(',').map((w: string) => Number.parseInt(w.trim(), 10))
+        if (weeksOfMonth.some((w: number) => Number.isNaN(w) || w < 1 || w > 5)) {
+          throw new Error('weeks-of-month 必须是 1-5 之间的数字，用逗号分隔')
+        }
+
+        const daysOfWeek = flags.weekdays.split(',').map((d: string) => Number.parseInt(d.trim(), 10))
+        if (daysOfWeek.some((d: number) => Number.isNaN(d) || d < 0 || d > 6)) {
+          throw new Error('weekdays 必须是 0-6 之间的数字，用逗号分隔 (0=周日, 1=周一...6=周六)')
+        }
+
+        monthlyTrigger = {
+          taskId,
+          startTime: flags['start-time'],
+          months: JSON.stringify(months),
+          triggerMode: 'weeks',
+          weeksOfMonth: JSON.stringify(weeksOfMonth),
+          daysOfWeek: JSON.stringify(daysOfWeek),
+          startWhenAvailable: false,
+        }
+      }
+
+      const result = await db.insert(monthlyTriggers).values(monthlyTrigger)
+      return result ? '✓ 月触发配置已创建' : '✗ 月触发配置创建失败'
+    }
+
+    case 'once': {
+      if (!flags['start-time']) {
+        throw new Error('once 触发类型需要 --start-time 参数 (格式: YYYY-MM-DD HH:mm)')
+      }
+
+      // 验证时间格式
+      if (!/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/.test(flags['start-time'])) {
+        throw new Error('start-time 格式必须为 YYYY-MM-DD HH:mm')
+      }
+
+      const onceTrigger: NewOnceTrigger = {
+        taskId,
+        startTime: flags['start-time'],
+        startWhenAvailable: false,
+      }
+
+      const result = await db.insert(onceTriggers).values(onceTrigger)
+      return result ? '✓ 一次性触发配置已创建' : '✗ 一次性触发配置创建失败'
+    }
+
     case 'boot':
     case 'logon':
       return '启动/登录触发任务无需额外配置'
+
     default:
       throw new Error(`未知的触发类型: ${triggerType}`)
   }
