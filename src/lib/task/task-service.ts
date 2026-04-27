@@ -26,6 +26,37 @@ export class TaskService {
     return await this.db.select().from(tasks)
   }
 
+  async getAllTasksWithTriggers() {
+    const allTasks = await this.getAllTasks()
+    const tasksWithTriggers = await Promise.all(
+      allTasks.map(async (task) => {
+        let triggerDetails = null
+        
+        switch (task.triggerType) {
+          case 'daily':
+            triggerDetails = await this.getDailyTriggerByTaskId(task.id)
+            break
+          case 'weekly':
+            triggerDetails = await this.getWeeklyTriggerByTaskId(task.id)
+            break
+          case 'monthly':
+            triggerDetails = await this.getMonthlyTriggerByTaskId(task.id)
+            break
+          case 'once':
+            triggerDetails = await this.getOnceTriggerByTaskId(task.id)
+            break
+        }
+        
+        return {
+          ...task,
+          triggerDetails
+        }
+      })
+    )
+    
+    return tasksWithTriggers
+  }
+
   async getTaskById(id: number): Promise<Task | null> {
     const result = await this.db.select().from(tasks).where(eq(tasks.id, id))
     return result[0] || null

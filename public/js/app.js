@@ -140,6 +140,142 @@ function taskManager() {
       return date.toLocaleString('zh-CN');
     },
 
+    formatTriggerDateTime(value) {
+      if (!value) return '';
+      if (typeof value !== 'string') return String(value);
+      const normalized = value.includes('T') ? value : value.replace(' ', 'T');
+      const date = new Date(normalized);
+      if (Number.isNaN(date.getTime())) {
+        return value;
+      }
+      return date.toLocaleString('zh-CN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    },
+
+    formatTimeOnly(value) {
+      if (!value || typeof value !== 'string') return '';
+      const match = value.match(/(\d{1,2}:\d{2})(?::\d{2})?$/);
+      return match ? match[1] : value;
+    },
+
+    parseListValue(value) {
+      if (!value) return [];
+      if (Array.isArray(value)) return value;
+      if (typeof value === 'string') {
+        try {
+          const parsed = JSON.parse(value);
+          return Array.isArray(parsed) ? parsed : [];
+        } catch {
+          return value
+            .split(',')
+            .map(item => item.trim())
+            .filter(Boolean);
+        }
+      }
+      return [];
+    },
+
+    formatDaysOfWeek(daysValue) {
+      const days = this.parseListValue(daysValue);
+      const dayNames = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+      return days
+        .map(d => dayNames[Number(d)])
+        .filter(Boolean)
+        .join(', ');
+    },
+
+    formatMonths(monthsValue) {
+      const months = this.parseListValue(monthsValue);
+      return months
+        .map(m => Number(m))
+        .filter(m => !Number.isNaN(m))
+        .map(m => `${m}月`)
+        .join(', ');
+    },
+
+    formatDaysOfMonth(daysValue) {
+      const days = this.parseListValue(daysValue);
+      return days
+        .map(d => Number(d))
+        .filter(d => !Number.isNaN(d))
+        .map(d => `${d}日`)
+        .join(', ');
+    },
+
+    formatWeeksOfMonth(weeksValue) {
+      const weeks = this.parseListValue(weeksValue);
+      const weekNames = {
+        1: '第一周',
+        2: '第二周',
+        3: '第三周',
+        4: '第四周',
+        5: '最后一周'
+      };
+      return weeks
+        .map(w => weekNames[Number(w)])
+        .filter(Boolean)
+        .join(', ');
+    },
+
+    getWeeklyInterval(details) {
+      return details?.intervalWeeks ?? details?.interval ?? 1;
+    },
+
+    getMonthlyTriggerMode(details) {
+      if (details?.triggerMode === 'days' || details?.triggerMode === 'weeks') {
+        return details.triggerMode;
+      }
+      if (this.parseListValue(details?.weeksOfMonth).length > 0 || this.parseListValue(details?.daysOfWeek).length > 0) {
+        return 'weeks';
+      }
+      if (this.parseListValue(details?.daysOfMonth).length > 0) {
+        return 'days';
+      }
+      return '';
+    },
+
+    getTriggerStartTime(details) {
+      return details?.startTime || details?.time || '';
+    },
+
+    shouldShowStartWhenAvailable(details) {
+      return Boolean(details?.startWhenAvailable);
+    },
+
+    getWeeklySummary(details) {
+      const interval = this.getWeeklyInterval(details);
+      const days = this.formatDaysOfWeek(details?.daysOfWeek);
+      const time = this.formatTimeOnly(this.getTriggerStartTime(details));
+      const intervalText = interval > 1 ? `每 ${interval} 周` : '每周';
+      const dayText = days || '未配置星期';
+      const timeText = time || '未配置时间';
+      return `${intervalText}的 ${dayText} ${timeText}`;
+    },
+
+    getMonthlySummary(details) {
+      const months = this.formatMonths(details?.months);
+      const mode = this.getMonthlyTriggerMode(details);
+      const time = this.formatTimeOnly(this.getTriggerStartTime(details));
+
+      if (mode === 'days') {
+        const days = this.formatDaysOfMonth(details?.daysOfMonth);
+        return `${months || '未配置月份'} 的 ${days || '未配置日期'} ${time || '未配置时间'}`;
+      }
+
+      if (mode === 'weeks') {
+        const weeks = this.formatWeeksOfMonth(details?.weeksOfMonth);
+        const days = this.formatDaysOfWeek(details?.daysOfWeek);
+        return `${months || '未配置月份'} 的 ${weeks || '未配置周次'} ${days || '未配置星期'} ${time || '未配置时间'}`;
+      }
+
+      return '未识别到完整的每月触发规则';
+    },
+
     showMessage(message, type = 'info') {
       const icons = {
         success: 'fa-check-circle',

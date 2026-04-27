@@ -3,6 +3,7 @@ import type { Server, Socket } from 'socket.io'
 import type { NewTask } from '../../db/schema.js'
 import { TaskService } from '../../lib/task/task-service.js'
 import { TaskDeleteHandler } from '../../lib/task/task-delete-handler.js'
+import { updateTask, updateTaskByName } from '../../lib/task/task-update-handler.js'
 import { validateNewTask, validateTaskId } from '../../lib/task/validators.js'
 
 export function registerTaskHandlers(io: Server, socket: Socket) {
@@ -12,7 +13,7 @@ export function registerTaskHandlers(io: Server, socket: Socket) {
   // #region 查询操作
   socket.on('task:getAll', async (callback) => {
     try {
-      const tasks = await taskService.getAllTasks()
+      const tasks = await taskService.getAllTasksWithTriggers()
       callback({ success: true, data: tasks })
     } catch (error) {
       callback({ success: false, error: '查询任务失败', message: (error as Error).message })
@@ -86,14 +87,34 @@ export function registerTaskHandlers(io: Server, socket: Socket) {
         return
       }
 
-      const result = await taskService.updateTask(idResult, data.updates)
-      if (!result) {
-        callback({ success: false, error: '任务不存在' })
+      const result = await updateTask(idResult, data.updates)
+      if (!result.success) {
+        callback({ success: false, error: result.message })
         return
       }
 
-      io.emit('task:updated', result)
-      callback({ success: true, data: result })
+      io.emit('task:updated', { id: result.taskId, name: result.taskName })
+      callback({ success: true, message: result.message, taskId: result.taskId, taskName: result.taskName })
+    } catch (error) {
+      callback({ success: false, error: '更新任务失败', message: (error as Error).message })
+    }
+  })
+
+  socket.on('task:updateByName', async (data: { name: string; updates: Partial<NewTask> }, callback) => {
+    try {
+      if (!data.name || data.name.trim() === '') {
+        callback({ success: false, error: '任务名称不能为空' })
+        return
+      }
+
+      const result = await updateTaskByName(data.name, data.updates)
+      if (!result.success) {
+        callback({ success: false, error: result.message })
+        return
+      }
+
+      io.emit('task:updated', { id: result.taskId, name: result.taskName })
+      callback({ success: true, message: result.message, taskId: result.taskId, taskName: result.taskName })
     } catch (error) {
       callback({ success: false, error: '更新任务失败', message: (error as Error).message })
     }
