@@ -62,3 +62,13 @@ grepSearch: query="\\bconfig\\b", includePattern="**/*.ts"
    ```
 
 **记录时间**: 2026-04-26
+
+## 代码删除与清理相关
+
+### 删除功能时需要全面检查相关配置
+**问题**: 更改test-cli.ts代码中的某个命令或功能时，只更改了源代码文件中的实现，但遗漏了 `package.json` 中相关的 npm scripts。
+
+**示例场景**:
+删除 `test/cli/test-cli.ts` 中的 `all` 子命令时，不仅要删除代码中的命令定义，还要删除 `package.json` 中的 `"test:all": "tsx test/cli/test-cli.ts all"` script。
+
+**记录时间**: 2026-05-02
