@@ -6,7 +6,11 @@ describe('task create - 必要参数验证', () => {
     // 验证必须提供可执行文件路径
     let error: Error | undefined
     try {
-      await runCommand(['task', 'create', 'testTask'])
+      await runCommand([
+        'task',
+        'create',
+        'testTask',
+      ])
     } catch (err) {
       error = err as Error
     }
@@ -19,7 +23,12 @@ describe('task create - 必要参数验证', () => {
     // 验证必须提供触发类型参数
     let error: Error | undefined
     try {
-      await runCommand(['task', 'create', 'testTask', '--path=notepad.exe'])
+      await runCommand([
+        'task',
+        'create',
+        'testTask',
+        '--path=notepad.exe',
+      ])
     } catch (err) {
       error = err as Error
     }

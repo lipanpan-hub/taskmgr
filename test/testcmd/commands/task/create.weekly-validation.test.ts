@@ -4,7 +4,14 @@ import {runCommand} from '@oclif/test'
 describe('task create - Weekly 触发类型验证', () => {
   it('weekly 触发类型缺少 weekdays 参数时报错', async () => {
     // 验证 weekly 触发类型必须提供 weekdays 参数
-    const result = await runCommand(['task', 'create', 'testTask1', '--path=notepad.exe', '--trigger=weekly', '--start-time=11:30'])
+    const result = await runCommand([
+      'task',
+      'create',
+      'testTask1',
+      '--path=notepad.exe',
+      '--trigger=weekly',
+      '--start-time=11:30',
+    ])
     
     expect(result.error?.message).to.contain('weekly 触发类型需要 --weekdays 参数')
   })
