@@ -17,13 +17,16 @@ const TEST_DIRS = ['test/testcmd', 'test/testbackend']
 async function main() {
   const program = new Command()
   
+  // #region 程序配置
   program
     .name('test-cli')
     .description('测试运行器 - 支持按文件或测试用例运行测试')
     .version('1.0.0')
+  // #endregion
   
+  // #region file 命令
   program
-    .command('run')
+    .command('file')
     .description('交互式选择并运行测试文件')
     .action(async () => {
       console.log('🔍 扫描测试文件...\n')
@@ -45,7 +48,9 @@ async function main() {
       console.log(`\n🚀 运行文件: ${relative(process.cwd(), selectedGroup.file)}\n`)
       runTests('', selectedGroup.file)
     })
+  // #endregion
   
+  // #region case 命令
   program
     .command('case')
     .description('交互式选择并运行指定的测试用例')
@@ -69,7 +74,9 @@ async function main() {
       console.log(`\n🚀 运行测试用例: ${selectedCase.fullName}\n`)
       runTests(selectedCase.fullName, selectedCase.file)
     })
+  // #endregion
   
+  // #region list 命令
   program
     .command('list')
     .description('列出所有可用的测试文件和测试用例')
@@ -96,6 +103,7 @@ async function main() {
         console.log(`  - ${c.fullName}`)
       })
     })
+  // #endregion
   
   // 如果没有提供任何参数，显示帮助信息
   if (process.argv.length === 2) {
