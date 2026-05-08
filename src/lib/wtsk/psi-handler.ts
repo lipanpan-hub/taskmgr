@@ -93,7 +93,7 @@ const timePrompt: prompts.PromptObject = {
   type: 'text',
   name: 'time',
   message: '输入开始时间 (YYYY-MM-DD HH:mm 或 HH:mm)',
-  initial: `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')} 09:00`,
+  initial: `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')} 11:30`,
   validate: (value: string) => /^(\d{4}-\d{2}-\d{2} )?\d{2}:\d{2}$/.test(value) || '请输入有效的时间格式 (YYYY-MM-DD HH:mm 或 HH:mm)',
 }
 

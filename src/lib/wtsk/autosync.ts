@@ -25,7 +25,7 @@ export async function createAutoSyncTask(): Promise<string> {
     disallowStartIfOnBatteries: false,
     stopIfGoingOnBatteries: false,
     startWhenAvailable: false,
-    startTime: '09:00',
+    startTime: '11:30',
     weekdays: [],
     months: [],
     monthdays: [],

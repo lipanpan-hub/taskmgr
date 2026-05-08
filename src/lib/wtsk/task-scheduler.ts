@@ -67,7 +67,7 @@ public class Startup {
             string arguments = input.arguments != null ? (string)input.arguments : "";
             string description = input.description != null ? (string)input.description : "";
             string triggerType = input.triggerType != null ? (string)input.triggerType : "Daily";
-            string startTime = input.startTime != null ? (string)input.startTime : "09:00";
+            string startTime = input.startTime != null ? (string)input.startTime : "11:30";
             int[] weekdays = ReadIntArray((object)input.weekdays);
             int[] months = ReadIntArray((object)input.months);
             int[] monthdays = ReadIntArray((object)input.monthdays);

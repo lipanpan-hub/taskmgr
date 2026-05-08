@@ -15,27 +15,27 @@ export default class Create extends Command {
     },
     {
       description: '创建每天执行的任务',
-      command: '<%= config.bin %> <%= command.id %> myTask --path="notepad.exe" --trigger=daily --start-time="09:00"',
+      command: '<%= config.bin %> <%= command.id %> myTask --path="notepad.exe" --trigger=daily --start-time="11:30"',
     },
     {
       description: '创建每隔3天执行的任务',
-      command: '<%= config.bin %> <%= command.id %> myTask --path="notepad.exe" --trigger=daily --start-time="09:00" --interval=3',
+      command: '<%= config.bin %> <%= command.id %> myTask --path="notepad.exe" --trigger=daily --start-time="11:30" --interval=3',
     },
     {
       description: '创建每周一、三、五执行的任务',
-      command: '<%= config.bin %> <%= command.id %> myTask --path="notepad.exe" --trigger=weekly --start-time="09:00" --weekdays="1,3,5"',
+      command: '<%= config.bin %> <%= command.id %> myTask --path="notepad.exe" --trigger=weekly --start-time="11:30" --weekdays="1,3,5"',
     },
     {
       description: '创建每隔2周的周一执行的任务',
-      command: '<%= config.bin %> <%= command.id %> myTask --path="notepad.exe" --trigger=weekly --start-time="09:00" --weekdays="1" --interval=2',
+      command: '<%= config.bin %> <%= command.id %> myTask --path="notepad.exe" --trigger=weekly --start-time="11:30" --weekdays="1" --interval=2',
     },
     {
       description: '创建每月1号和15号执行的任务',
-      command: '<%= config.bin %> <%= command.id %> myTask --path="notepad.exe" --trigger=monthly --start-time="09:00" --months="1,2,3,4,5,6,7,8,9,10,11,12" --monthdays="1,15"',
+      command: '<%= config.bin %> <%= command.id %> myTask --path="notepad.exe" --trigger=monthly --start-time="11:30" --months="1,2,3,4,5,6,7,8,9,10,11,12" --monthdays="1,15"',
     },
     {
       description: '创建每年1月、6月、12月的第一周周一执行的任务',
-      command: '<%= config.bin %> <%= command.id %> myTask --path="notepad.exe" --trigger=monthly --start-time="09:00" --months="1,6,12" --weeks-of-month="1" --weekdays="1"',
+      command: '<%= config.bin %> <%= command.id %> myTask --path="notepad.exe" --trigger=monthly --start-time="11:30" --months="1,6,12" --weeks-of-month="1" --weekdays="1"',
     },
   ]
 

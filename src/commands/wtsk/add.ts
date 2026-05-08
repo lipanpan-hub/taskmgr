@@ -18,7 +18,7 @@ export default class Add extends Command {
     },
     {
       description: '创建每天运行的定时任务，每隔1天触发一次',
-      command: String.raw`<%= config.bin %> <%= command.id %> testTask --path="notepad.exe" --trigger=daily --interval=1 --start-time="09:00"`,
+      command: String.raw`<%= config.bin %> <%= command.id %> testTask --path="notepad.exe" --trigger=daily --interval=1 --start-time="11:30"`,
     },
     {
       description: '创建每周一、周三、周五运行的定时任务',
@@ -56,7 +56,7 @@ export default class Add extends Command {
       description: '任务描述'
     }),
     'start-time': Flags.string({
-      default: `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')} 09:00`, 
+      default: `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')} 11:30`, 
       description: '任务开始时间 (YYYY-MM-DD HH:mm 或 HH:mm)'
     }),
     interval: Flags.integer({

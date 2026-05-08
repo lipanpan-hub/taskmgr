@@ -187,28 +187,28 @@ EXAMPLES
 
   创建每天执行的任务
 
-    $ tm task create myTask --path="notepad.exe" --trigger=daily --start-time="09:00"
+    $ tm task create myTask --path="notepad.exe" --trigger=daily --start-time="11:30"
 
   创建每隔3天执行的任务
 
-    $ tm task create myTask --path="notepad.exe" --trigger=daily --start-time="09:00" --interval=3
+    $ tm task create myTask --path="notepad.exe" --trigger=daily --start-time="11:30" --interval=3
 
   创建每周一、三、五执行的任务
 
-    $ tm task create myTask --path="notepad.exe" --trigger=weekly --start-time="09:00" --weekdays="1,3,5"
+    $ tm task create myTask --path="notepad.exe" --trigger=weekly --start-time="11:30" --weekdays="1,3,5"
 
   创建每隔2周的周一执行的任务
 
-    $ tm task create myTask --path="notepad.exe" --trigger=weekly --start-time="09:00" --weekdays="1" --interval=2
+    $ tm task create myTask --path="notepad.exe" --trigger=weekly --start-time="11:30" --weekdays="1" --interval=2
 
   创建每月1号和15号执行的任务
 
-    $ tm task create myTask --path="notepad.exe" --trigger=monthly --start-time="09:00" ^
+    $ tm task create myTask --path="notepad.exe" --trigger=monthly --start-time="11:30" ^
       --months="1,2,3,4,5,6,7,8,9,10,11,12" --monthdays="1,15"
 
   创建每年1月、6月、12月的第一周周一执行的任务
 
-    $ tm task create myTask --path="notepad.exe" --trigger=monthly --start-time="09:00" --months="1,6,12" ^
+    $ tm task create myTask --path="notepad.exe" --trigger=monthly --start-time="11:30" --months="1,6,12" ^
       --weeks-of-month="1" --weekdays="1"
 ```
 
@@ -382,7 +382,7 @@ FLAGS
       --monthdays=<value>       每月的几号 (1-31，用逗号分隔，仅 monthly 生效)
       --months=<value>          月份 (1-12，用逗号分隔，仅 monthly 生效)
       --path=<value>            可执行文件路径
-      --start-time=<value>      [default: 2026-04-27 09:00] 任务开始时间 (YYYY-MM-DD HH:mm 或 HH:mm)
+      --start-time=<value>      [default: 2026-04-27 11:30] 任务开始时间 (YYYY-MM-DD HH:mm 或 HH:mm)
       --start-when-available    错过启动时间后是否补运行
       --trigger=<option>        [default: daily] 触发类型: daily, weekly, monthly, once, boot, logon
                                 <options: boot|daily|logon|monthly|once|weekly>
@@ -399,7 +399,7 @@ EXAMPLES
 
   创建每天运行的定时任务，每隔1天触发一次
 
-    $ tm wtsk add testTask --path="notepad.exe" --trigger=daily --interval=1 --start-time="09:00"
+    $ tm wtsk add testTask --path="notepad.exe" --trigger=daily --interval=1 --start-time="11:30"
 
   创建每周一、周三、周五运行的定时任务
 
