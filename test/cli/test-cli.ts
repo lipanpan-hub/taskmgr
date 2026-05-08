@@ -26,9 +26,17 @@ async function main() {
   
   // #region file 命令
   program
-    .command('file')
-    .description('交互式选择并运行测试文件')
-    .action(async () => {
+    .command('file [filepath]')
+    .description('运行测试文件 (可选参数: 测试文件路径，不提供则交互式选择)')
+    .action(async (filepath?: string) => {
+      // 如果用户指定了文件路径，直接运行该文件
+      if (filepath) {
+        console.log(`🚀 运行测试文件: ${filepath}\n`)
+        runTests('', filepath)
+        return
+      }
+      
+      // 否则进行交互式选择
       console.log('🔍 扫描测试文件...\n')
       
       const testGroups = collectTestGroups(TEST_DIRS)
@@ -45,7 +53,6 @@ async function main() {
         return
       }
       
-      console.log(`\n🚀 运行文件: ${relative(process.cwd(), selectedGroup.file)}\n`)
       runTests('', selectedGroup.file)
     })
   // #endregion
@@ -71,8 +78,8 @@ async function main() {
         return
       }
       
-      console.log(`\n🚀 运行测试用例: ${selectedCase.fullName}\n`)
-      runTests(selectedCase.fullName, selectedCase.file)
+      console.log(`\n🚀 运行测试用例: ${selectedCase.it}\n`)
+      runTests(selectedCase.it, selectedCase.file)
     })
   // #endregion
   
@@ -89,7 +96,7 @@ async function main() {
         return
       }
       
-      printTestFiles(testGroups)
+      // printTestFiles(testGroups)
       
       const selectedGroup = await selectTestFileInteractive(testGroups)
       
@@ -100,7 +107,7 @@ async function main() {
       
       console.log(`\n📄 ${relative(process.cwd(), selectedGroup.file)} 的测试用例:\n`)
       selectedGroup.cases.forEach((c) => {
-        console.log(`  - ${c.fullName}`)
+        console.log(`  - ${c.it}`)
       })
     })
   // #endregion

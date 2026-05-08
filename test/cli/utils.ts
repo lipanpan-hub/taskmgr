@@ -6,9 +6,7 @@ import Fuse from 'fuse.js'
 
 // #region 类型定义
 export interface TestCase {
-  describe: string
   it: string
-  fullName: string
   file: string
 }
 
@@ -44,39 +42,25 @@ export function scanTestFiles(dir: string): string[] {
 }
 
 export function parseTestFile(filePath: string): TestCase[] {
-  // 解析测试文件中的 describe 和 it 用例
+  // 解析测试文件中的 it 用例
   const cases: TestCase[] = []
   
   try {
     const content = readFileSync(filePath, 'utf-8')
     const lines = content.split('\n')
-    const describeStack: string[] = []
     
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i].trim()
       
-      const describeMatch = line.match(/describe\s*\(\s*['"`]([^'"`]+)['"`]/)
-      if (describeMatch) {
-        describeStack.push(describeMatch[1])
-        continue
-      }
-      
+      // 匹配 it 测试用例
       const itMatch = line.match(/it\s*\(\s*['"`]([^'"`]+)['"`]/)
       if (itMatch) {
         const itName = itMatch[1]
-        const describeName = describeStack.join(' > ')
-        const fullName = describeName ? `${describeName} > ${itName}` : itName
         
         cases.push({
-          describe: describeName,
           it: itName,
-          fullName,
           file: filePath,
         })
-      }
-      
-      if (line.includes('})') && describeStack.length > 0) {
-        describeStack.pop()
       }
     }
   } catch (error) {
@@ -115,16 +99,21 @@ export function findTestFile(path: string, testGroups: TestGroup[]): TestGroup |
 }
 // #endregion
 
+
+
 // #region 测试执行与输出
 export function runTests(grepPattern: string, specificFile?: string) {
   // 执行测试命令，支持 grep 过滤和指定文件
+  // grepPattern 应该是 it 测试用例的名称，而不是完整的 describe > it 路径
   try {
+    // 构建基础命令：指定文件时直接用 mocha，否则用 npm script
     let command = 'npm run mocha:test'
     
     if (specificFile) {
       command = `mocha "${specificFile}"`
     }
     
+    // 添加 grep 过滤器（转义正则特殊字符）
     if (grepPattern) {
       const escapedPattern = grepPattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
       command += ` --grep "${escapedPattern}"`
@@ -132,6 +121,7 @@ export function runTests(grepPattern: string, specificFile?: string) {
     
     console.log(`执行命令: ${command}\n`)
     
+    // 执行测试命令，输出直接显示在终端
     execSync(command, {
       stdio: 'inherit',
       cwd: process.cwd(),
@@ -160,7 +150,7 @@ export function printTestCases(testGroups: TestGroup[]) {
   testGroups.forEach((group) => {
     console.log(`\n  📄 ${relative(process.cwd(), group.file)}`)
     group.cases.forEach((c) => {
-      console.log(`    - ${c.fullName}`)
+      console.log(`    - ${c.it}`)
     })
   })
 }
@@ -208,7 +198,7 @@ export async function selectTestCaseInteractive(testGroups: TestGroup[]): Promis
   }
   
   const caseChoices = allCases.map((testCase) => ({
-    title: `${testCase.fullName} (${relative(process.cwd(), testCase.file)})`,
+    title: `${testCase.it} (${relative(process.cwd(), testCase.file)})`,
     value: testCase,
   }))
   
