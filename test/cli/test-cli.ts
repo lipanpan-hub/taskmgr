@@ -28,7 +28,25 @@ async function main() {
   program
     .command('file [filepath]')
     .description('运行测试文件 (可选参数: 测试文件路径，不提供则交互式选择)')
-    .action(async (filepath?: string) => {
+    .option('-d, --dir <directory>', '指定文件夹，运行该文件夹下的所有测试文件')
+    .action(async (filepath?: string, options?: { dir?: string }) => {
+      // 如果用户指定了文件夹，运行该文件夹下的所有测试文件
+      if (options?.dir) {
+        console.log(`🚀 运行文件夹下的所有测试: ${options.dir}\n`)
+        const testGroups = collectTestGroups([options.dir])
+        
+        if (testGroups.length === 0) {
+          console.log('❌ 该文件夹下未找到测试文件')
+          process.exit(1)
+        }
+        
+        for (const group of testGroups) {
+          console.log(`\n📄 运行: ${relative(process.cwd(), group.file)}`)
+          runTests('', group.file)
+        }
+        return
+      }
+      
       // 如果用户指定了文件路径，直接运行该文件
       if (filepath) {
         console.log(`🚀 运行测试文件: ${filepath}\n`)
