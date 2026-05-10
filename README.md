@@ -20,7 +20,7 @@ $ npm install -g taskmgr
 $ tm COMMAND
 running command...
 $ tm (--version)
-taskmgr/2.3.17 win32-x64 node-v24.14.1
+taskmgr/2.3.17 win32-x64 node-v24.15.0
 $ tm --help [COMMAND]
 USAGE
   $ tm COMMAND
