@@ -22,6 +22,10 @@ export default class Delete extends Command {
       command: '<%= config.bin %> <%= command.id %> --id=1',
     },
     {
+      description: '删除所有任务',
+      command: '<%= config.bin %> <%= command.id %> --all --force',
+    },
+    {
       description: '强制删除（不确认）',
       command: '<%= config.bin %> <%= command.id %> myTask --force',
     },
@@ -35,6 +39,9 @@ export default class Delete extends Command {
     id: Flags.integer({
       description: '通过ID删除任务',
     }),
+    all: Flags.boolean({
+      description: '删除所有任务',
+    }),
     force: Flags.boolean({
       char: 'f',
       description: '强制删除，不进行确认',
@@ -47,14 +54,16 @@ export default class Delete extends Command {
 
     let result
 
-    if (flags.interactive) {
+    if (flags.all) {
+      result = await handler.deleteAll(flags.force)
+    } else if (flags.interactive) {
       result = await handler.interactiveDelete()
     } else if (flags.id) {
       result = await handler.deleteById(flags.id, flags.force)
     } else if (args.name) {
       result = await handler.deleteByName(args.name, flags.force)
     } else {
-      this.error('必须提供任务名称、使用 --id 指定ID，或使用 --interactive 交互式选择')
+      this.error('必须提供任务名称、使用 --id 指定ID、使用 --all 删除所有任务，或使用 --interactive 交互式选择')
     }
 
     if (result.success) {
