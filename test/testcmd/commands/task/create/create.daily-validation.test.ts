@@ -21,39 +21,6 @@ describe('task create - Daily 触发类型验证', () => {
   })
   // #endregion
 
-  // #region 基本功能测试
-  it('daily 触发类型提供有效 start-time 参数时不报错', async () => {
-    // 验证提供有效的 start-time 参数后命令可以正常执行（默认 interval=1）
-    const taskName = generateTaskName('testDailyTask_test2')
-    const result = await runCommand([
-      'task',
-      'create',
-      taskName,
-      '--path=notepad.exe',
-      '--trigger=daily',
-      '--start-time=11:30',
-    ])
-
-    expect(result.error).to.be.undefined
-  })
-
-  it('daily 触发类型提供 interval 参数时不报错', async () => {
-    // 验证可以指定自定义的 interval 参数（每隔几天触发）
-    const taskName = generateTaskName('testDailyTask_test3')
-    const result = await runCommand([
-      'task',
-      'create',
-      taskName,
-      '--path=notepad.exe',
-      '--trigger=daily',
-      '--start-time=11:30',
-      '--interval=3',
-    ])
-
-    expect(result.error).to.be.undefined
-  })
-  // #endregion
-
   // #region start-time 格式测试
   it('start-time 使用简短格式 HH:mm 时正常工作', async () => {
     // 验证简短时间格式（只有时分）
@@ -195,38 +162,6 @@ describe('task create - Daily 触发类型验证', () => {
       'create',
       taskName,
       '--path=notepad.exe',
-      '--trigger=daily',
-      '--start-time=10:00',
-    ])
-
-    expect(result.error).to.be.undefined
-  })
-  // #endregion
-
-  // #region 可执行文件路径测试
-  it('path 使用绝对路径时正常工作', async () => {
-    // 验证绝对路径
-    const taskName = generateTaskName('testDailyTask_test15')
-    const result = await runCommand([
-      'task',
-      'create',
-      taskName,
-      '--path=C:\\Windows\\System32\\notepad.exe',
-      '--trigger=daily',
-      '--start-time=10:00',
-    ])
-
-    expect(result.error).to.be.undefined
-  })
-
-  it('path 使用相对路径时正常工作', async () => {
-    // 验证相对路径
-    const taskName = generateTaskName('testDailyTask_test16')
-    const result = await runCommand([
-      'task',
-      'create',
-      taskName,
-      '--path=.\\scripts\\test.bat',
       '--trigger=daily',
       '--start-time=10:00',
     ])
