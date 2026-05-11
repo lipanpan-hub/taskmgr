@@ -1,5 +1,5 @@
 import {expect} from 'chai'
-import {runCommand} from '@oclif/test'
+import {runCommand} from '../../../test-helper.js'
 import {TaskService} from '../../../../../src/lib/task/task-service.js'
 
 describe('task delete - 删除所有任务', () => {

@@ -1,5 +1,5 @@
-import {runCommand} from '@oclif/test'
 import {expect} from 'chai'
+import {runCommand} from '../../test-helper.js'
 
 describe('tsk:del', () => {
   describe('参数验证', () => {

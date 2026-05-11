@@ -1,5 +1,5 @@
 import {expect} from 'chai'
-import {runCommand} from '@oclif/test'
+import {runCommand} from '../../../test-helper.js'
 
 describe('task create - Weekly 触发类型验证', () => {
   it('weekly 触发类型缺少 weekdays 参数时报错', async () => {

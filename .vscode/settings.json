@@ -65,4 +65,13 @@
     },
     "workbench.editor.revealIfOpen": true,
 
+    // Mocha Test Explorer 配置
+    "mochaExplorer.files": "test/**/*.test.ts",
+    "mochaExplorer.require": "tsx",
+    "mochaExplorer.env": {
+        "NODE_ENV": "test"
+    },
+    "mochaExplorer.timeout": 60000,
+    "mochaExplorer.ui": "bdd",
+    "mochaExplorer.logpanel": true
 }

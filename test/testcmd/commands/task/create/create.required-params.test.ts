@@ -1,5 +1,5 @@
 import {expect} from 'chai'
-import {runCommand} from '@oclif/test'
+import {runCommand} from '../../../test-helper.js'
 
 describe('task create - 必要参数验证', () => {
   it('缺少必要参数时报错', async () => {

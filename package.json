@@ -118,7 +118,9 @@
   "repository": "lipanpan-hub/taskmgr",
   "scripts": {
     "start": "node bin/run.js",
-    "build": "npm run build:css && shx rm -rf dist tsconfig.tsbuildinfo && tsc -b",
+    "build": "npm run build:css && shx rm -rf dist tsconfig.tsbuildinfo && tsc",
+    "typecheck": "tsc && tsc --project test/tsconfig.json",
+    "typecheck:test": "tsc --project test/tsconfig.json",
     "build:css": "cross-env BROWSERSLIST_IGNORE_OLD_DATA=1 npx tailwindcss -i ./public/css/input.css -o ./public/css/style.css --minify --content \"./public/**/*.{html,js}\"",
     "watch:css": "npx tailwindcss -i ./public/css/input.css -o ./public/css/style.css --watch --content \"./public/**/*.{html,js}\"",
     "debug": "cross-env DEBUG=* node --inspect bin/dev.js",

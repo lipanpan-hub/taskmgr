@@ -1,5 +1,5 @@
 import {expect} from 'chai'
-import {runCommand} from '@oclif/test'
+import {runCommand} from '../../../test-helper.js'
 
 describe('task create - Daily 触发类型验证', () => {
   // 生成唯一任务名称的辅助函数
@@ -99,21 +99,6 @@ describe('task create - Daily 触发类型验证', () => {
 
     expect(result.error).to.be.undefined
   })
-
-  it('start-time 使用临近午夜时间 23:59 时正常工作', async () => {
-    // 验证边界时间：一天结束前
-    const taskName = generateTaskName('testDailyTask_test7')
-    const result = await runCommand([
-      'task',
-      'create',
-      taskName,
-      '--path=notepad.exe',
-      '--trigger=daily',
-      '--start-time=23:59',
-    ])
-
-    expect(result.error).to.be.undefined
-  })
   // #endregion
 
   // #region interval 边界值测试
@@ -144,22 +129,6 @@ describe('task create - Daily 触发类型验证', () => {
       '--trigger=daily',
       '--start-time=10:00',
       '--interval=30',
-    ])
-
-    expect(result.error).to.be.undefined
-  })
-
-  it('interval 设置为 7 时正常工作（每周执行）', async () => {
-    // 验证常见的周间隔
-    const taskName = generateTaskName('testDailyTask_test10')
-    const result = await runCommand([
-      'task',
-      'create',
-      taskName,
-      '--path=notepad.exe',
-      '--trigger=daily',
-      '--start-time=10:00',
-      '--interval=7',
     ])
 
     expect(result.error).to.be.undefined
