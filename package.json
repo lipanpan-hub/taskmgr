@@ -1,7 +1,7 @@
 {
   "name": "@lppx/taskmgr",
   "description": "my taskmgr cli",
-  "version": "2.3.18",
+  "version": "2.3.19",
   "author": "lppx",
   "bin": {
     "ttt": "./bin/run.js",
@@ -97,7 +97,7 @@
     ],
     "topicSeparator": " ",
     "topics": {
-      "task":{
+      "task": {
         "description": "为AI提供的win定时任务管理命令"
       },
       "wtsk": {
