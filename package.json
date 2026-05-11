@@ -1,5 +1,5 @@
 {
-  "name": "taskmgr",
+  "name": "@lppx/taskmgr",
   "description": "my taskmgr cli",
   "version": "2.3.17",
   "author": "lppx",
