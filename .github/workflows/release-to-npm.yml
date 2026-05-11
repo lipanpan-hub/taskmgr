@@ -1,5 +1,5 @@
 # 工作流名称：发布到 NPM
-name: publish
+name: release-to-npmjs-com 
 
 # 触发条件：当 GitHub Release 被发布时自动执行
 on:

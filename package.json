@@ -97,8 +97,11 @@
     ],
     "topicSeparator": " ",
     "topics": {
+      "task":{
+        "description": "为AI提供的win定时任务管理命令"
+      },
       "wtsk": {
-        "description": "为人类提供的win定时任务管理入口"
+        "description": "为人类提供的win定时任务管理命令"
       },
       "scripts": {
         "description": "脚本管理"
@@ -109,6 +112,7 @@
       "node_modules/better-sqlite3/**/*",
       "TaskScheduler.2.12.2/**/*"
     ],
+    "nsisCustomization": "nsis/nsis.nsi",
     "update": {
       "s3": {}
     }
