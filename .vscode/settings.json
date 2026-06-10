@@ -73,5 +73,6 @@
     },
     "mochaExplorer.timeout": 60000,
     "mochaExplorer.ui": "bdd",
-    "mochaExplorer.logpanel": true
+    "mochaExplorer.logpanel": true,
+    "foldOnOpen.targets": ["Level2"]
 }
