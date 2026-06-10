@@ -17,6 +17,7 @@
     "@oclif/plugin-warn-if-update-available": "^3.1.55",
     "@oclif/plugin-which": "^3.2.46",
     "better-sqlite3": "^12.9.0",
+    "cli-table3": "^0.6.5",
     "commander": "^14.0.3",
     "drizzle-orm": "^0.45.2",
     "edge-js": "^25.0.1",

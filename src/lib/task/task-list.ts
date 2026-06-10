@@ -1,4 +1,5 @@
 import type {Task, DailyTrigger, WeeklyTrigger, MonthlyTrigger, OnceTrigger} from '../../db/schema.js'
+import Table from 'cli-table3'
 import {TaskService} from './task-service.js'
 
 // #region 类型定义
@@ -42,26 +43,28 @@ export function applyFilters(tasks: Task[], options: FilterOptions): Task[] {
 
 // #region 格式化输出
 export function formatDetailedLine(tasks: Task[]): string[] {
-  const lines: string[] = []
-  lines.push('\n任务详细列表:')
-  lines.push(`ID | 任务名称 | 类型 | 状态 | 可执行文件 | 参数 | 描述`)
-  lines.push('─'.repeat(100))
+  const table = new Table({
+    head: ['ID', '任务名称', '类型', '状态', '可执行文件', '参数', '描述'],
+    colWidths: [6, 16, 8, 8, 28, 30, 16],
+    wordWrap: true,
+    wrapOnWordBoundary: false,
+    style: {head: ['cyan']},
+  })
 
   for (const task of tasks) {
     const status = task.enabled ? '✓启用' : '✗禁用'
-    const args = task.arguments || '-'
-    const desc = task.description || '-'
-    const path = truncate(task.executablePath, 25)
-    const argsStr = truncate(args, 90)
-    const descStr = truncate(desc, 12)
-
-    lines.push(
-      `${task.id} | ${truncate(task.name, 12)} | ${task.triggerType} | ${status} | ${path} | ${argsStr} | ${descStr}`,
-    )
+    table.push([
+      task.id,
+      task.name,
+      task.triggerType,
+      status,
+      task.executablePath,
+      task.arguments || '-',
+      task.description || '-',
+    ])
   }
 
-  lines.push('─'.repeat(100))
-  return lines
+  return ['\n任务详细列表:', table.toString()]
 }
 
 export async function formatBlock(tasks: Task[]): Promise<string[]> {
@@ -143,12 +146,5 @@ export async function formatBlock(tasks: Task[]): Promise<string[]> {
 
   lines.push('═'.repeat(80))
   return lines
-}
-// #endregion
-
-// #region 工具函数
-export function truncate(str: string, maxLen: number): string {
-  if (str.length <= maxLen) return str
-  return str.slice(0, maxLen - 3) + '...'
 }
 // #endregion
