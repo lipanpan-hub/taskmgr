@@ -10,8 +10,10 @@ export async function createAutoSyncTask(): Promise<string> {
     return `任务 ${taskName} 已存在，无需重复创建`
   }
 
-  const executablePath = 'tm'
-  const execArguments = 'task sync2schd'
+  // tm 实体是 tm.cmd, 任务计划程序的 ExecAction 不会用 PATHEXT 补全扩展名, 直接指定 tm 会报 0x80070002 找不到文件
+  // 因此改用 cmd.exe /c 间接调用, 由 cmd 负责通过 PATH + PATHEXT 解析到 tm.cmd
+  const executablePath = 'cmd.exe'
+  const execArguments = '/c tm task sync2schd'
 
   const result = await createScheduledTask({
     taskName,
