@@ -1,8 +1,9 @@
 import {Command, Flags} from '@oclif/core'
 
 import {getAllTasks, TaskInfo} from '../../lib/wtsk/task-scheduler.js'
+import { BaseCommand } from '../../lib/base-command.js'
 
-export default class List extends Command {
+export default class List extends BaseCommand {
   static description = '手动列出所有定时任务'
   static examples = [
     '<%= config.bin %> <%= command.id %>',

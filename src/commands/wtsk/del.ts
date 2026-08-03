@@ -2,8 +2,9 @@ import {Command, Flags} from '@oclif/core'
 import prompts from 'prompts'
 
 import {deleteScheduledTask, getAllTasks} from '../../lib/wtsk/task-scheduler.js'
+import { BaseCommand } from '../../lib/base-command.js'
 
-export default class Del extends Command {
+export default class Del extends BaseCommand {
   static description = '手动删除定时任务'
   static examples = [`<%= config.bin %> <%= command.id %> -n myTask`]
   static flags = {

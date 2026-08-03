@@ -1,8 +1,9 @@
 import {Command, Flags} from '@oclif/core'
 import {TaskService} from '../../lib/task/task-service.js'
 import {applyFilters, formatBlock, formatDetailedLine} from '../../lib/task/task-list.js'
+import { BaseCommand } from '../../lib/base-command.js'
 
-export default class List extends Command {
+export default class List extends BaseCommand {
   static description = '列出数据库中的所有定时任务'
 
   static examples = [
@@ -79,3 +80,4 @@ export default class List extends Command {
 
 
 }
+  

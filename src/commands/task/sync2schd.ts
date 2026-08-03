@@ -3,8 +3,10 @@ import {eq} from 'drizzle-orm'
 import {getDb} from '../../db/index.js'
 import {tasks} from '../../db/schema.js'
 import {syncTasksToScheduler} from '../../lib/task/task-sync-handler.js'
+import { BaseCommand } from '../../lib/base-command.js'
 
-export default class Sync2Schd extends Command {
+export default class Sync2Schd extends BaseCommand {
+  static aliases = ["task:sync"]
   static description = '将数据库中的任务同步到 Windows Task Scheduler'
 
   static examples = [

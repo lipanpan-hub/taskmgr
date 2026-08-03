@@ -5,8 +5,9 @@ import {basename, join} from 'node:path'
 import {handlePsiInteractive} from '../../lib/wtsk/psi-handler.js'
 import {createScheduledTask} from '../../lib/wtsk/task-scheduler.js'
 import {normalizeStartTime, parseNumberList} from '../../lib/wtsk/trigger-utils.js'
+import { BaseCommand } from '../../lib/base-command.js'
 
-export default class Add extends Command {
+export default class Add extends BaseCommand {
   static args = {
     taskName: Args.string({description: '任务名称', required: true}),
   }

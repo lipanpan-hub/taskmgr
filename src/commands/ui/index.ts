@@ -1,8 +1,9 @@
 import { Command, Flags } from '@oclif/core'
 
 import { startServer } from '../../backend/index.js'
+import { BaseCommand } from '../../lib/base-command.js'
 
-export default class Ui extends Command {
+export default class Ui extends BaseCommand {
   static description = '启动 Web UI 服务'
   static examples = ['<%= config.bin %> <%= command.id %>', '<%= config.bin %> <%= command.id %> --port 8080']
   static flags = {

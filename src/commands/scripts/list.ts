@@ -1,8 +1,9 @@
 import {Command} from '@oclif/core'
 import {readdirSync, statSync} from 'node:fs'
 import {join} from 'node:path'
+import { BaseCommand } from '../../lib/base-command.js'
 
-export default class List extends Command {
+export default class List extends BaseCommand {
   static description = '列出用户配置目录下的所有脚本'
   static examples = [
     '<%= config.bin %> <%= command.id %>',

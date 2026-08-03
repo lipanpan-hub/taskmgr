@@ -1,7 +1,8 @@
 import {Args, Command, Flags} from '@oclif/core'
 import {directCreateTask, interactiveCreateTask} from '../../lib/task/task-creator-handler.js'
+import { BaseCommand } from '../../lib/base-command.js'
 
-export default class Create extends Command {
+export default class Create extends BaseCommand {
   static args = {
     name: Args.string({description: '任务名称'}),
   }
