@@ -20,7 +20,7 @@ $ npm install -g @lppx/taskmgr
 $ tm COMMAND
 running command...
 $ tm (--version)
-@lppx/taskmgr/2.3.23 win32-x64 node-v24.18.0
+@lppx/taskmgr/2.3.24 win32-x64 node-v24.18.0
 $ tm --help [COMMAND]
 USAGE
   $ tm COMMAND
@@ -418,7 +418,7 @@ FLAGS
       --monthdays=<value>       每月的几号 (1-31，用逗号分隔，仅 monthly 生效)
       --months=<value>          月份 (1-12，用逗号分隔，仅 monthly 生效)
       --path=<value>            可执行文件路径
-      --start-time=<value>      [default: 2026-08-05 11:30] 任务开始时间 (YYYY-MM-DD HH:mm 或 HH:mm)
+      --start-time=<value>      [default: 2026-08-04 11:30] 任务开始时间 (YYYY-MM-DD HH:mm 或 HH:mm)
       --start-when-available    错过启动时间后是否补运行
       --trigger=<option>        [default: daily] 触发类型: daily, weekly, monthly, once, boot, logon
                                 <options: boot|daily|logon|monthly|once|weekly>
