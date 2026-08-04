@@ -9,6 +9,13 @@ export interface OptimizedTaskInput {
 
 
 
+/**
+ * 优化定时任务的输入参数，根据可执行文件与运行时类型生成最终执行配置。
+ *
+ * @param executablePath - 用户输入的可执行文件路径或运行时名称
+ * @param args - 可选的执行参数（如脚本路径）
+ * @returns 优化后的任务输入，包含可执行文件路径与参数
+ */
 export async function optimizeTaskInput(
   executablePath: string,
   args?: string,
@@ -47,7 +54,14 @@ export async function optimizeTaskInput(
 
 
 // #region 运行时参数优化
-// 注意：调用此函数前必须确保 args 为单个脚本路径
+/**
+ * 针对特定运行时与脚本类型生成后台静默或隔离执行的优化参数。
+ *
+ * @remarks 调用此函数前必须确保 args 为单个脚本路径。
+ * @param runtime - 运行时名称（如 pwsh、powershell、uv）
+ * @param args - 单个脚本路径
+ * @returns 匹配到优化规则时返回优化后的输入，否则返回 null
+ */
 function optimizeRuntimeArgs(
   runtime: string,
   args: string,

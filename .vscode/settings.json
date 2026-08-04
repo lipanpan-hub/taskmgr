@@ -74,5 +74,5 @@
     "mochaExplorer.timeout": 60000,
     "mochaExplorer.ui": "bdd",
     "mochaExplorer.logpanel": true,
-    "foldOnOpen.targets": ["Level2"]
+    "foldOnOpen.targets": ["Level2","AllBlockComments","AllMarkerRegions"]
 }
