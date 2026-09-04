@@ -72,7 +72,7 @@ EXAMPLES
       --weeks-of-month="1" --weekdays="1"
 ```
 
-_See code: [src/commands/task/create.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.24/src/commands/task/create.ts)_
+_See code: [src/commands/task/create.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.26/src/commands/task/create.ts)_
 
 ## `tm task delete [NAME]`
 
@@ -116,7 +116,7 @@ EXAMPLES
     $ tm task delete myTask --force
 ```
 
-_See code: [src/commands/task/delete.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.24/src/commands/task/delete.ts)_
+_See code: [src/commands/task/delete.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.26/src/commands/task/delete.ts)_
 
 ## `tm task list`
 
@@ -155,7 +155,7 @@ EXAMPLES
     $ tm task list --enabled
 ```
 
-_See code: [src/commands/task/list.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.24/src/commands/task/list.ts)_
+_See code: [src/commands/task/list.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.26/src/commands/task/list.ts)_
 
 ## `tm task sync`
 
@@ -211,4 +211,4 @@ EXAMPLES
     $ tm task sync2schd --name="myTask"
 ```
 
-_See code: [src/commands/task/sync2schd.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.24/src/commands/task/sync2schd.ts)_
+_See code: [src/commands/task/sync2schd.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.26/src/commands/task/sync2schd.ts)_

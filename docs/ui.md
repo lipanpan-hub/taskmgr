@@ -25,4 +25,4 @@ EXAMPLES
   $ tm ui --port 8080
 ```
 
-_See code: [src/commands/ui/index.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.24/src/commands/ui/index.ts)_
+_See code: [src/commands/ui/index.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.26/src/commands/ui/index.ts)_
