@@ -1,7 +1,7 @@
 {
   "name": "@lppx/taskmgr",
   "description": "my taskmgr cli",
-  "version": "2.3.24",
+  "version": "2.3.25",
   "author": "lppx",
   "bin": {
     "ttt": "./bin/run.js",
