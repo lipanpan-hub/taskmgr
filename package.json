@@ -102,14 +102,20 @@
     ],
     "topicSeparator": " ",
     "topics": {
+      "help": {
+        "description": "显示帮助信息"
+      },
+      "version": {
+        "description": "显示版本信息"
+      },
       "task": {
-        "description": "为AI提供的win定时任务管理命令"
+        "description": "面向 AI 调用的 Windows 定时任务管理命令：创建、删除、查询任务并同步到任务计划程序"
       },
       "wtsk": {
-        "description": "为人类提供的win定时任务管理命令"
+        "description": "面向人类使用的 Windows 定时任务管理命令：手动创建、删除与列出任务"
       },
       "scripts": {
-        "description": "脚本管理"
+        "description": "脚本管理命令：添加、列出脚本并打开脚本目录"
       }
     },
     "additionalFiles": [

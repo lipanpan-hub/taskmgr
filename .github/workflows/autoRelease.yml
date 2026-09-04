@@ -72,8 +72,8 @@ jobs:
         id: prepack
         shell: bash
         run: |
-          # 执行 prepack 命令（包含 manifest 生成和 README 更新）
-          npm run prepack
+          npx oclif manifest 
+          npx oclif readme --multi
           # 检查是否有文件变更
           if [ -n "$(git status --porcelain)" ]; then
             # 如果有更新，提交并推送到远程仓库
