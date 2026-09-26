@@ -3,11 +3,81 @@
 
 面向 AI 调用的 Windows 定时任务管理命令：创建、删除、查询任务并同步到任务计划程序
 
+* [`tm task add [NAME]`](#tm-task-add-name)
 * [`tm task create [NAME]`](#tm-task-create-name)
+* [`tm task del [NAME]`](#tm-task-del-name)
 * [`tm task delete [NAME]`](#tm-task-delete-name)
 * [`tm task list`](#tm-task-list)
+* [`tm task ls`](#tm-task-ls)
+* [`tm task remove [NAME]`](#tm-task-remove-name)
 * [`tm task sync`](#tm-task-sync)
 * [`tm task sync2schd`](#tm-task-sync2schd)
+
+## `tm task add [NAME]`
+
+创建定时任务到数据库
+
+```
+USAGE
+  $ tm task add [NAME] [-i | --path <value> | --arguments <value> | --description <value> | --trigger
+    daily|weekly|monthly|once|boot|logon | --start-time <value> | --interval <value> | --weekdays <value> | --months
+    <value> | --monthdays <value> | --weeks-of-month <value>] [--enabled]
+
+ARGUMENTS
+  [NAME]  任务名称
+
+FLAGS
+  -i, --interactive             交互式创建任务
+      --arguments=<value>       执行参数
+      --description=<value>     任务描述
+      --[no-]enabled            是否启用任务
+      --interval=<value>        间隔 (daily: 每隔几天, weekly: 每隔几周)
+      --monthdays=<value>       每月的哪几天 (逗号分隔, 1-31, 例如: 1,15,30)
+      --months=<value>          月份 (逗号分隔, 1-12, 例如: 1,6,12)
+      --path=<value>            可执行文件路径
+      --start-time=<value>      开始时间 (HH:mm 或 YYYY-MM-DD HH:mm)
+      --trigger=<option>        触发类型
+                                <options: daily|weekly|monthly|once|boot|logon>
+      --weekdays=<value>        星期几 (逗号分隔, 0=周日, 1=周一...6=周六, 例如: 1,3,5)
+      --weeks-of-month=<value>  每月的第几周 (逗号分隔, 1-5, 例如: 1,3)
+
+DESCRIPTION
+  创建定时任务到数据库
+
+ALIASES
+  $ tm task add
+
+EXAMPLES
+  交互式创建任务
+
+    $ tm task add --interactive
+
+  创建每天执行的任务
+
+    $ tm task add myTask --path="notepad.exe" --trigger=daily --start-time="11:30"
+
+  创建每隔3天执行的任务
+
+    $ tm task add myTask --path="notepad.exe" --trigger=daily --start-time="11:30" --interval=3
+
+  创建每周一、三、五执行的任务
+
+    $ tm task add myTask --path="notepad.exe" --trigger=weekly --start-time="11:30" --weekdays="1,3,5"
+
+  创建每隔2周的周一执行的任务
+
+    $ tm task add myTask --path="notepad.exe" --trigger=weekly --start-time="11:30" --weekdays="1" --interval=2
+
+  创建每月1号和15号执行的任务
+
+    $ tm task add myTask --path="notepad.exe" --trigger=monthly --start-time="11:30" ^
+      --months="1,2,3,4,5,6,7,8,9,10,11,12" --monthdays="1,15"
+
+  创建每年1月、6月、12月的第一周周一执行的任务
+
+    $ tm task add myTask --path="notepad.exe" --trigger=monthly --start-time="11:30" --months="1,6,12" ^
+      --weeks-of-month="1" --weekdays="1"
+```
 
 ## `tm task create [NAME]`
 
@@ -39,6 +109,9 @@ FLAGS
 
 DESCRIPTION
   创建定时任务到数据库
+
+ALIASES
+  $ tm task add
 
 EXAMPLES
   交互式创建任务
@@ -72,7 +145,53 @@ EXAMPLES
       --weeks-of-month="1" --weekdays="1"
 ```
 
-_See code: [src/commands/task/create.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.26/src/commands/task/create.ts)_
+_See code: [src/commands/task/create.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.27/src/commands/task/create.ts)_
+
+## `tm task del [NAME]`
+
+删除数据库中的定时任务及其关联配置
+
+```
+USAGE
+  $ tm task del [NAME] [-i] [--id <value>] [--all] [-f]
+
+ARGUMENTS
+  [NAME]  要删除的任务名称
+
+FLAGS
+  -f, --force        强制删除，不进行确认
+  -i, --interactive  交互式选择要删除的任务
+      --all          删除所有任务
+      --id=<value>   通过ID删除任务
+
+DESCRIPTION
+  删除数据库中的定时任务及其关联配置
+
+ALIASES
+  $ tm task remove
+  $ tm task del
+
+EXAMPLES
+  交互式删除任务
+
+    $ tm task del --interactive
+
+  直接删除指定任务
+
+    $ tm task del myTask
+
+  通过ID删除任务
+
+    $ tm task del --id=1
+
+  删除所有任务
+
+    $ tm task del --all --force
+
+  强制删除（不确认）
+
+    $ tm task del myTask --force
+```
 
 ## `tm task delete [NAME]`
 
@@ -93,6 +212,10 @@ FLAGS
 
 DESCRIPTION
   删除数据库中的定时任务及其关联配置
+
+ALIASES
+  $ tm task remove
+  $ tm task del
 
 EXAMPLES
   交互式删除任务
@@ -116,7 +239,7 @@ EXAMPLES
     $ tm task delete myTask --force
 ```
 
-_See code: [src/commands/task/delete.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.26/src/commands/task/delete.ts)_
+_See code: [src/commands/task/delete.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.27/src/commands/task/delete.ts)_
 
 ## `tm task list`
 
@@ -137,12 +260,16 @@ FLAGS
 DESCRIPTION
   列出数据库中的所有定时任务
 
+ALIASES
+  $ tm task list
+  $ tm task ls
+
 EXAMPLES
-  列出所有任务
+  用表格形式列出所有任务
 
     $ tm task list
 
-  以块状格式显示
+  以块状格式显示详细信息
 
     $ tm task list --block
 
@@ -155,7 +282,94 @@ EXAMPLES
     $ tm task list --enabled
 ```
 
-_See code: [src/commands/task/list.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.26/src/commands/task/list.ts)_
+_See code: [src/commands/task/list.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.27/src/commands/task/list.ts)_
+
+## `tm task ls`
+
+列出数据库中的所有定时任务
+
+```
+USAGE
+  $ tm task ls [-b] [-n <value>] [--enabled | --disabled] [-t daily|weekly|monthly|once|boot|logon]
+
+FLAGS
+  -b, --block          以块状格式显示详细信息
+  -n, --name=<value>   按任务名称过滤（支持部分匹配）
+  -t, --type=<option>  按触发类型过滤
+                       <options: daily|weekly|monthly|once|boot|logon>
+      --disabled       仅显示禁用的任务
+      --enabled        仅显示启用的任务
+
+DESCRIPTION
+  列出数据库中的所有定时任务
+
+ALIASES
+  $ tm task list
+  $ tm task ls
+
+EXAMPLES
+  用表格形式列出所有任务
+
+    $ tm task ls
+
+  以块状格式显示详细信息
+
+    $ tm task ls --block
+
+  过滤特定任务
+
+    $ tm task ls --name="myTask"
+
+  过滤启用的任务
+
+    $ tm task ls --enabled
+```
+
+## `tm task remove [NAME]`
+
+删除数据库中的定时任务及其关联配置
+
+```
+USAGE
+  $ tm task remove [NAME] [-i] [--id <value>] [--all] [-f]
+
+ARGUMENTS
+  [NAME]  要删除的任务名称
+
+FLAGS
+  -f, --force        强制删除，不进行确认
+  -i, --interactive  交互式选择要删除的任务
+      --all          删除所有任务
+      --id=<value>   通过ID删除任务
+
+DESCRIPTION
+  删除数据库中的定时任务及其关联配置
+
+ALIASES
+  $ tm task remove
+  $ tm task del
+
+EXAMPLES
+  交互式删除任务
+
+    $ tm task remove --interactive
+
+  直接删除指定任务
+
+    $ tm task remove myTask
+
+  通过ID删除任务
+
+    $ tm task remove --id=1
+
+  删除所有任务
+
+    $ tm task remove --all --force
+
+  强制删除（不确认）
+
+    $ tm task remove myTask --force
+```
 
 ## `tm task sync`
 
@@ -173,6 +387,7 @@ DESCRIPTION
 
 ALIASES
   $ tm task sync
+  $ tm task sync2schd
 
 EXAMPLES
   同步所有任务
@@ -200,6 +415,7 @@ DESCRIPTION
 
 ALIASES
   $ tm task sync
+  $ tm task sync2schd
 
 EXAMPLES
   同步所有任务
@@ -211,4 +427,4 @@ EXAMPLES
     $ tm task sync2schd --name="myTask"
 ```
 
-_See code: [src/commands/task/sync2schd.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.26/src/commands/task/sync2schd.ts)_
+_See code: [src/commands/task/sync2schd.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.27/src/commands/task/sync2schd.ts)_

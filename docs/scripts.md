@@ -21,11 +21,15 @@ ARGUMENTS
 DESCRIPTION
   添加脚本到用户配置目录
 
+ALIASES
+  $ tm script add
+  $ tm script addscript
+
 EXAMPLES
   $ tm scripts add ./script.ps1
 ```
 
-_See code: [src/commands/scripts/add.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.26/src/commands/scripts/add.ts)_
+_See code: [src/commands/scripts/add.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.27/src/commands/scripts/add.ts)_
 
 ## `tm scripts list`
 
@@ -38,11 +42,15 @@ USAGE
 DESCRIPTION
   列出用户配置目录下的所有脚本
 
+ALIASES
+  $ tm script list
+  $ tm script ls
+
 EXAMPLES
   $ tm scripts list
 ```
 
-_See code: [src/commands/scripts/list.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.26/src/commands/scripts/list.ts)_
+_See code: [src/commands/scripts/list.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.27/src/commands/scripts/list.ts)_
 
 ## `tm scripts open`
 
@@ -55,8 +63,12 @@ USAGE
 DESCRIPTION
   打开脚本文件目录
 
+ALIASES
+  $ tm script open
+  $ tm script opendcriptsdir
+
 EXAMPLES
   $ tm scripts open
 ```
 
-_See code: [src/commands/scripts/open.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.26/src/commands/scripts/open.ts)_
+_See code: [src/commands/scripts/open.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.27/src/commands/scripts/open.ts)_
