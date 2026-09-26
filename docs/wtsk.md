@@ -5,7 +5,9 @@
 
 * [`tm wtsk add TASKNAME`](#tm-wtsk-add-taskname)
 * [`tm wtsk del`](#tm-wtsk-del)
+* [`tm wtsk delete`](#tm-wtsk-delete)
 * [`tm wtsk list`](#tm-wtsk-list)
+* [`tm wtsk ls`](#tm-wtsk-ls)
 
 ## `tm wtsk add TASKNAME`
 
@@ -29,7 +31,7 @@ FLAGS
       --monthdays=<value>       每月的几号 (1-31，用逗号分隔，仅 monthly 生效)
       --months=<value>          月份 (1-12，用逗号分隔，仅 monthly 生效)
       --path=<value>            可执行文件路径
-      --start-time=<value>      [default: 2026-09-04 11:30] 任务开始时间 (YYYY-MM-DD HH:mm 或 HH:mm)
+      --start-time=<value>      [default: 2026-09-26 11:30] 任务开始时间 (YYYY-MM-DD HH:mm 或 HH:mm)
       --start-when-available    错过启动时间后是否补运行
       --trigger=<option>        [default: daily] 触发类型: daily, weekly, monthly, once, boot, logon
                                 <options: boot|daily|logon|monthly|once|weekly>
@@ -63,7 +65,7 @@ EXAMPLES
       --weekdays="5" --start-time="23:59"
 ```
 
-_See code: [src/commands/wtsk/add.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.26/src/commands/wtsk/add.ts)_
+_See code: [src/commands/wtsk/add.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.27/src/commands/wtsk/add.ts)_
 
 ## `tm wtsk del`
 
@@ -80,11 +82,38 @@ FLAGS
 DESCRIPTION
   手动删除定时任务
 
+ALIASES
+  $ tm wtsk del
+  $ tm wtsk delete
+
 EXAMPLES
   $ tm wtsk del -n myTask
 ```
 
-_See code: [src/commands/wtsk/del.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.26/src/commands/wtsk/del.ts)_
+_See code: [src/commands/wtsk/del.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.27/src/commands/wtsk/del.ts)_
+
+## `tm wtsk delete`
+
+手动删除定时任务
+
+```
+USAGE
+  $ tm wtsk delete [-i | -n <value>]
+
+FLAGS
+  -i, --interactive       交互式选择任务
+  -n, --taskName=<value>  任务名称
+
+DESCRIPTION
+  手动删除定时任务
+
+ALIASES
+  $ tm wtsk del
+  $ tm wtsk delete
+
+EXAMPLES
+  $ tm wtsk delete -n myTask
+```
 
 ## `tm wtsk list`
 
@@ -101,6 +130,10 @@ FLAGS
 DESCRIPTION
   手动列出所有定时任务
 
+ALIASES
+  $ tm wtsk list
+  $ tm wtsk ls
+
 EXAMPLES
   $ tm wtsk list
 
@@ -111,4 +144,33 @@ EXAMPLES
   $ tm wtsk list -l 5 --block
 ```
 
-_See code: [src/commands/wtsk/list.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.26/src/commands/wtsk/list.ts)_
+_See code: [src/commands/wtsk/list.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.27/src/commands/wtsk/list.ts)_
+
+## `tm wtsk ls`
+
+手动列出所有定时任务
+
+```
+USAGE
+  $ tm wtsk ls [-b] [-l <value>]
+
+FLAGS
+  -b, --[no-]block     使用块状格式显示任务详情
+  -l, --limit=<value>  限制输出的任务数量
+
+DESCRIPTION
+  手动列出所有定时任务
+
+ALIASES
+  $ tm wtsk list
+  $ tm wtsk ls
+
+EXAMPLES
+  $ tm wtsk ls
+
+  $ tm wtsk ls --block
+
+  $ tm wtsk ls --limit 10
+
+  $ tm wtsk ls -l 5 --block
+```
