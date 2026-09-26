@@ -5,7 +5,7 @@ import { BaseCommand } from '../../lib/base-command.js'
 
 export default class Open extends BaseCommand {
   static aliases = ["script:open","script:opendcriptsdir"]
-  static description = '打开脚本文件目录'
+  static description = '打开脚本文件目录（供人类使用，AI 请勿调用）'
   static examples = [
     '<%= config.bin %> <%= command.id %>',
   ]

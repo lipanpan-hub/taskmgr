@@ -1,8 +1,8 @@
 ---
 name: taskmgr-skill
-description: 用 tm 命令行工具管理 Windows 定时任务（计划任务）。当用户要求创建/查询/删除定时任务、定时执行脚本或程序、定时关机休眠、设置每天/每周/每月/开机/登录时自动运行时使用。
-keywords: tm, taskmgr, 定时任务, 计划任务, 定时执行, 定时关机, 开机自启, cron, schtasks, Task Scheduler
-version: 1.0.0
+description: 用 tm 命令行工具管理 Windows 定时任务（计划任务）及其脚本。当用户要求创建/查询/删除定时任务、把写好的 PowerShell/Python 等脚本设为定时执行、定时关机休眠、设置每天/每周/每月/开机/登录时自动运行时使用。
+keywords: tm, taskmgr, 定时任务, 计划任务, 定时执行, 定时脚本, 定时关机, 开机自启, cron, schtasks, Task Scheduler
+version: 1.1.0
 ---
 
 # tm 定时任务管理
@@ -12,7 +12,7 @@ version: 1.0.0
 ## 铁律
 
 1. 只用 `tm task` 子命令，它是为非交互调用设计的。绝不使用 `tm wtsk`（面向人类，含交互式提示）。
-2. 绝不传 `-i` / `--interactive` / `--psi`，这些会挂起等待键盘输入。
+2. 绝不传 `-i` / `--interactive` / `--psi`，这些会挂起等待键盘输入。`tm scripts open` 会弹出资源管理器窗口，也不要调用。
 3. 删除必须带 `--force`，否则会卡在确认提示。
 4. `tm task create` 一步到位：写库 + 建触发器 + 同步到任务计划程序，任何一步失败自动回滚。创建后无需再执行同步。
 5. 没有 update 命令。修改任务 = `tm task delete <名称> --force` 然后重新 create。
@@ -24,7 +24,26 @@ version: 1.0.0
 - 删除任务 → `tm task delete <名称> --force`
 - 数据库与系统不一致时重新同步 → `tm task sync2schd`（别名 `tm task sync`）
 - 查看系统里实际的任务（只读，含下次运行时间等系统状态）→ `tm wtsk list`
-- 查看可用脚本 → `tm scripts list`；把脚本纳入管理 → `tm scripts add <路径>`
+- 把新写的脚本放进脚本目录 → `tm scripts add <路径>`
+- 查看脚本目录里已有的脚本及其绝对路径 → `tm scripts list`
+
+## 脚本类任务：先入库，再建任务
+
+任务要执行的是你刚写好的脚本（`.ps1`、`.py`、`.js`、`.ts` 等）时，固定按这个顺序：
+
+1. 把脚本写到任意位置（例如当前工作目录）
+2. `tm scripts add "<脚本路径>"`，把它复制进脚本目录。输出中 `保存位置:` 后面就是脚本的新绝对路径
+3. `tm task create` 的 `--arguments` 引用这个新路径，不要引用原始位置
+
+这样做的原因：脚本目录位置固定，不会因为工作目录被清理、项目被移动而让任务在运行时找不到文件；用户也能用 `tm scripts list` 一眼看到定时任务依赖了哪些脚本。
+
+注意事项：
+
+- `add` 只复制单个文件。脚本必须自包含，依赖同目录其他文件（相对导入、配置文件、数据文件）的写法会失效
+- 同名文件直接覆盖，不提示。修改脚本时改完重新 `add` 即可，引用该路径的任务无需重建；要避免误覆盖他人脚本，先 `tm scripts list` 查重名
+- 不要使用内置模板的文件名：`倒计时关机脚本.ps1`、`倒计时休眠脚本.ps1`、`休眠脚本.ps1`、`test-node.js`、`testBun.ts`、`testPython.py`。每次执行 tm 时都会用模板强制覆盖这些同名文件
+- 任务不设置工作目录，运行时当前目录不是脚本所在目录。脚本内读写文件用绝对路径，或基于脚本自身位置计算（PowerShell 用 `$PSScriptRoot`，Python 用 `Path(__file__).parent`）
+- 文件名尽量不含空格，减少命令行引号转义问题
 
 ## 创建任务
 
@@ -65,7 +84,7 @@ tm task create <任务名> --path=<可执行文件或运行时> --trigger=<类�
 
 要拿到这层优化，`--arguments` 里只放脚本路径，不要自己拼 `-File`、`-ExecutionPolicy` 等参数。需要自行控制完整命令行时，`--path` 给绝对路径，`--arguments` 给完整参数串。
 
-脚本目录：`%LOCALAPPDATA%\lppxtaskmgr\scripts`。先用 `tm scripts list` 拿到确切路径再引用，不要凭猜测拼路径。
+脚本目录：`%LOCALAPPDATA%\lppxtaskmgr\scripts`。引用路径以 `tm scripts add` 的 `保存位置:` 或 `tm scripts list` 的输出为准，不要凭猜测拼路径。
 
 ## 查询与删除
 
@@ -98,6 +117,14 @@ tm task delete --all --force      # 危险：清空全部任务，执行前必�
 ## 示例
 
 ```powershell
+# 新写的脚本：先入库，再用 add 输出的「保存位置」建任务
+tm scripts add ".\backup-notes.py"
+# 输出: 保存位置: C:\Users\lppx\AppData\Local\lppxtaskmgr\scripts\backup-notes.py
+tm task create 笔记备份 --path=uv --arguments="C:\Users\lppx\AppData\Local\lppxtaskmgr\scripts\backup-notes.py" --trigger=daily --start-time="21:00"
+
+# 修改脚本内容：改完重新 add 覆盖即可，任务不用动
+tm scripts add ".\backup-notes.py"
+
 # 每天 23:30 静默跑一个 PowerShell 脚本
 tm task create 夜间清理 --path=pwsh --arguments="C:\Users\lppx\AppData\Local\lppxtaskmgr\scripts\倒计时关机脚本.ps1" --trigger=daily --start-time="23:30" --description="每晚清理"
 
