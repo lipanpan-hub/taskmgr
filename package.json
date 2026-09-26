@@ -166,8 +166,8 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "dev": "concurrently \"npm run watch:css\" \"npm run dev:backend\" --names \"CSS,Backend\" --prefix-colors \"cyan,green\"",
-    "dev:backend": "tsx watch src/backend/server.ts",
-    "start:backend": "node dist/backend/server.js"
+    "dev:backend": "tsx watch src/backend/main.ts",
+    "start:backend": "node dist/backend/main.js"
   },
   "types": "dist/index.d.ts"
 }
