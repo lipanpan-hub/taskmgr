@@ -1,5 +1,6 @@
 import {exec} from 'node:child_process'
 import path from 'node:path'
+import {fileURLToPath} from 'node:url'
 import {promisify} from 'node:util'
 
 import edge from 'edge-js'
@@ -11,8 +12,13 @@ const execAsync = promisify(exec)
 // 获取程序根目录：打包后 execPath 指向 exe 文件，开发环境指向 node.exe
 // 判断是否打包：检查 execPath 是否以项目名结尾
 const isPacked = process.execPath.includes('lppxtaskmgr')
+// 本模块位于 <根目录>/dist/lib/wtsk（源码态为 src/lib/wtsk），向上三级即包根目录
+const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url))
 // 打包后 execPath 在 bin 目录下，需要向上两级到达 client 目录
-const APP_ROOT = isPacked ? path.resolve(path.dirname(process.execPath), '..') : process.cwd()
+// 未打包时不能依赖 cwd：cwd 是用户执行命令时所在的目录，与包安装位置无关
+const APP_ROOT = isPacked
+  ? path.resolve(path.dirname(process.execPath), '..')
+  : path.resolve(MODULE_DIR, '../../..')
 const TASK_SCHEDULER_DLL = path.join(APP_ROOT, 'TaskScheduler.2.12.2', 'lib', 'net45', 'Microsoft.Win32.TaskScheduler.dll')
 const TASK_FOLDER = 'taskmgr'
 
