@@ -27,12 +27,27 @@
 
 两套命令**不共享状态**：`tm wtsk add` 创建的任务不会出现在 `tm task list` 里；`tm task delete` 只删数据库记录，不会移除已注册到 Windows 的任务（那需要 `tm wtsk del`）。
 
+## 命令别名
+
+主命令都提供了等价别名，用哪个写法功能都一样：
+
+- `tm scripts add` = `tm script add` / `tm script addscript`
+- `tm scripts list` = `tm script list` / `tm script ls`
+- `tm scripts open` = `tm script open` / `tm script opendcriptsdir`
+- `tm task create` = `tm task add`
+- `tm task delete` = `tm task del` / `tm task remove`
+- `tm task list` = `tm task ls`
+- `tm task sync2schd` = `tm task sync`
+- `tm ui` = `tm ui start` / `tm ui run`
+- `tm wtsk del` = `tm wtsk delete`
+- `tm wtsk list` = `tm wtsk ls`
+
 ## 功能一览
 
 - 六种触发类型：`daily`、`weekly`、`monthly`、`once`、`boot`、`logon`
 - 交互式创建/删除（`prompts` + `fuse.js` 模糊补全）
 - PowerShell 脚本库管理：脚本集中存放在配置目录，创建任务时可交互选择
-- Web UI：`tm ui` 启动 Express + Socket.IO 服务，浏览器里增删改查任务，多端实时同步
+- Web UI：`tm ui` 启动 NestJS + Socket.IO 服务，浏览器里增删改查任务，多端实时同步
 - 登录时自动同步：首次运行会注册一个 `AutoSync` 任务，用户登录时静默把数据库任务同步到 Windows
 
 # 安装方法
@@ -40,7 +55,7 @@
 ## 环境要求
 
 - Windows（其他平台会在启动时给出警告并跳过所有初始化）
-- Node.js >= 18
+- Node.js >= 20
 - PowerShell 可用（启动时会自动检测）
 - .NET Framework 4.5+（Win8/10/11 自带，edge-js 加载的是 net45 版 DLL）
 
@@ -155,7 +170,7 @@ tm ui                # 默认 3000 端口，并自动打开浏览器
 tm ui --port 8080
 ```
 
-> ⚠️ Web 服务**没有任何鉴权**，且 CORS 允许所有来源、监听在全部网络接口上。任何能访问该端口的人都可以增删任务，请只在本机或可信网络中使用，必要时用防火墙限制该端口。
+> ⚠️ Web 服务**没有任何鉴权**，且 CORS 允许所有来源。服务只监听本机 `127.0.0.1`，因此风险限于本机；但本机上的任何程序都能增删任务，请勿在不可信环境下长期驻留该服务。
 
 Web UI 操作的是**数据库**，改完仍需 `tm task sync2schd`（或等下次登录由 AutoSync 触发）才会落到 Windows。
 
@@ -198,7 +213,7 @@ npm run db:generate    # 生成迁移
 npm run db:studio      # 可视化查看数据
 ```
 
-注意：开发模式下 DLL 路径按 `process.cwd()` 推导，必须在项目根目录执行 `bin/dev.js`，否则找不到 `TaskScheduler.2.12.2\lib\net45\*.dll`。
+注意：DLL 路径由模块自身位置推导，与当前工作目录无关——未打包时取模块所在目录向上三级（`src/lib/wtsk` 或 `dist/lib/wtsk` 均指向包根目录），打包后取可执行文件目录的上一级。因此可在任意目录执行 `bin/dev.js`，都能找到 `TaskScheduler.2.12.2\lib\net45\*.dll`。
 
 
 <!-- commands -->
