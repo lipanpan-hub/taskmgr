@@ -4,6 +4,7 @@ import {getAllTasks, TaskInfo} from '../../lib/wtsk/task-scheduler.js'
 import { BaseCommand } from '../../lib/base-command.js'
 
 export default class List extends BaseCommand {
+  static aliases = ["wtsk:list","wtsk:ls"]
   static description = '手动列出所有定时任务'
   static examples = [
     '<%= config.bin %> <%= command.id %>',

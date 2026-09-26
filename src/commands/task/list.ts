@@ -9,11 +9,11 @@ export default class List extends BaseCommand {
 
   static examples = [
     {
-      description: '列出所有任务',
+      description: '用表格形式列出所有任务',
       command: '<%= config.bin %> <%= command.id %>',
     },
     {
-      description: '以块状格式显示',
+      description: '以块状格式显示详细信息',
       command: '<%= config.bin %> <%= command.id %> --block',
     },
     {

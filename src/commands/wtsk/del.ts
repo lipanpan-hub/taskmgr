@@ -5,7 +5,10 @@ import {deleteScheduledTask, getAllTasks} from '../../lib/wtsk/task-scheduler.js
 import { BaseCommand } from '../../lib/base-command.js'
 
 export default class Del extends BaseCommand {
+  static aliases = ["wtsk:del","wtsk:delete"]
   static description = '手动删除定时任务'
+
+
   static examples = [`<%= config.bin %> <%= command.id %> -n myTask`]
   static flags = {
     taskName: Flags.string({char: 'n', description: '任务名称'}),
