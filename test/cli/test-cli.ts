@@ -4,7 +4,6 @@ import { Command } from 'commander'
 import {
   runTests,
   collectTestGroups,
-  printTestFiles,
   selectTestFileInteractive,
   selectTestCaseInteractive,
 } from './utils.js'
@@ -37,7 +36,8 @@ async function main() {
         
         if (testGroups.length === 0) {
           console.log('❌ 该文件夹下未找到测试文件')
-          process.exit(1)
+          process.exitCode = 1
+          return
         }
         
         for (const group of testGroups) {
@@ -61,7 +61,8 @@ async function main() {
       
       if (testGroups.length === 0) {
         console.log('❌ 未找到测试文件')
-        process.exit(1)
+        process.exitCode = 1
+        return
       }
       
       const selectedGroup = await selectTestFileInteractive(testGroups)
@@ -86,7 +87,8 @@ async function main() {
       
       if (testGroups.length === 0) {
         console.log('❌ 未找到测试文件')
-        process.exit(1)
+        process.exitCode = 1
+        return
       }
       
       const selectedCase = await selectTestCaseInteractive(testGroups)
@@ -139,7 +141,9 @@ async function main() {
 }
 // #endregion
 
-main().catch((error) => {
+try {
+  await main()
+} catch (error) {
   console.error('❌ 发生错误:', error)
-  process.exit(1)
-})
+  process.exitCode = 1
+}

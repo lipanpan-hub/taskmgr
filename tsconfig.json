@@ -1,6 +1,8 @@
 {
   "compilerOptions": {
     "declaration": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "module": "Node16",
     "outDir": "dist",
     "rootDir": "src",

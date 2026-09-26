@@ -1,4 +1,4 @@
-import {Command, Flags} from '@oclif/core'
+import {Flags} from '@oclif/core'
 
 import {getAllTasks, TaskInfo} from '../../lib/wtsk/task-scheduler.js'
 import { BaseCommand } from '../../lib/base-command.js'

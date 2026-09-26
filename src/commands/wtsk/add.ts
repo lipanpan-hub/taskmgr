@@ -1,4 +1,4 @@
-import {Args, Command, Flags} from '@oclif/core'
+import {Args, Flags} from '@oclif/core'
 import {copyFileSync} from 'node:fs'
 import {basename, join} from 'node:path'
 

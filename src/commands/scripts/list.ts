@@ -1,4 +1,3 @@
-import {Command} from '@oclif/core'
 import {readdirSync, statSync} from 'node:fs'
 import {join} from 'node:path'
 import { BaseCommand } from '../../lib/base-command.js'

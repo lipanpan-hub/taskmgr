@@ -1,4 +1,4 @@
-import {Command, Flags} from '@oclif/core'
+import {Flags} from '@oclif/core'
 import prompts from 'prompts'
 
 import {deleteScheduledTask, getAllTasks} from '../../lib/wtsk/task-scheduler.js'

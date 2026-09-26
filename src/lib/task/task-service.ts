@@ -23,7 +23,7 @@ export class TaskService {
 
   // #region 查询操作
   async getAllTasks(): Promise<Task[]> {
-    return await this.db.select().from(tasks)
+    return this.db.select().from(tasks)
   }
 
   async getAllTasksWithTriggers() {
@@ -33,18 +33,22 @@ export class TaskService {
         let triggerDetails = null
         
         switch (task.triggerType) {
-          case 'daily':
+          case 'daily': {
             triggerDetails = await this.getDailyTriggerByTaskId(task.id)
             break
-          case 'weekly':
-            triggerDetails = await this.getWeeklyTriggerByTaskId(task.id)
-            break
-          case 'monthly':
+          }
+          case 'monthly': {
             triggerDetails = await this.getMonthlyTriggerByTaskId(task.id)
             break
-          case 'once':
+          }
+          case 'once': {
             triggerDetails = await this.getOnceTriggerByTaskId(task.id)
             break
+          }
+          case 'weekly': {
+            triggerDetails = await this.getWeeklyTriggerByTaskId(task.id)
+            break
+          }
         }
         
         return {
@@ -156,7 +160,7 @@ export class TaskService {
   }
 
   async deleteAllTasks(): Promise<Task[]> {
-    return await this.db.delete(tasks).returning()
+    return this.db.delete(tasks).returning()
   }
   // #endregion
 }

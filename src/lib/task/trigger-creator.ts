@@ -12,28 +12,51 @@ import {
   type NewOnceTrigger,
 } from '../../db/schema.js'
 
+// 数据库实例类型
+type DbInstance = ReturnType<typeof getDb>
+
+// 直接创建任务时由 CLI 传入的参数
+export interface DirectCreateFlags {
+  path?: string
+  arguments?: string
+  description?: string
+  trigger?: string
+  'start-time'?: string
+  interval?: number
+  weekdays?: string
+  months?: string
+  monthdays?: string
+  'weeks-of-month'?: string
+  enabled?: boolean
+}
+
 // #region 交互式创建触发器
 export async function createTriggerInteractive(taskId: number, triggerType: string): Promise<boolean> {
   const db = getDb()
 
   try {
     switch (triggerType) {
-      case 'daily':
-        await createDailyTriggerInteractive(db, taskId)
-        break
-      case 'weekly':
-        await createWeeklyTriggerInteractive(db, taskId)
-        break
-      case 'monthly':
-        await createMonthlyTriggerInteractive(db, taskId)
-        break
-      case 'once':
-        await createOnceTriggerInteractive(db, taskId)
-        break
       case 'boot':
-      case 'logon':
+      case 'logon': {
         console.log('启动/登录触发任务无需额外配置')
         break
+      }
+      case 'daily': {
+        await createDailyTriggerInteractive(db, taskId)
+        break
+      }
+      case 'monthly': {
+        await createMonthlyTriggerInteractive(db, taskId)
+        break
+      }
+      case 'once': {
+        await createOnceTriggerInteractive(db, taskId)
+        break
+      }
+      case 'weekly': {
+        await createWeeklyTriggerInteractive(db, taskId)
+        break
+      }
     }
     return true
   } catch (error) {
@@ -45,7 +68,7 @@ export async function createTriggerInteractive(taskId: number, triggerType: stri
   }
 }
 
-async function createDailyTriggerInteractive(db: any, taskId: number): Promise<void> {
+async function createDailyTriggerInteractive(db: DbInstance, taskId: number): Promise<void> {
   const config = await prompts([
     {
       type: 'text',
@@ -86,7 +109,7 @@ async function createDailyTriggerInteractive(db: any, taskId: number): Promise<v
   if (result) console.log('✓ 天触发配置已创建')
 }
 
-async function createWeeklyTriggerInteractive(db: any, taskId: number): Promise<void> {
+async function createWeeklyTriggerInteractive(db: DbInstance, taskId: number): Promise<void> {
   const config = await prompts([
     {
       type: 'text',
@@ -143,7 +166,7 @@ async function createWeeklyTriggerInteractive(db: any, taskId: number): Promise<
   if (result) console.log('✓ 周触发配置已创建')
 }
 
-async function createMonthlyTriggerInteractive(db: any, taskId: number): Promise<void> {
+async function createMonthlyTriggerInteractive(db: DbInstance, taskId: number): Promise<void> {
   const config = await prompts([
     {
       type: 'text',
@@ -250,7 +273,7 @@ async function createMonthlyTriggerInteractive(db: any, taskId: number): Promise
   if (result) console.log('✓ 月触发配置已创建')
 }
 
-async function createOnceTriggerInteractive(db: any, taskId: number): Promise<void> {
+async function createOnceTriggerInteractive(db: DbInstance, taskId: number): Promise<void> {
   const config = await prompts([
     {
       type: 'text',
@@ -286,10 +309,15 @@ async function createOnceTriggerInteractive(db: any, taskId: number): Promise<vo
 // #endregion
 
 // #region 直接创建触发器
-export async function createTriggerDirect(taskId: number, triggerType: string, flags: any): Promise<string> {
+export async function createTriggerDirect(taskId: number, triggerType: string, flags: DirectCreateFlags): Promise<string> {
   const db = getDb()
 
   switch (triggerType) {
+    case 'boot':
+    case 'logon': {
+      return '启动/登录触发任务无需额外配置'
+    }
+
     case 'daily': {
       if (!flags['start-time']) {
         throw new Error('daily 触发类型需要 --start-time 参数')
@@ -304,32 +332,6 @@ export async function createTriggerDirect(taskId: number, triggerType: string, f
 
       const result = await db.insert(dailyTriggers).values(dailyTrigger)
       return result ? '✓ 天触发配置已创建' : '✗ 天触发配置创建失败'
-    }
-
-    case 'weekly': {
-      if (!flags['start-time']) {
-        throw new Error('weekly 触发类型需要 --start-time 参数')
-      }
-      if (!flags.weekdays) {
-        throw new Error('weekly 触发类型需要 --weekdays 参数 (例如: 1,3,5)')
-      }
-
-      // 解析 weekdays 字符串为数组
-      const daysOfWeek = flags.weekdays.split(',').map((d: string) => Number.parseInt(d.trim(), 10))
-      if (daysOfWeek.some((d: number) => Number.isNaN(d) || d < 0 || d > 6)) {
-        throw new Error('weekdays 必须是 0-6 之间的数字，用逗号分隔 (0=周日, 1=周一...6=周六)')
-      }
-
-      const weeklyTrigger: NewWeeklyTrigger = {
-        taskId,
-        startTime: flags['start-time'],
-        intervalWeeks: flags.interval || 1,
-        daysOfWeek: JSON.stringify(daysOfWeek),
-        startWhenAvailable: false,
-      }
-
-      const result = await db.insert(weeklyTriggers).values(weeklyTrigger)
-      return result ? '✓ 周触发配置已创建' : '✗ 周触发配置创建失败'
     }
 
     case 'monthly': {
@@ -347,8 +349,10 @@ export async function createTriggerDirect(taskId: number, triggerType: string, f
       }
 
       // 判断触发模式：按天还是按周
-      const hasMonthdays = !!flags.monthdays
-      const hasWeeksOfMonth = !!flags['weeks-of-month']
+      const monthdaysInput = flags.monthdays
+      const weeksOfMonthInput = flags['weeks-of-month']
+      const hasMonthdays = Boolean(monthdaysInput)
+      const hasWeeksOfMonth = Boolean(weeksOfMonthInput)
 
       if (!hasMonthdays && !hasWeeksOfMonth) {
         throw new Error('monthly 触发类型需要 --monthdays 或 --weeks-of-month 参数')
@@ -360,9 +364,9 @@ export async function createTriggerDirect(taskId: number, triggerType: string, f
 
       let monthlyTrigger: NewMonthlyTrigger
 
-      if (hasMonthdays) {
+      if (monthdaysInput) {
         // 按天模式
-        const daysOfMonth = flags.monthdays.split(',').map((d: string) => Number.parseInt(d.trim(), 10))
+        const daysOfMonth = monthdaysInput.split(',').map((d: string) => Number.parseInt(d.trim(), 10))
         if (daysOfMonth.some((d: number) => Number.isNaN(d) || d < 1 || d > 31)) {
           throw new Error('monthdays 必须是 1-31 之间的数字，用逗号分隔')
         }
@@ -376,12 +380,12 @@ export async function createTriggerDirect(taskId: number, triggerType: string, f
           startWhenAvailable: false,
         }
       } else {
-        // 按周模式
+        // 按周模式：monthdays 为空时 weeks-of-month 必定有值，前面已校验
         if (!flags.weekdays) {
           throw new Error('使用 --weeks-of-month 时必须同时指定 --weekdays 参数')
         }
 
-        const weeksOfMonth = flags['weeks-of-month'].split(',').map((w: string) => Number.parseInt(w.trim(), 10))
+        const weeksOfMonth = weeksOfMonthInput!.split(',').map((w: string) => Number.parseInt(w.trim(), 10))
         if (weeksOfMonth.some((w: number) => Number.isNaN(w) || w < 1 || w > 5)) {
           throw new Error('weeks-of-month 必须是 1-5 之间的数字，用逗号分隔')
         }
@@ -425,13 +429,35 @@ export async function createTriggerDirect(taskId: number, triggerType: string, f
       const result = await db.insert(onceTriggers).values(onceTrigger)
       return result ? '✓ 一次性触发配置已创建' : '✗ 一次性触发配置创建失败'
     }
+    case 'weekly': {
+      if (!flags['start-time']) {
+        throw new Error('weekly 触发类型需要 --start-time 参数')
+      }
+      if (!flags.weekdays) {
+        throw new Error('weekly 触发类型需要 --weekdays 参数 (例如: 1,3,5)')
+      }
 
-    case 'boot':
-    case 'logon':
-      return '启动/登录触发任务无需额外配置'
+      // 解析 weekdays 字符串为数组
+      const daysOfWeek = flags.weekdays.split(',').map((d: string) => Number.parseInt(d.trim(), 10))
+      if (daysOfWeek.some((d: number) => Number.isNaN(d) || d < 0 || d > 6)) {
+        throw new Error('weekdays 必须是 0-6 之间的数字，用逗号分隔 (0=周日, 1=周一...6=周六)')
+      }
 
-    default:
+      const weeklyTrigger: NewWeeklyTrigger = {
+        taskId,
+        startTime: flags['start-time'],
+        intervalWeeks: flags.interval || 1,
+        daysOfWeek: JSON.stringify(daysOfWeek),
+        startWhenAvailable: false,
+      }
+
+      const result = await db.insert(weeklyTriggers).values(weeklyTrigger)
+      return result ? '✓ 周触发配置已创建' : '✗ 周触发配置创建失败'
+    }
+
+    default: {
       throw new Error(`未知的触发类型: ${triggerType}`)
+    }
   }
 }
 // #endregion

@@ -46,7 +46,7 @@ export function parseTestFile(filePath: string): TestCase[] {
   const cases: TestCase[] = []
   
   try {
-    const content = readFileSync(filePath, 'utf-8')
+    const content = readFileSync(filePath, 'utf8')
     const lines = content.split('\n')
     
     for (let i = 0; i < lines.length; i++) {
@@ -118,7 +118,7 @@ export function runTests(grepPattern: string, specificFile?: string) {
     
     // 步骤2: 添加 grep 过滤器（转义正则特殊字符，避免注入风险）
     if (grepPattern) {
-      const escapedPattern = grepPattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+      const escapedPattern = grepPattern.replace(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`)
       command += ` --grep "${escapedPattern}"`
     }
     
@@ -131,9 +131,9 @@ export function runTests(grepPattern: string, specificFile?: string) {
     })
     
     console.log('\n✅ 测试完成')
-  } catch (error) {
+  } catch {
     console.error('\n❌ 测试失败')
-    process.exit(1)
+    process.exitCode = 1
   }
 }
 
@@ -179,7 +179,7 @@ export async function selectTestFileInteractive(testGroups: TestGroup[]): Promis
     name: 'file',
     message: '选择要查看的测试文件',
     choices: fileChoices,
-    suggest: async (input: string, choices: any[]) => {
+    suggest: async (input: string, choices: prompts.Choice[]) => {
       if (!input) return choices // 无输入时显示全部选项
       const results = fuse.search(input) // 使用 Fuse.js 进行模糊搜索
       return results.map((r) => r.item)
@@ -224,7 +224,7 @@ export async function selectTestCaseInteractive(testGroups: TestGroup[]): Promis
     name: 'testCase',
     message: '选择要运行的测试用例',
     choices: caseChoices,
-    suggest: async (input: string, choices: any[]) => {
+    suggest: async (input: string, choices: prompts.Choice[]) => {
       if (!input) return choices // 无输入时显示全部选项
       const results = fuse.search(input) // 使用 Fuse.js 进行模糊搜索
       return results.map((r) => r.item)

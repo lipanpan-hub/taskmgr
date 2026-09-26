@@ -39,9 +39,9 @@ export async function syncTaskToScheduler(task: Task): Promise<TaskSyncResult> {
 
 // 批量同步任务到 Windows Task Scheduler
 export async function syncTasksToScheduler(taskList: Task[]): Promise<{
-  successCount: number
   failCount: number
   results: TaskSyncResult[]
+  successCount: number
 }> {
   const results: TaskSyncResult[] = []
 

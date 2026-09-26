@@ -5,6 +5,16 @@ import prompts from 'prompts'
 
 import {normalizeStartTime} from './trigger-utils.js'
 
+// 各触发类型交互问答返回的配置字段
+interface TriggerConfig {
+  interval?: number
+  monthdays?: number[]
+  months?: number[]
+  time?: string
+  weekdays?: number[]
+  weeksOfMonth?: number[]
+}
+
 export async function handlePsiInteractive(configDir: string) {
   const scriptsDir = join(configDir, 'scripts')
   
@@ -46,30 +56,36 @@ export async function handlePsiInteractive(configDir: string) {
     throw new Error('未选择任何脚本或触发类型')
   }
 
-  let triggerConfig: any = {}
+  let triggerConfig: TriggerConfig = {}
   switch (baseResponse.trigger) {
-    case 'daily':
-      triggerConfig = await handleDailyTrigger()
-      break
-    case 'weekly':
-      triggerConfig = await handleWeeklyTrigger()
-      break
-    case 'monthly':
-      triggerConfig = await handleMonthlyTrigger()
-      break
-    case 'once':
-      triggerConfig = await handleOnceTrigger()
-      break
-    case 'boot':
+    case 'boot': {
       triggerConfig = await handleBootTrigger()
       break
-    case 'logon':
+    }
+    case 'daily': {
+      triggerConfig = await handleDailyTrigger()
+      break
+    }
+    case 'logon': {
       triggerConfig = await handleLogonTrigger()
       break
+    }
+    case 'monthly': {
+      triggerConfig = await handleMonthlyTrigger()
+      break
+    }
+    case 'once': {
+      triggerConfig = await handleOnceTrigger()
+      break
+    }
+    case 'weekly': {
+      triggerConfig = await handleWeeklyTrigger()
+      break
+    }
   }
 
   // 如果用户强制中断了操作，对于需要时间的触发类型将缺失时间
-  if (['daily', 'weekly', 'monthly', 'once'].includes(baseResponse.trigger) && (!triggerConfig || !triggerConfig.time)) {
+  if (['daily', 'monthly', 'once', 'weekly'].includes(baseResponse.trigger) && (!triggerConfig || !triggerConfig.time)) {
     throw new Error('操作已中止: 缺少必要的时间设置')
   }
 

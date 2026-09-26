@@ -27,7 +27,7 @@ export interface TestContext {
 
 // 启动测试服务器
 export async function startTestServer(): Promise<HttpServer> {
-  const { httpServer } = createApp()
+  const { httpServer } = await createApp()
   await new Promise<void>((resolve) => {
     httpServer.listen(TEST_PORT, () => {
       console.log(`测试服务器启动在端口 ${TEST_PORT}`)

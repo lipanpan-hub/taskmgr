@@ -34,28 +34,8 @@ async function checkRuntime(runtime: string): Promise<RuntimeInfo> {
     let versionCommand: string
 
     switch (runtime) {
-      case 'powershell': {
-        versionCommand = 'powershell -Command "$PSVersionTable.PSVersion.ToString()"'
-        break
-      }
-      case 'pwsh': {
-        versionCommand = 'pwsh -Command "$PSVersionTable.PSVersion.ToString()"'
-        break
-      }
-      case 'uv': {
-        versionCommand = 'uv --version'
-        break
-      }
-      case 'python': {
-        versionCommand = 'python --version'
-        break
-      }
       case 'bun': {
         versionCommand = 'bun --version'
-        break
-      }
-      case 'node': {
-        versionCommand = 'node --version'
         break
       }
       case 'deno': {
@@ -64,6 +44,26 @@ async function checkRuntime(runtime: string): Promise<RuntimeInfo> {
       }
       case 'go': {
         versionCommand = 'go version'
+        break
+      }
+      case 'node': {
+        versionCommand = 'node --version'
+        break
+      }
+      case 'powershell': {
+        versionCommand = 'powershell -Command "$PSVersionTable.PSVersion.ToString()"'
+        break
+      }
+      case 'pwsh': {
+        versionCommand = 'pwsh -Command "$PSVersionTable.PSVersion.ToString()"'
+        break
+      }
+      case 'python': {
+        versionCommand = 'python --version'
+        break
+      }
+      case 'uv': {
+        versionCommand = 'uv --version'
         break
       }
       default: {

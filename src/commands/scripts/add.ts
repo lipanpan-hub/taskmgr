@@ -1,4 +1,4 @@
-import {Args, Command} from '@oclif/core'
+import {Args} from '@oclif/core'
 import {copyFileSync, existsSync, mkdirSync} from 'node:fs'
 import {basename, join} from 'node:path'
 import { BaseCommand } from '../../lib/base-command.js'

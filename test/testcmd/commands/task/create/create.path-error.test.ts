@@ -46,7 +46,7 @@ describe('task create - 可执行文件路径错误场景', () => {
       'task',
       'create',
       taskName,
-      '--path=C:\\Program Files\\test.exe',
+      String.raw`--path=C:\Program Files\test.exe`,
       '--trigger=daily',
       '--start-time=10:00',
     ])

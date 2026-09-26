@@ -75,54 +75,47 @@ export async function formatBlock(tasks: Task[]): Promise<string[]> {
 
   for (const [index, task] of tasks.entries()) {
     if (index > 0) lines.push('')
-    lines.push('-'.repeat(80))
-    lines.push(`任务 #${task.id}: ${task.name}`)
-    lines.push(`  状态:         ${task.enabled ? '✓ 启用' : '✗ 禁用'}`)
-    lines.push(`  触发类型:     ${task.triggerType}`)
-    lines.push(`  可执行文件:   ${task.executablePath}`)
+    lines.push('-'.repeat(80), `任务 #${task.id}: ${task.name}`, `  状态:         ${task.enabled ? '✓ 启用' : '✗ 禁用'}`, `  触发类型:     ${task.triggerType}`, `  可执行文件:   ${task.executablePath}`)
     if (task.arguments) lines.push(`  参数:         ${task.arguments}`)
     if (task.description) lines.push(`  描述:         ${task.description}`)
-    lines.push(`  创建时间:     ${task.createdAt}`)
-    lines.push(`  更新时间:     ${task.updatedAt}`)
+    lines.push(`  创建时间:     ${task.createdAt}`, `  更新时间:     ${task.updatedAt}`)
 
     // 根据触发类型获取并显示 trigger 信息
     let trigger: DailyTrigger | WeeklyTrigger | MonthlyTrigger | OnceTrigger | null = null
     switch (task.triggerType) {
-      case 'daily':
+      case 'daily': {
         trigger = await taskService.getDailyTriggerByTaskId(task.id)
         break
-      case 'weekly':
-        trigger = await taskService.getWeeklyTriggerByTaskId(task.id)
-        break
-      case 'monthly':
+      }
+      case 'monthly': {
         trigger = await taskService.getMonthlyTriggerByTaskId(task.id)
         break
-      case 'once':
+      }
+      case 'once': {
         trigger = await taskService.getOnceTriggerByTaskId(task.id)
         break
+      }
+      case 'weekly': {
+        trigger = await taskService.getWeeklyTriggerByTaskId(task.id)
+        break
+      }
     }
 
     if (trigger) {
       lines.push(`  触发器配置:`)
       if ('intervalDays' in trigger) {
         // DailyTrigger
-        lines.push(`    间隔天数:   ${trigger.intervalDays}`)
-        lines.push(`    开始时间:   ${trigger.startTime}`)
-        lines.push(`    错过时启动: ${trigger.startWhenAvailable ? '是' : '否'}`)
+        lines.push(`    间隔天数:   ${trigger.intervalDays}`, `    开始时间:   ${trigger.startTime}`, `    错过时启动: ${trigger.startWhenAvailable ? '是' : '否'}`)
       } else if ('intervalWeeks' in trigger) {
         // WeeklyTrigger
         const daysOfWeek = JSON.parse(trigger.daysOfWeek)
         const dayNames = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
         const dayLabels = daysOfWeek.map((d: number) => dayNames[d]).join(', ')
-        lines.push(`    间隔周数:   ${trigger.intervalWeeks}`)
-        lines.push(`    星期几:     ${dayLabels}`)
-        lines.push(`    开始时间:   ${trigger.startTime}`)
-        lines.push(`    错过时启动: ${trigger.startWhenAvailable ? '是' : '否'}`)
+        lines.push(`    间隔周数:   ${trigger.intervalWeeks}`, `    星期几:     ${dayLabels}`, `    开始时间:   ${trigger.startTime}`, `    错过时启动: ${trigger.startWhenAvailable ? '是' : '否'}`)
       } else if ('months' in trigger) {
         // MonthlyTrigger
         const months = JSON.parse(trigger.months)
-        lines.push(`    月份:       ${months.join(', ')}`)
-        lines.push(`    触发模式:   ${trigger.triggerMode === 'days' ? '按天' : '按周'}`)
+        lines.push(`    月份:       ${months.join(', ')}`, `    触发模式:   ${trigger.triggerMode === 'days' ? '按天' : '按周'}`)
         if (trigger.triggerMode === 'days' && trigger.daysOfMonth) {
           const days = JSON.parse(trigger.daysOfMonth)
           lines.push(`    日期:       ${days.join(', ')}`)
@@ -131,15 +124,12 @@ export async function formatBlock(tasks: Task[]): Promise<string[]> {
           const daysOfWeek = JSON.parse(trigger.daysOfWeek)
           const dayNames = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
           const dayLabels = daysOfWeek.map((d: number) => dayNames[d]).join(', ')
-          lines.push(`    第几周:     ${weeks.join(', ')}`)
-          lines.push(`    星期几:     ${dayLabels}`)
+          lines.push(`    第几周:     ${weeks.join(', ')}`, `    星期几:     ${dayLabels}`)
         }
-        lines.push(`    开始时间:   ${trigger.startTime}`)
-        lines.push(`    错过时启动: ${trigger.startWhenAvailable ? '是' : '否'}`)
+        lines.push(`    开始时间:   ${trigger.startTime}`, `    错过时启动: ${trigger.startWhenAvailable ? '是' : '否'}`)
       } else if ('startTime' in trigger) {
         // OnceTrigger
-        lines.push(`    执行时间:   ${trigger.startTime}`)
-        lines.push(`    错过时启动: ${trigger.startWhenAvailable ? '是' : '否'}`)
+        lines.push(`    执行时间:   ${trigger.startTime}`, `    错过时启动: ${trigger.startWhenAvailable ? '是' : '否'}`)
       }
     }
   }

@@ -1,14 +1,15 @@
 import { exec } from 'node:child_process'
+import type { Server as HttpServer } from 'node:http'
 
 import { createApp } from './app.js'
 
 const DEFAULT_PORT = 3000
 const HOST = '127.0.0.1'
 
-export function startServer(port?: number) {
+export async function startServer(port?: number): Promise<HttpServer> {
   const envPort = process.env.PORT ? Number(process.env.PORT) : undefined
   const PORT = port ?? envPort ?? DEFAULT_PORT
-  const { httpServer } = createApp()
+  const { httpServer } = await createApp()
 
   return httpServer.listen(PORT, HOST, () => {
     console.log(`Server is running on http://${HOST}:${PORT}`)

@@ -1,8 +1,7 @@
 // 环境变量配置模块 - 负责加载和管理应用程序的环境配置
 import { readFileSync, existsSync } from 'node:fs'
-import { join } from 'node:path'
+import { join , dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { dirname } from 'node:path'
 
 // 获取当前模块的文件路径(ESM模块需要通过import.meta.url转换)
 const __filename = fileURLToPath(import.meta.url)
@@ -19,7 +18,7 @@ function loadEnv(): Record<string, string> {
   const env: Record<string, string> = {}
 
   if (existsSync(envPath)) {
-    const content = readFileSync(envPath, 'utf-8')
+    const content = readFileSync(envPath, 'utf8')
 
     // 逐行解析.env文件内容
     content.split('\n').forEach(line => {

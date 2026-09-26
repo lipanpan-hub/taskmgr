@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import sinon from 'sinon'
+import {createSandbox, type SinonSandbox} from 'sinon'
 import type { Socket as ClientSocket } from 'socket.io-client'
 import type { Server as HttpServer } from 'node:http'
 import type { NewTask } from '../../../src/db/schema.js'
@@ -20,7 +20,7 @@ describe('WebSocket 创建操作测试', function () {
 
   let httpServer: HttpServer
   let clientSocket: ClientSocket
-  let sandbox: sinon.SinonSandbox
+  let sandbox: SinonSandbox
   const createdTaskIds: number[] = []
 
   before(async () => {
@@ -28,7 +28,7 @@ describe('WebSocket 创建操作测试', function () {
   })
 
   beforeEach(async () => {
-    sandbox = sinon.createSandbox()
+    sandbox = createSandbox()
     clientSocket = await connectClient()
   })
 

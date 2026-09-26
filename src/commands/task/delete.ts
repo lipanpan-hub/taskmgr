@@ -1,4 +1,4 @@
-import {Args, Command, Flags} from '@oclif/core'
+import {Args, Flags} from '@oclif/core'
 import {TaskDeleteHandler} from '../../lib/task/task-delete-handler.js'
 import { BaseCommand } from '../../lib/base-command.js'
 

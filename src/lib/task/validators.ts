@@ -5,7 +5,7 @@ export interface ValidationError {
   message: string
 }
 
-const VALID_TRIGGER_TYPES = ['daily', 'weekly', 'monthly', 'once', 'boot', 'logon'] as const
+const VALID_TRIGGER_TYPES: readonly string[] = ['daily', 'weekly', 'monthly', 'once', 'boot', 'logon']
 
 export function validateTaskId(id: unknown): number | ValidationError {
   const numId = Number(id)
@@ -24,7 +24,7 @@ export function validateNewTask(task: NewTask): ValidationError | null {
     return { error: '缺少必填字段', message: 'executablePath 字段不能为空' }
   }
 
-  if (task.triggerType && !VALID_TRIGGER_TYPES.includes(task.triggerType as any)) {
+  if (task.triggerType && !VALID_TRIGGER_TYPES.includes(task.triggerType)) {
     return {
       error: '无效的触发类型',
       message: `triggerType 必须是以下值之一: ${VALID_TRIGGER_TYPES.join(', ')}`,

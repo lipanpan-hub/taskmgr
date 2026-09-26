@@ -1,4 +1,4 @@
-import {Command, Flags} from '@oclif/core'
+import {Flags} from '@oclif/core'
 import {eq} from 'drizzle-orm'
 import {getDb} from '../../db/index.js'
 import {tasks} from '../../db/schema.js'

@@ -13,7 +13,7 @@ describe('task create - 可执行文件路径正常场景', () => {
       'task',
       'create',
       taskName,
-      '--path=C:\\Windows\\System32\\notepad.exe',
+      String.raw`--path=C:\Windows\System32\notepad.exe`,
       '--trigger=daily',
       '--start-time=10:00',
     ])
@@ -28,7 +28,7 @@ describe('task create - 可执行文件路径正常场景', () => {
       'task',
       'create',
       taskName,
-      '--path=D:\\Tools\\test.exe',
+      String.raw`--path=D:\Tools\test.exe`,
       '--trigger=daily',
       '--start-time=10:00',
     ])
@@ -45,7 +45,7 @@ describe('task create - 可执行文件路径正常场景', () => {
       'task',
       'create',
       taskName,
-      '--path=.\\scripts\\test.bat',
+      String.raw`--path=.\scripts\test.bat`,
       '--trigger=daily',
       '--start-time=10:00',
     ])
@@ -60,7 +60,7 @@ describe('task create - 可执行文件路径正常场景', () => {
       'task',
       'create',
       taskName,
-      '--path=..\\scripts\\test.bat',
+      String.raw`--path=..\scripts\test.bat`,
       '--trigger=daily',
       '--start-time=10:00',
     ])
@@ -109,7 +109,7 @@ describe('task create - 可执行文件路径正常场景', () => {
       'task',
       'create',
       taskName,
-      '--path="C:\\Program Files\\test app\\test.exe"',
+      String.raw`--path="C:\Program Files\test app\test.exe"`,
       '--trigger=daily',
       '--start-time=10:00',
     ])

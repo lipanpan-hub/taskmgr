@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import sinon from 'sinon'
+import {createSandbox, type SinonSandbox} from 'sinon'
 import type { Socket as ClientSocket } from 'socket.io-client'
 import type { Server as HttpServer } from 'node:http'
 import {
@@ -18,7 +18,7 @@ describe('WebSocket 查询操作测试', function () {
 
   let httpServer: HttpServer
   let clientSocket: ClientSocket
-  let sandbox: sinon.SinonSandbox
+  let sandbox: SinonSandbox
   const createdTaskIds: number[] = []
 
   before(async () => {
@@ -26,7 +26,7 @@ describe('WebSocket 查询操作测试', function () {
   })
 
   beforeEach(async () => {
-    sandbox = sinon.createSandbox()
+    sandbox = createSandbox()
     clientSocket = await connectClient()
   })
 
@@ -60,7 +60,7 @@ describe('WebSocket 查询操作测试', function () {
     })
 
     it('应该在任务不存在时返回错误', async () => {
-      const response = await emitAsync<ApiResponse>(clientSocket, 'task:getById', 999999)
+      const response = await emitAsync<ApiResponse>(clientSocket, 'task:getById', 999_999)
       expect(response).to.have.property('success', false)
       if (!response.success) {
         expect(response.error).to.equal('任务不存在')

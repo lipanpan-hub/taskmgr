@@ -1,4 +1,3 @@
-import {Command} from '@oclif/core'
 import {spawn} from 'node:child_process'
 import {existsSync, mkdirSync} from 'node:fs'
 import {join} from 'node:path'

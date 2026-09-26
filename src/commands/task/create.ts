@@ -1,4 +1,4 @@
-import {Args, Command, Flags} from '@oclif/core'
+import {Args, Flags} from '@oclif/core'
 import {directCreateTask, interactiveCreateTask} from '../../lib/task/task-creator-handler.js'
 import { BaseCommand } from '../../lib/base-command.js'
 

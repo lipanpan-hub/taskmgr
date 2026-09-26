@@ -1,16 +1,16 @@
 import {eq} from 'drizzle-orm'
 import {getDb} from '../../db/index.js'
-import {dailyTriggers, weeklyTriggers, monthlyTriggers, onceTriggers} from '../../db/schema.js'
+import {type Task, dailyTriggers, weeklyTriggers, monthlyTriggers, onceTriggers} from '../../db/schema.js'
 import type {CreateTaskOptions} from '../wtsk/task-scheduler.js'
 
 // 构建任务选项
-export async function buildTaskOptions(task: any): Promise<CreateTaskOptions> {
+export async function buildTaskOptions(task: Task): Promise<CreateTaskOptions> {
   const db = getDb()
   const baseOptions: CreateTaskOptions = {
     taskName: task.name,
     executablePath: task.executablePath,
-    arguments: task.arguments,
-    description: task.description,
+    arguments: task.arguments ?? undefined,
+    description: task.description ?? undefined,
     enabled: task.enabled,
     triggerType: task.triggerType,
     weekdays: [],
@@ -27,6 +27,11 @@ export async function buildTaskOptions(task: any): Promise<CreateTaskOptions> {
 
   // 根据触发类型获取触发器配置
   switch (task.triggerType) {
+    case 'boot':
+    case 'logon': {
+      return baseOptions
+    }
+
     case 'daily': {
       const [trigger] = await db.select().from(dailyTriggers).where(eq(dailyTriggers.taskId, task.id))
       if (!trigger) throw new Error('未找到天触发配置')
@@ -34,18 +39,6 @@ export async function buildTaskOptions(task: any): Promise<CreateTaskOptions> {
         ...baseOptions,
         startTime: trigger.startTime,
         interval: trigger.intervalDays,
-        startWhenAvailable: trigger.startWhenAvailable,
-      }
-    }
-
-    case 'weekly': {
-      const [trigger] = await db.select().from(weeklyTriggers).where(eq(weeklyTriggers.taskId, task.id))
-      if (!trigger) throw new Error('未找到周触发配置')
-      return {
-        ...baseOptions,
-        startTime: trigger.startTime,
-        interval: trigger.intervalWeeks,
-        weekdays: JSON.parse(trigger.daysOfWeek),
         startWhenAvailable: trigger.startWhenAvailable,
       }
     }
@@ -79,12 +72,20 @@ export async function buildTaskOptions(task: any): Promise<CreateTaskOptions> {
         startWhenAvailable: trigger.startWhenAvailable,
       }
     }
+    case 'weekly': {
+      const [trigger] = await db.select().from(weeklyTriggers).where(eq(weeklyTriggers.taskId, task.id))
+      if (!trigger) throw new Error('未找到周触发配置')
+      return {
+        ...baseOptions,
+        startTime: trigger.startTime,
+        interval: trigger.intervalWeeks,
+        weekdays: JSON.parse(trigger.daysOfWeek),
+        startWhenAvailable: trigger.startWhenAvailable,
+      }
+    }
 
-    case 'boot':
-    case 'logon':
-      return baseOptions
-
-    default:
+    default: {
       throw new Error(`未知的触发类型: ${task.triggerType}`)
+    }
   }
 }

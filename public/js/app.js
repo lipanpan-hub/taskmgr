@@ -1,5 +1,5 @@
 // Alpine.js 主应用
-function taskManager() {
+globalThis.taskManager = function () {
   return {
     // #region 状态管理
     isDark: false,
@@ -57,7 +57,7 @@ function taskManager() {
 
     loadTheme() {
       const savedTheme = localStorage.getItem('theme');
-      this.isDark = savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      this.isDark = savedTheme === 'dark' || (!savedTheme && globalThis.matchMedia('(prefers-color-scheme: dark)').matches);
       if (this.isDark) {
         document.documentElement.classList.add('dark');
       }
@@ -192,7 +192,7 @@ function taskManager() {
     formatMonths(monthsValue) {
       const months = this.parseListValue(monthsValue);
       return months
-        .map(m => Number(m))
+        .map(Number)
         .filter(m => !Number.isNaN(m))
         .map(m => `${m}月`)
         .join(', ');
@@ -201,7 +201,7 @@ function taskManager() {
     formatDaysOfMonth(daysValue) {
       const days = this.parseListValue(daysValue);
       return days
-        .map(d => Number(d))
+        .map(Number)
         .filter(d => !Number.isNaN(d))
         .map(d => `${d}日`)
         .join(', ');
@@ -297,4 +297,4 @@ function taskManager() {
     }
     // #endregion
   };
-}
+};

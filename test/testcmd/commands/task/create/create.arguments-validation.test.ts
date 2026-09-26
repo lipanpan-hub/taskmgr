@@ -45,7 +45,7 @@ describe('task create - arguments 参数正常场景', () => {
       'create',
       taskName,
       '--path=notepad.exe',
-      '--arguments=C:\\Windows\\System32\\drivers\\etc\\hosts',
+      String.raw`--arguments=C:\Windows\System32\drivers\etc\hosts`,
       '--trigger=daily',
       '--start-time=10:00',
     ])
@@ -60,7 +60,7 @@ describe('task create - arguments 参数正常场景', () => {
       'create',
       taskName,
       '--path=cmd.exe',
-      '--arguments="/c .\\scripts\\test.bat"',
+      String.raw`--arguments="/c .\scripts\test.bat"`,
       '--trigger=daily',
       '--start-time=10:00',
     ])
@@ -92,7 +92,7 @@ describe('task create - arguments 参数正常场景', () => {
       'create',
       taskName,
       '--path=notepad.exe',
-      '--arguments="C:\\Program Files\\test file.txt"',
+      String.raw`--arguments="C:\Program Files\test file.txt"`,
       '--trigger=daily',
       '--start-time=10:00',
     ])

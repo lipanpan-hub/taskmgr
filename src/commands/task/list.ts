@@ -1,4 +1,4 @@
-import {Command, Flags} from '@oclif/core'
+import {Flags} from '@oclif/core'
 import {TaskService} from '../../lib/task/task-service.js'
 import {applyFilters, formatBlock, formatDetailedLine} from '../../lib/task/task-list.js'
 import { BaseCommand } from '../../lib/base-command.js'

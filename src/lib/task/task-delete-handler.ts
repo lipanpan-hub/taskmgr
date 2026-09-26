@@ -201,13 +201,13 @@ export class TaskDeleteHandler {
       for (const task of deletedTasks) {
         try {
           const exists = await taskExists(task.name)
-          if (exists) {
-            const result = await deleteScheduledTask(task.name)
-            if (result.startsWith('Error:')) {
-              failCount++
-            } else {
-              successCount++
-            }
+          if (!exists) continue
+
+          const result = await deleteScheduledTask(task.name)
+          if (result.startsWith('Error:')) {
+            failCount++
+          } else {
+            successCount++
           }
         } catch {
           failCount++

@@ -2,7 +2,7 @@ import { join } from 'node:path'
 import Database from 'better-sqlite3'
 import { drizzle } from 'drizzle-orm/better-sqlite3'
 import { tasks } from './schema.js'
-import { envConfig as envConfig } from '../lib/env.js'
+import { envConfig } from '../lib/env.js'
 import { getOclifConfigDir } from '../lib/utils/oclif-config-dir.js'
 
 const configDir = getOclifConfigDir()

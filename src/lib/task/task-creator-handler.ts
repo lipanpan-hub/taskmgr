@@ -2,7 +2,7 @@ import prompts from 'prompts'
 import Fuse from 'fuse.js'
 import { TaskService } from './task-service.js'
 import type { NewTask } from '../../db/schema.js'
-import { createTriggerDirect, createTriggerInteractive } from './trigger-creator.js'
+import { createTriggerDirect, createTriggerInteractive, type DirectCreateFlags } from './trigger-creator.js'
 import { syncTaskToScheduler } from './task-sync-handler.js'
 import { getAvailableRuntimeNames } from '../utils/runtime-detector.js'
 import { optimizeTaskInput } from './task-input-optimizer.js'
@@ -47,7 +47,7 @@ export async function interactiveCreateTask(): Promise<void> {
       name: 'executablePath',
       message: '可执行文件路径',
       choices: runtimeChoices,
-      suggest: async (input: string, choices: any[]) => {
+      suggest: async (input: string, choices: prompts.Choice[]) => {
         const keyword = input.trim()
         if (!keyword) return choices
         const results = runtimeFuse.search(keyword).slice(0, 20).map((r) => r.item)
@@ -62,7 +62,7 @@ export async function interactiveCreateTask(): Promise<void> {
       name: 'arguments',
       message: '执行参数（可选）',
       choices: scriptChoices,
-      suggest: async (input: string, choices: any[]) => {
+      suggest: async (input: string, choices: prompts.Choice[]) => {
         const keyword = input.trim()
         if (!keyword) return choices
         const results = scriptFuse.search(keyword).slice(0, 20).map((r) => r.item)
@@ -159,7 +159,7 @@ export async function interactiveCreateTask(): Promise<void> {
 // #region 直接创建
 export async function directCreateTask(
   name: string | undefined,
-  flags: any,
+  flags: DirectCreateFlags,
 ): Promise<void> {
   if (!name) {
     throw new Error('必须提供任务名称')
@@ -183,7 +183,7 @@ export async function directCreateTask(
     executablePath: optimized.executablePath,
     arguments: optimized.arguments || undefined, // 空字符串转为 undefined
     description: flags.description || undefined,
-    triggerType: flags.trigger,
+    triggerType: flags.trigger as NewTask['triggerType'],
     enabled: flags.enabled,
   }
 
