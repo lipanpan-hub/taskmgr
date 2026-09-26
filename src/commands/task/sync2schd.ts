@@ -6,7 +6,7 @@ import {syncTasksToScheduler} from '../../lib/task/task-sync-handler.js'
 import { BaseCommand } from '../../lib/base-command.js'
 
 export default class Sync2Schd extends BaseCommand {
-  static aliases = ["task:sync"]
+  static aliases = ["task:sync","task:sync2schd"]
   static description = '将数据库中的任务同步到 Windows Task Scheduler'
 
   static examples = [

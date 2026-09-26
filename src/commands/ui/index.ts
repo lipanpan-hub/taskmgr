@@ -4,6 +4,7 @@ import { startServer } from '../../backend/server.js'
 import { BaseCommand } from '../../lib/base-command.js'
 
 export default class Ui extends BaseCommand {
+  static aliases = ["ui:start","ui:run"]
   static description = '启动 Web UI 服务'
   static examples = ['<%= config.bin %> <%= command.id %>', '<%= config.bin %> <%= command.id %> --port 8080']
   static flags = {

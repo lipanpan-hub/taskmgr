@@ -3,6 +3,7 @@ import {directCreateTask, interactiveCreateTask} from '../../lib/task/task-creat
 import { BaseCommand } from '../../lib/base-command.js'
 
 export default class Create extends BaseCommand {
+  static aliases = ["task:add"]
   static args = {
     name: Args.string({description: '任务名称'}),
   }

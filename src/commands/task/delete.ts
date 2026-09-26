@@ -3,6 +3,7 @@ import {TaskDeleteHandler} from '../../lib/task/task-delete-handler.js'
 import { BaseCommand } from '../../lib/base-command.js'
 
 export default class Delete extends BaseCommand {
+  static aliases = ["task:remove","task:del"]
   static args = {
     name: Args.string({description: '要删除的任务名称'}),
   }

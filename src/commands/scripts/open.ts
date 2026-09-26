@@ -4,6 +4,7 @@ import {join} from 'node:path'
 import { BaseCommand } from '../../lib/base-command.js'
 
 export default class Open extends BaseCommand {
+  static aliases = ["script:open","script:opendcriptsdir"]
   static description = '打开脚本文件目录'
   static examples = [
     '<%= config.bin %> <%= command.id %>',

@@ -3,6 +3,7 @@ import {join} from 'node:path'
 import { BaseCommand } from '../../lib/base-command.js'
 
 export default class List extends BaseCommand {
+  static aliases = ["script:list","script:ls"]
   static description = '列出用户配置目录下的所有脚本'
   static examples = [
     '<%= config.bin %> <%= command.id %>',

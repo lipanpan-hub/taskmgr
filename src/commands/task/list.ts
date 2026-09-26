@@ -4,6 +4,7 @@ import {applyFilters, formatBlock, formatDetailedLine} from '../../lib/task/task
 import { BaseCommand } from '../../lib/base-command.js'
 
 export default class List extends BaseCommand {
+  static aliases = ["task:list","task:ls"]
   static description = '列出数据库中的所有定时任务'
 
   static examples = [

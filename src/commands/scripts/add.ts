@@ -4,6 +4,7 @@ import {basename, join} from 'node:path'
 import { BaseCommand } from '../../lib/base-command.js'
 
 export default class Add extends BaseCommand {
+  static aliases = ["script:add","script:addscript"]
   static args = {
     path: Args.string({
       description: '脚本文件路径',
