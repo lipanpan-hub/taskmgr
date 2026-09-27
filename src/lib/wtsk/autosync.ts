@@ -23,6 +23,9 @@ function ensureHiddenLauncher(): string {
 export async function createAutoSyncTask(): Promise<string> {
   const taskName = 'AutoSync'
 
+  // 无论任务是否已存在都先补写启动器: 该 vbs 可能被清理工具/杀软删除, 每次运行 tm 都自愈
+  const launcherPath = ensureHiddenLauncher()
+
   // 检查任务是否已存在
   const exists = await taskExists(taskName)
   if (exists) {
@@ -31,7 +34,6 @@ export async function createAutoSyncTask(): Promise<string> {
 
   // 通过 wscript.exe 运行隐藏启动器来执行命令, 避免 cmd 控制台窗口闪现
   // (tm 实体是 tm.cmd, 由启动器内部的 cmd /c 负责经 PATH + PATHEXT 解析)
-  const launcherPath = ensureHiddenLauncher()
   const executablePath = 'wscript.exe'
   const execArguments = `"${launcherPath}"`
 
