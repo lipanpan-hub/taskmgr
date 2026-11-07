@@ -65,7 +65,7 @@ EXAMPLES
       --weekdays="5" --start-time="23:59"
 ```
 
-_See code: [src/commands/wtsk/add.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.28/src/commands/wtsk/add.ts)_
+_See code: [src/commands/wtsk/add.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.29/src/commands/wtsk/add.ts)_
 
 ## `tm wtsk del`
 
@@ -90,7 +90,7 @@ EXAMPLES
   $ tm wtsk del -n myTask
 ```
 
-_See code: [src/commands/wtsk/del.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.28/src/commands/wtsk/del.ts)_
+_See code: [src/commands/wtsk/del.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.29/src/commands/wtsk/del.ts)_
 
 ## `tm wtsk delete`
 
@@ -144,7 +144,7 @@ EXAMPLES
   $ tm wtsk list -l 5 --block
 ```
 
-_See code: [src/commands/wtsk/list.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.28/src/commands/wtsk/list.ts)_
+_See code: [src/commands/wtsk/list.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.29/src/commands/wtsk/list.ts)_
 
 ## `tm wtsk ls`
 

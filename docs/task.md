@@ -59,7 +59,7 @@ EXAMPLES
     $ tm task create
 ```
 
-_See code: [src/commands/task/create/index.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.28/src/commands/task/create/index.ts)_
+_See code: [src/commands/task/create/index.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.29/src/commands/task/create/index.ts)_
 
 ## `tm task create boot [NAME]`
 
@@ -106,7 +106,7 @@ EXAMPLES
     $ tm task create boot myTask --path="notepad.exe" --delay=5
 ```
 
-_See code: [src/commands/task/create/boot.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.28/src/commands/task/create/boot.ts)_
+_See code: [src/commands/task/create/boot.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.29/src/commands/task/create/boot.ts)_
 
 ## `tm task create daily [NAME]`
 
@@ -161,7 +161,7 @@ EXAMPLES
       --repeat-duration=120
 ```
 
-_See code: [src/commands/task/create/daily.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.28/src/commands/task/create/daily.ts)_
+_See code: [src/commands/task/create/daily.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.29/src/commands/task/create/daily.ts)_
 
 ## `tm task create logon [NAME]`
 
@@ -208,7 +208,7 @@ EXAMPLES
     $ tm task create logon myTask --path="notepad.exe" --delay=1
 ```
 
-_See code: [src/commands/task/create/logon.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.28/src/commands/task/create/logon.ts)_
+_See code: [src/commands/task/create/logon.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.29/src/commands/task/create/logon.ts)_
 
 ## `tm task create monthly [NAME]`
 
@@ -266,7 +266,7 @@ EXAMPLES
       --weekdays="1"
 ```
 
-_See code: [src/commands/task/create/monthly.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.28/src/commands/task/create/monthly.ts)_
+_See code: [src/commands/task/create/monthly.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.29/src/commands/task/create/monthly.ts)_
 
 ## `tm task create once [NAME]`
 
@@ -314,7 +314,7 @@ EXAMPLES
     $ tm task create once myTask --path="notepad.exe" --start-time="2026-12-31 23:59"
 ```
 
-_See code: [src/commands/task/create/once.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.28/src/commands/task/create/once.ts)_
+_See code: [src/commands/task/create/once.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.29/src/commands/task/create/once.ts)_
 
 ## `tm task create weekly [NAME]`
 
@@ -369,7 +369,7 @@ EXAMPLES
     $ tm task create weekly myTask --path="notepad.exe" --start-time="11:30" --weekdays="1" --interval=2
 ```
 
-_See code: [src/commands/task/create/weekly.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.28/src/commands/task/create/weekly.ts)_
+_See code: [src/commands/task/create/weekly.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.29/src/commands/task/create/weekly.ts)_
 
 ## `tm task del [NAME]`
 
@@ -463,7 +463,7 @@ EXAMPLES
     $ tm task delete myTask --force
 ```
 
-_See code: [src/commands/task/delete.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.28/src/commands/task/delete.ts)_
+_See code: [src/commands/task/delete.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.29/src/commands/task/delete.ts)_
 
 ## `tm task list`
 
@@ -506,7 +506,7 @@ EXAMPLES
     $ tm task list --enabled
 ```
 
-_See code: [src/commands/task/list.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.28/src/commands/task/list.ts)_
+_See code: [src/commands/task/list.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.29/src/commands/task/list.ts)_
 
 ## `tm task ls`
 
@@ -601,10 +601,12 @@ EXAMPLES
 
 ```
 USAGE
-  $ tm task sync [-n <value>]
+  $ tm task sync [-n <value>] [--only-missing]
 
 FLAGS
-  -n, --name=<value>  指定要同步的任务名称
+  -n, --name=<value>       指定要同步的任务名称
+      --[no-]only-missing  只同步 Windows 中尚不存在的任务，已存在的跳过（重新注册会中断登录/开机触发器的重复计划）。用
+                           --no-only-missing 可强制覆盖已存在的任务
 
 DESCRIPTION
   将数据库中的任务同步到 Windows Task Scheduler
@@ -614,13 +616,17 @@ ALIASES
   $ tm task sync2schd
 
 EXAMPLES
-  同步所有任务
+  同步所有任务（默认只补建 Windows 中缺失的任务）
 
     $ tm task sync
 
   同步指定任务
 
     $ tm task sync --name="myTask"
+
+  强制覆盖 Windows 中已存在的任务（会中断登录/开机触发器正在进行的重复计划）
+
+    $ tm task sync --no-only-missing
 ```
 
 ## `tm task sync2schd`
@@ -629,10 +635,12 @@ EXAMPLES
 
 ```
 USAGE
-  $ tm task sync2schd [-n <value>]
+  $ tm task sync2schd [-n <value>] [--only-missing]
 
 FLAGS
-  -n, --name=<value>  指定要同步的任务名称
+  -n, --name=<value>       指定要同步的任务名称
+      --[no-]only-missing  只同步 Windows 中尚不存在的任务，已存在的跳过（重新注册会中断登录/开机触发器的重复计划）。用
+                           --no-only-missing 可强制覆盖已存在的任务
 
 DESCRIPTION
   将数据库中的任务同步到 Windows Task Scheduler
@@ -642,13 +650,17 @@ ALIASES
   $ tm task sync2schd
 
 EXAMPLES
-  同步所有任务
+  同步所有任务（默认只补建 Windows 中缺失的任务）
 
     $ tm task sync2schd
 
   同步指定任务
 
     $ tm task sync2schd --name="myTask"
+
+  强制覆盖 Windows 中已存在的任务（会中断登录/开机触发器正在进行的重复计划）
+
+    $ tm task sync2schd --no-only-missing
 ```
 
-_See code: [src/commands/task/sync2schd.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.28/src/commands/task/sync2schd.ts)_
+_See code: [src/commands/task/sync2schd.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.29/src/commands/task/sync2schd.ts)_
