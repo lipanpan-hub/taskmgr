@@ -4,6 +4,7 @@ import {getDb} from '../../db/index.js'
 import {tasks} from '../../db/schema.js'
 import {syncTasksToScheduler} from '../../lib/task/task-sync-handler.js'
 import { BaseCommand } from '../../lib/base-command.js'
+import {taskExists} from '../../lib/wtsk/task-scheduler.js'
 
 export default class Sync2Schd extends BaseCommand {
   static aliases = ["task:sync","task:sync2schd"]
@@ -18,12 +19,19 @@ export default class Sync2Schd extends BaseCommand {
       description: '同步指定任务',
       command: '<%= config.bin %> <%= command.id %> --name="myTask"',
     },
+    {
+      description: '只同步 Windows 中缺失的任务（AutoSync 登录时使用）',
+      command: '<%= config.bin %> <%= command.id %> --only-missing',
+    },
   ]
 
   static flags = {
     name: Flags.string({
       char: 'n',
       description: '指定要同步的任务名称',
+    }),
+    'only-missing': Flags.boolean({
+      description: '只同步 Windows 中尚不存在的任务，已存在的跳过（重新注册会中断登录/开机触发器的重复计划）',
     }),
   }
 
@@ -45,6 +53,16 @@ export default class Sync2Schd extends BaseCommand {
     if (taskList.length === 0) {
       this.log('数据库中没有任务')
       return
+    }
+
+    // 只同步缺失的任务: 先过滤掉 Windows 中已存在的任务
+    if (flags['only-missing']) {
+      const existFlags = await Promise.all(taskList.map((task) => taskExists(task.name)))
+      taskList = taskList.filter((_task, index) => !existFlags[index])
+      if (taskList.length === 0) {
+        this.log('所有任务都已存在于 Windows，无需同步')
+        return
+      }
     }
 
     this.log(`开始同步 ${taskList.length} 个任务...`)

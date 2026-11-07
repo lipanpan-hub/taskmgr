@@ -13,13 +13,14 @@ function ensureHiddenLauncher(): string {
 
   const launcherPath = join(configDir, 'autosync-launcher.vbs')
   // Run 参数含义: (要执行的命令, 窗口样式 = 0 隐藏, 是否等待返回 = False 不阻塞)
-  const vbsContent = 'CreateObject("WScript.Shell").Run "cmd /c tm task sync2schd", 0, False\n'
+  // --only-missing: 已存在的任务不重新注册, 否则会中断 logon/boot 触发器正在进行的重复计划
+  const vbsContent = 'CreateObject("WScript.Shell").Run "cmd /c tm task sync2schd --only-missing", 0, False\n'
   writeFileSync(launcherPath, vbsContent, {encoding: 'utf8'})
 
   return launcherPath
 }
 
-// 创建自动同步任务，在用户登录时自动执行 tm task sync2schd 命令
+// 创建自动同步任务，在用户登录时自动执行 tm task sync2schd --only-missing 命令
 export async function createAutoSyncTask(): Promise<string> {
   const taskName = 'AutoSync'
 
