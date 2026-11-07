@@ -11,10 +11,10 @@ describe('task create - arguments 参数正常场景', () => {
     const result = await runCommand([
       'task',
       'create',
+      'daily',
       taskName,
       '--path=notepad.exe',
       '--arguments=test.txt',
-      '--trigger=daily',
       '--start-time=10:00',
     ])
 
@@ -26,10 +26,10 @@ describe('task create - arguments 参数正常场景', () => {
     const result = await runCommand([
       'task',
       'create',
+      'daily',
       taskName,
       '--path=cmd.exe',
       '--arguments="/c echo hello world"',
-      '--trigger=daily',
       '--start-time=10:00',
     ])
 
@@ -43,10 +43,10 @@ describe('task create - arguments 参数正常场景', () => {
     const result = await runCommand([
       'task',
       'create',
+      'daily',
       taskName,
       '--path=notepad.exe',
       String.raw`--arguments=C:\Windows\System32\drivers\etc\hosts`,
-      '--trigger=daily',
       '--start-time=10:00',
     ])
 
@@ -58,10 +58,10 @@ describe('task create - arguments 参数正常场景', () => {
     const result = await runCommand([
       'task',
       'create',
+      'daily',
       taskName,
       '--path=cmd.exe',
       String.raw`--arguments="/c .\scripts\test.bat"`,
-      '--trigger=daily',
       '--start-time=10:00',
     ])
 
@@ -75,10 +75,10 @@ describe('task create - arguments 参数正常场景', () => {
     const result = await runCommand([
       'task',
       'create',
+      'daily',
       taskName,
       '--path=cmd.exe',
       '--arguments="/c echo hello"',
-      '--trigger=daily',
       '--start-time=10:00',
     ])
 
@@ -90,10 +90,10 @@ describe('task create - arguments 参数正常场景', () => {
     const result = await runCommand([
       'task',
       'create',
+      'daily',
       taskName,
       '--path=notepad.exe',
       String.raw`--arguments="C:\Program Files\test file.txt"`,
-      '--trigger=daily',
       '--start-time=10:00',
     ])
 
@@ -107,10 +107,10 @@ describe('task create - arguments 参数正常场景', () => {
     const result = await runCommand([
       'task',
       'create',
+      'daily',
       taskName,
       '--path=cmd.exe',
       '--arguments="/c dir /w"',
-      '--trigger=daily',
       '--start-time=10:00',
     ])
 
@@ -122,10 +122,10 @@ describe('task create - arguments 参数正常场景', () => {
     const result = await runCommand([
       'task',
       'create',
+      'daily',
       taskName,
       '--path=cmd.exe',
       '--arguments="/c dir /w /p /s"',
-      '--trigger=daily',
       '--start-time=10:00',
     ])
 
@@ -137,10 +137,10 @@ describe('task create - arguments 参数正常场景', () => {
     const result = await runCommand([
       'task',
       'create',
+      'daily',
       taskName,
       '--path=node.exe',
       '--arguments=--version',
-      '--trigger=daily',
       '--start-time=10:00',
     ])
 
@@ -152,10 +152,10 @@ describe('task create - arguments 参数正常场景', () => {
     const result = await runCommand([
       'task',
       'create',
+      'daily',
       taskName,
       '--path=node.exe',
       '--arguments="script.js --config=config.json --port=3000"',
-      '--trigger=daily',
       '--start-time=10:00',
     ])
 
@@ -169,10 +169,10 @@ describe('task create - arguments 参数正常场景', () => {
     const result = await runCommand([
       'task',
       'create',
+      'daily',
       taskName,
       '--path=cmd.exe',
       '--arguments="/c echo test^&test"',
-      '--trigger=daily',
       '--start-time=10:00',
     ])
 
@@ -184,10 +184,10 @@ describe('task create - arguments 参数正常场景', () => {
     const result = await runCommand([
       'task',
       'create',
+      'daily',
       taskName,
       '--path=cmd.exe',
       '--arguments="/c echo test^|more"',
-      '--trigger=daily',
       '--start-time=10:00',
     ])
 
@@ -199,10 +199,10 @@ describe('task create - arguments 参数正常场景', () => {
     const result = await runCommand([
       'task',
       'create',
+      'daily',
       taskName,
       '--path=cmd.exe',
       '--arguments="/c echo test^>output.txt"',
-      '--trigger=daily',
       '--start-time=10:00',
     ])
 
@@ -216,10 +216,10 @@ describe('task create - arguments 参数正常场景', () => {
     const result = await runCommand([
       'task',
       'create',
+      'daily',
       taskName,
       '--path=powershell.exe',
       '--arguments="-ExecutionPolicy Bypass -File test.ps1"',
-      '--trigger=daily',
       '--start-time=10:00',
     ])
 
@@ -231,10 +231,10 @@ describe('task create - arguments 参数正常场景', () => {
     const result = await runCommand([
       'task',
       'create',
+      'daily',
       taskName,
       '--path=python.exe',
       '--arguments="script.py --arg1 value1"',
-      '--trigger=daily',
       '--start-time=10:00',
     ])
 
@@ -246,10 +246,10 @@ describe('task create - arguments 参数正常场景', () => {
     const result = await runCommand([
       'task',
       'create',
+      'daily',
       taskName,
       '--path=node.exe',
       '--arguments="app.js --port 3000"',
-      '--trigger=daily',
       '--start-time=10:00',
     ])
 
@@ -263,10 +263,10 @@ describe('task create - arguments 参数正常场景', () => {
     const result = await runCommand([
       'task',
       'create',
+      'daily',
       taskName,
       '--path=notepad.exe',
       '--arguments=',
-      '--trigger=daily',
       '--start-time=10:00',
     ])
 
@@ -278,9 +278,9 @@ describe('task create - arguments 参数正常场景', () => {
     const result = await runCommand([
       'task',
       'create',
+      'daily',
       taskName,
       '--path=notepad.exe',
-      '--trigger=daily',
       '--start-time=10:00',
     ])
 
@@ -294,10 +294,10 @@ describe('task create - arguments 参数正常场景', () => {
     const result = await runCommand([
       'task',
       'create',
+      'daily',
       taskName,
       '--path=cmd.exe',
       '--arguments="/c app.exe --config config.json --verbose"',
-      '--trigger=daily',
       '--start-time=10:00',
     ])
 
@@ -309,10 +309,10 @@ describe('task create - arguments 参数正常场景', () => {
     const result = await runCommand([
       'task',
       'create',
+      'daily',
       taskName,
       '--path=cmd.exe',
       '--arguments="/c powershell.exe -Command Write-Host"',
-      '--trigger=daily',
       '--start-time=10:00',
     ])
 
@@ -327,10 +327,10 @@ describe('task create - arguments 参数正常场景', () => {
     const result = await runCommand([
       'task',
       'create',
+      'daily',
       taskName,
       '--path=cmd.exe',
       `--arguments="/c echo ${longArgs}"`,
-      '--trigger=daily',
       '--start-time=10:00',
     ])
 

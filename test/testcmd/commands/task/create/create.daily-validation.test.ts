@@ -12,9 +12,9 @@ describe('task create - Daily 触发类型验证', () => {
     const result = await runCommand([
         'task', 
         'create', 
+        'daily', 
         taskName, 
-        '--path=notepad.exe', 
-        '--trigger=daily',
+        '--path=notepad.exe',
     ])
     
     expect(result.error?.message).to.contain('daily 触发类型需要 --start-time 参数')
@@ -28,9 +28,9 @@ describe('task create - Daily 触发类型验证', () => {
     const result = await runCommand([
       'task',
       'create',
+      'daily',
       taskName,
       '--path=notepad.exe',
-      '--trigger=daily',
       '--start-time=09:00',
     ])
 
@@ -43,9 +43,9 @@ describe('task create - Daily 触发类型验证', () => {
     const result = await runCommand([
       'task',
       'create',
+      'daily',
       taskName,
       '--path=notepad.exe',
-      '--trigger=daily',
       '--start-time="2026-12-31 23:59"',
     ])
 
@@ -58,9 +58,9 @@ describe('task create - Daily 触发类型验证', () => {
     const result = await runCommand([
       'task',
       'create',
+      'daily',
       taskName,
       '--path=notepad.exe',
-      '--trigger=daily',
       '--start-time=00:00',
     ])
 
@@ -75,9 +75,9 @@ describe('task create - Daily 触发类型验证', () => {
     const result = await runCommand([
       'task',
       'create',
+      'daily',
       taskName,
       '--path=notepad.exe',
-      '--trigger=daily',
       '--start-time=10:00',
       '--interval=1',
     ])
@@ -91,9 +91,9 @@ describe('task create - Daily 触发类型验证', () => {
     const result = await runCommand([
       'task',
       'create',
+      'daily',
       taskName,
       '--path=notepad.exe',
-      '--trigger=daily',
       '--start-time=10:00',
       '--interval=30',
     ])
@@ -109,11 +109,11 @@ describe('task create - Daily 触发类型验证', () => {
     const result = await runCommand([
       'task',
       'create',
+      'daily',
       taskName,
       '--path=notepad.exe',
       '--arguments=test.txt',
       '--description=每日测试任务',
-      '--trigger=daily',
       '--start-time=14:30',
       '--interval=2',
     ])
@@ -127,9 +127,9 @@ describe('task create - Daily 触发类型验证', () => {
     const result = await runCommand([
       'task',
       'create',
+      'daily',
       taskName,
       '--path=notepad.exe',
-      '--trigger=daily',
       '--start-time=10:00',
       '--no-enabled',
     ])
@@ -145,9 +145,9 @@ describe('task create - Daily 触发类型验证', () => {
     const result = await runCommand([
       'task',
       'create',
+      'daily',
       taskName,
       '--path=notepad.exe',
-      '--trigger=daily',
       '--start-time=10:00',
     ])
 
@@ -160,9 +160,9 @@ describe('task create - Daily 触发类型验证', () => {
     const result = await runCommand([
       'task',
       'create',
+      'daily',
       taskName,
       '--path=notepad.exe',
-      '--trigger=daily',
       '--start-time=10:00',
     ])
 

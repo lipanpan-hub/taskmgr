@@ -103,7 +103,8 @@ tm task create daily DTV检查 --path=pwsh --arguments="<脚本绝对路径>" --
 
 ### 旧写法
 
-`tm task create <任务名> --path=... --trigger=<类型> ...` 仍可用，但不支持高级选项，新任务一律用子命令。
+`tm task create <任务名> --path=... --trigger=<类型> ...` 已移除，必须使用 `tm task create <类型>` 子命令。
+
 ## path 与 arguments 的自动优化
 
 `--path` 可以直接写运行时名，无需绝对路径。已支持探测：`powershell`、`pwsh`、`uv`、`python`、`bun`、`node`、`deno`、`go`。

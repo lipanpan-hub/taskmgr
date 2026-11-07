@@ -7,9 +7,9 @@ describe('task create - Weekly 触发类型验证', () => {
     const result = await runCommand([
       'task',
       'create',
+      'weekly',
       'testTask1',
       '--path=notepad.exe',
-      '--trigger=weekly',
       '--start-time=11:30',
     ])
     
@@ -21,9 +21,9 @@ describe('task create - Weekly 触发类型验证', () => {
     const result = await runCommand([
       'task',
       'create',
+      'weekly',
       'testTask2',
       '--path=notepad.exe',
-      '--trigger=weekly',
       '--start-time=11:30',
       '--weekdays=1,3,5',
     ])
@@ -36,9 +36,9 @@ describe('task create - Weekly 触发类型验证', () => {
     const result = await runCommand([
       'task',
       'create',
+      'weekly',
       'testTask3',
       '--path=notepad.exe',
-      '--trigger=weekly',
       '--start-time=11:30',
       '--weekdays=7,8,9',
     ])

@@ -12,8 +12,8 @@ describe('task create - 可执行文件路径错误场景', () => {
     const result = await runCommand([
       'task',
       'create',
+      'daily',
       taskName,
-      '--trigger=daily',
       '--start-time=10:00',
     ])
 
@@ -28,9 +28,9 @@ describe('task create - 可执行文件路径错误场景', () => {
     const result = await runCommand([
       'task',
       'create',
+      'daily',
       taskName,
       '--path=',
-      '--trigger=daily',
       '--start-time=10:00',
     ])
 
@@ -45,9 +45,9 @@ describe('task create - 可执行文件路径错误场景', () => {
     const result = await runCommand([
       'task',
       'create',
+      'daily',
       taskName,
       String.raw`--path=C:\Program Files\test.exe`,
-      '--trigger=daily',
       '--start-time=10:00',
     ])
 
