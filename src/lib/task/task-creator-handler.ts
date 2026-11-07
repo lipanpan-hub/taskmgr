@@ -7,9 +7,11 @@ import { syncTaskToScheduler } from './task-sync-handler.js'
 import { getAvailableRuntimeNames } from '../utils/runtime-detector.js'
 import { optimizeTaskInput } from './task-input-optimizer.js'
 import { scanScripts } from '../utils/script-scanner.js'
+import { advancedFlagsToTaskFields, promptAdvancedOptions } from './advanced-options.js'
 
 // #region 交互式创建
-export async function interactiveCreateTask(): Promise<void> {
+// presetTriggerType: 由 `create <触发类型> -i` 传入时，不再询问触发类型
+export async function interactiveCreateTask(presetTriggerType?: NewTask['triggerType']): Promise<void> {
   const taskService = new TaskService()
 
   // 获取可用运行时列表
@@ -77,7 +79,7 @@ export async function interactiveCreateTask(): Promise<void> {
       message: '任务描述（可选）',
     },
     {
-      type: 'select',
+      type: presetTriggerType ? null : 'select',
       name: 'triggerType',
       message: '触发类型',
       choices: [
@@ -100,16 +102,23 @@ export async function interactiveCreateTask(): Promise<void> {
     },
   ])
 
+  // 预设了触发类型时，跳过的提问不会出现在答案中，这里补上
+  if (presetTriggerType) basicInfo.triggerType = presetTriggerType
+
   if (!basicInfo.name || !basicInfo.executablePath || !basicInfo.triggerType) {
     throw new Error('操作已取消')
   }
   console.log(basicInfo.arguments)
+
+  // 高级选项（可跳过）
+  const advancedFields = await promptAdvancedOptions(basicInfo.triggerType)
 
   // 优化任务输入
   const optimized = await optimizeTaskInput(basicInfo.executablePath, basicInfo.arguments)
 
   // 创建任务
   const newTask: NewTask = {
+    ...advancedFields,
     name: basicInfo.name,
     executablePath: optimized.executablePath,
     arguments: optimized.arguments || undefined, // 空字符串转为 undefined
@@ -179,6 +188,7 @@ export async function directCreateTask(
   const optimized = await optimizeTaskInput(flags.path, flags.arguments)
 
   const newTask: NewTask = {
+    ...advancedFlagsToTaskFields(flags),
     name: name!,
     executablePath: optimized.executablePath,
     arguments: optimized.arguments || undefined, // 空字符串转为 undefined

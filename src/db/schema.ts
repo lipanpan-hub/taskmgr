@@ -12,6 +12,21 @@ export const tasks = sqliteTable('tasks', {
     enum: ['daily', 'weekly', 'monthly', 'once', 'boot', 'logon'] 
   }).notNull().default('daily'),
   enabled: integer('enabled', { mode: 'boolean' }).notNull().default(true),
+  // #region 高级选项（任务级，对所有触发类型生效；每个任务只有一个触发器，因此放在 tasks 表而不是各触发器表）
+  hidden: integer('hidden', { mode: 'boolean' }).notNull().default(false), // 隐藏任务
+  wakeToRun: integer('wake_to_run', { mode: 'boolean' }).notNull().default(true), // 唤醒电脑运行
+  disallowStartIfOnBatteries: integer('disallow_start_if_on_batteries', { mode: 'boolean' }).notNull().default(false), // 使用电池时不启动
+  stopIfGoingOnBatteries: integer('stop_if_going_on_batteries', { mode: 'boolean' }).notNull().default(false), // 切换到电池时停止
+  runHighest: integer('run_highest', { mode: 'boolean' }).notNull().default(false), // 以最高权限运行
+  multipleInstances: text('multiple_instances', {
+    enum: ['parallel', 'queue', 'ignore-new', 'stop-existing'],
+  }).notNull().default('ignore-new'), // 任务已在运行时的处理策略
+  executionTimeLimitMinutes: integer('execution_time_limit_minutes'), // 执行时限(分钟)，0=不限制，null=使用系统默认(72小时)
+  endTime: text('end_time'), // 触发器过期时间，格式: YYYY-MM-DD HH:mm
+  repeatIntervalMinutes: integer('repeat_interval_minutes'), // 重复间隔(分钟)
+  repeatDurationMinutes: integer('repeat_duration_minutes'), // 重复持续时间(分钟)，null=无限期
+  delayMinutes: integer('delay_minutes'), // 延迟(分钟)：boot/logon 为触发后延迟，其余为开始时间后随机延迟上限
+  // #endregion
   createdAt: text('created_at').notNull().default(sql`(datetime('now', 'localtime'))`),
   updatedAt: text('updated_at').notNull().default(sql`(datetime('now', 'localtime'))`),
 })

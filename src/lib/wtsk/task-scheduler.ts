@@ -87,6 +87,14 @@ public class Startup {
             bool wakeToRun = input.wakeToRun != null ? (bool)input.wakeToRun : true;
             bool disallowStartIfOnBatteries = input.disallowStartIfOnBatteries != null ? (bool)input.disallowStartIfOnBatteries : false;
             bool stopIfGoingOnBatteries = input.stopIfGoingOnBatteries != null ? (bool)input.stopIfGoingOnBatteries : false;
+            bool runHighest = input.runHighest != null ? (bool)input.runHighest : false;
+            string multipleInstances = input.multipleInstances != null ? (string)input.multipleInstances : "";
+            string endTime = input.endTime != null ? (string)input.endTime : "";
+            // 以下分钟数缺省为 -1，表示未设置
+            int executionTimeLimitMinutes = input.executionTimeLimitMinutes != null ? (int)input.executionTimeLimitMinutes : -1;
+            int repeatIntervalMinutes = input.repeatIntervalMinutes != null ? (int)input.repeatIntervalMinutes : -1;
+            int repeatDurationMinutes = input.repeatDurationMinutes != null ? (int)input.repeatDurationMinutes : -1;
+            int delayMinutes = input.delayMinutes != null ? (int)input.delayMinutes : -1;
             string currentUser = WindowsIdentity.GetCurrent().Name;
             bool isAdministrator = new WindowsPrincipal(WindowsIdentity.GetCurrent())
                 .IsInRole(WindowsBuiltInRole.Administrator);
@@ -112,6 +120,14 @@ public class Startup {
                 td.Settings.StopIfGoingOnBatteries = stopIfGoingOnBatteries;
                 td.Principal.UserId = currentUser;
                 td.Principal.LogonType = TaskLogonType.InteractiveToken;
+                if (runHighest) td.Principal.RunLevel = TaskRunLevel.Highest;
+                if (executionTimeLimitMinutes >= 0) td.Settings.ExecutionTimeLimit = TimeSpan.FromMinutes(executionTimeLimitMinutes);
+                switch (multipleInstances) {
+                    case "parallel": td.Settings.MultipleInstances = TaskInstancesPolicy.Parallel; break;
+                    case "queue": td.Settings.MultipleInstances = TaskInstancesPolicy.Queue; break;
+                    case "ignore-new": td.Settings.MultipleInstances = TaskInstancesPolicy.IgnoreNew; break;
+                    case "stop-existing": td.Settings.MultipleInstances = TaskInstancesPolicy.StopExisting; break;
+                }
                 
                 switch (triggerType.ToLower())
                 {
@@ -241,6 +257,25 @@ public class Startup {
                         break;
                 }
                 
+                // 触发器级高级选项：过期时间、重复、延迟（每个任务只有一个触发器）
+                Trigger trig = td.Triggers[0];
+                if (endTime != "") trig.EndBoundary = DateTime.Parse(endTime);
+                if (repeatIntervalMinutes > 0) {
+                    trig.Repetition.Interval = TimeSpan.FromMinutes(repeatIntervalMinutes);
+                    // 持续时间缺省为 TimeSpan.Zero，即无限期重复
+                    trig.Repetition.Duration = repeatDurationMinutes > 0 ? TimeSpan.FromMinutes(repeatDurationMinutes) : TimeSpan.Zero;
+                }
+                if (delayMinutes > 0) {
+                    TimeSpan delay = TimeSpan.FromMinutes(delayMinutes);
+                    if (trig is BootTrigger) ((BootTrigger)trig).Delay = delay;
+                    else if (trig is LogonTrigger) ((LogonTrigger)trig).Delay = delay;
+                    else if (trig is TimeTrigger) ((TimeTrigger)trig).RandomDelay = delay;
+                    else if (trig is DailyTrigger) ((DailyTrigger)trig).RandomDelay = delay;
+                    else if (trig is WeeklyTrigger) ((WeeklyTrigger)trig).RandomDelay = delay;
+                    else if (trig is MonthlyTrigger) ((MonthlyTrigger)trig).RandomDelay = delay;
+                    else if (trig is MonthlyDOWTrigger) ((MonthlyDOWTrigger)trig).RandomDelay = delay;
+                }
+
                 td.Actions.Add(new ExecAction(executablePath, arguments, null));
                 
                 taskFolder.RegisterTaskDefinition(taskName, td);
@@ -479,14 +514,23 @@ function getRunTask() {
   return _runTask
 }
 
+export type MultipleInstancesPolicy = 'ignore-new' | 'parallel' | 'queue' | 'stop-existing'
+
 export interface CreateTaskOptions {
   arguments?: string
+  delayMinutes?: number // boot/logon: 触发后延迟；其余触发器: 开始时间后随机延迟上限
   description?: string
   disallowStartIfOnBatteries?: boolean
   enabled?: boolean
+  endTime?: string // 触发器过期时间 (YYYY-MM-DD HH:mm)
   executablePath: string
+  executionTimeLimitMinutes?: number // 0 表示不限制
   hidden?: boolean
   interval?: number
+  multipleInstances?: MultipleInstancesPolicy
+  repeatDurationMinutes?: number // 缺省表示无限期重复
+  repeatIntervalMinutes?: number
+  runHighest?: boolean
   months?: number[]
   monthdays?: number[]  // 每月执行日期 (1-31)，仅 monthly 触发器使用
   startTime?: string
@@ -525,9 +569,17 @@ export interface TaskDetail extends TaskInfo {
 
 export async function createScheduledTask(options: CreateTaskOptions): Promise<string> {
   const fn = getCreateTask()
+  // 可选字段显式补 null：edge-js 的动态对象缺失成员会抛异常，null 则可用 `!= null` 判断
   const normalizedOptions = {
     ...options,
     startTime: options.startTime ? normalizeStartTime(options.startTime) : options.startTime,
+    runHighest: options.runHighest ?? false,
+    multipleInstances: options.multipleInstances ?? null,
+    endTime: options.endTime ? normalizeStartTime(options.endTime) : null,
+    executionTimeLimitMinutes: options.executionTimeLimitMinutes ?? null,
+    repeatIntervalMinutes: options.repeatIntervalMinutes ?? null,
+    repeatDurationMinutes: options.repeatDurationMinutes ?? null,
+    delayMinutes: options.delayMinutes ?? null,
   }
 
   return new Promise((resolve, reject) => {

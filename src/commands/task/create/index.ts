@@ -1,6 +1,6 @@
 import {Args, Flags} from '@oclif/core'
-import {directCreateTask, interactiveCreateTask} from '../../lib/task/task-creator-handler.js'
-import { BaseCommand } from '../../lib/base-command.js'
+import {directCreateTask, interactiveCreateTask} from '../../../lib/task/task-creator-handler.js'
+import { BaseCommand } from '../../../lib/base-command.js'
 
 export default class Create extends BaseCommand {
   static aliases = ["task:add"]
@@ -8,7 +8,7 @@ export default class Create extends BaseCommand {
     name: Args.string({description: '任务名称'}),
   }
 
-  static description = '创建定时任务到数据库'
+  static description = '创建定时任务到数据库。直接创建模式（--trigger）已不推荐且不支持高级选项，请改用 `create daily|weekly|monthly|once|boot|logon` 子命令；交互式创建（--interactive）可正常使用'
 
   static examples = [
     {

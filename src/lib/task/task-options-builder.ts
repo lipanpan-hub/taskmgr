@@ -18,11 +18,19 @@ export async function buildTaskOptions(task: Task): Promise<CreateTaskOptions> {
     monthdays: [],
     weeksOfMonth: [],
     interval: 1,
-    hidden: false,
-    wakeToRun: true,
-    startWhenAvailable: false,
-    disallowStartIfOnBatteries: false,
-    stopIfGoingOnBatteries: false,
+    startWhenAvailable: false, // 由各触发器表覆盖
+    // 任务级高级选项直接取自 tasks 表
+    hidden: task.hidden,
+    wakeToRun: task.wakeToRun,
+    disallowStartIfOnBatteries: task.disallowStartIfOnBatteries,
+    stopIfGoingOnBatteries: task.stopIfGoingOnBatteries,
+    runHighest: task.runHighest,
+    multipleInstances: task.multipleInstances,
+    executionTimeLimitMinutes: task.executionTimeLimitMinutes ?? undefined,
+    endTime: task.endTime ?? undefined,
+    repeatIntervalMinutes: task.repeatIntervalMinutes ?? undefined,
+    repeatDurationMinutes: task.repeatDurationMinutes ?? undefined,
+    delayMinutes: task.delayMinutes ?? undefined,
   }
 
   // 根据触发类型获取触发器配置

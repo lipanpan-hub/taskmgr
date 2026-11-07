@@ -67,6 +67,31 @@ export function formatDetailedLine(tasks: Task[]): string[] {
   return ['\n任务详细列表:', table.toString()]
 }
 
+// 仅输出与默认值不同的高级选项，避免默认任务的输出被无意义的行占满
+function formatAdvancedLines(task: Task): string[] {
+  const advancedItems: Array<[string, string]> = []
+  if (task.hidden) advancedItems.push(['隐藏任务', '是'])
+  if (!task.wakeToRun) advancedItems.push(['唤醒电脑运行', '否'])
+  if (task.disallowStartIfOnBatteries) advancedItems.push(['电池供电时不启动', '是'])
+  if (task.stopIfGoingOnBatteries) advancedItems.push(['切换电池时停止', '是'])
+  if (task.runHighest) advancedItems.push(['最高权限运行', '是'])
+  if (task.multipleInstances !== 'ignore-new') advancedItems.push(['已运行时再触发', task.multipleInstances])
+  if (task.executionTimeLimitMinutes !== null) {
+    advancedItems.push(['执行时限', (task.executionTimeLimitMinutes === 0) ? '不限制' : `${task.executionTimeLimitMinutes} 分钟`])
+  }
+
+  if (task.endTime) advancedItems.push(['过期时间', task.endTime])
+  if (task.repeatIntervalMinutes !== null) {
+    const durationText = (task.repeatDurationMinutes === null) ? '无限期' : `${task.repeatDurationMinutes} 分钟`
+    advancedItems.push(['重复', `每 ${task.repeatIntervalMinutes} 分钟，持续 ${durationText}`])
+  }
+
+  if (task.delayMinutes !== null) advancedItems.push(['延迟', `${task.delayMinutes} 分钟`])
+
+  if (advancedItems.length === 0) return []
+  return ['  高级选项:', ...advancedItems.map(([label, value]) => `    ${label}: ${value}`)]
+}
+
 export async function formatBlock(tasks: Task[]): Promise<string[]> {
   const lines: string[] = []
   lines.push('\n任务详细信息:')
@@ -78,7 +103,7 @@ export async function formatBlock(tasks: Task[]): Promise<string[]> {
     lines.push('-'.repeat(80), `任务 #${task.id}: ${task.name}`, `  状态:         ${task.enabled ? '✓ 启用' : '✗ 禁用'}`, `  触发类型:     ${task.triggerType}`, `  可执行文件:   ${task.executablePath}`)
     if (task.arguments) lines.push(`  参数:         ${task.arguments}`)
     if (task.description) lines.push(`  描述:         ${task.description}`)
-    lines.push(`  创建时间:     ${task.createdAt}`, `  更新时间:     ${task.updatedAt}`)
+    lines.push(`  创建时间:     ${task.createdAt}`, `  更新时间:     ${task.updatedAt}`, ...formatAdvancedLines(task))
 
     // 根据触发类型获取并显示 trigger 信息
     let trigger: DailyTrigger | WeeklyTrigger | MonthlyTrigger | OnceTrigger | null = null

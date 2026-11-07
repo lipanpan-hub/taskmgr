@@ -2,7 +2,7 @@
 name: taskmgr-skill
 description: 用 tm 命令行工具管理 Windows 定时任务（计划任务）及其脚本。当用户要求创建/查询/删除定时任务、把写好的 PowerShell/Python 等脚本设为定时执行、定时关机休眠、设置每天/每周/每月/开机/登录时自动运行时使用。
 keywords: tm, taskmgr, 定时任务, 计划任务, 定时执行, 定时脚本, 定时关机, 开机自启, cron, schtasks, Task Scheduler
-version: 1.1.0
+version: 1.2.0
 ---
 
 # tm 定时任务管理
@@ -14,12 +14,12 @@ version: 1.1.0
 1. 只用 `tm task` 子命令，它是为非交互调用设计的。绝不使用 `tm wtsk`（面向人类，含交互式提示）。
 2. 绝不传 `-i` / `--interactive` / `--psi`，这些会挂起等待键盘输入。`tm scripts open` 会弹出资源管理器窗口，也不要调用。
 3. 删除必须带 `--force`，否则会卡在确认提示。
-4. `tm task create` 一步到位：写库 + 建触发器 + 同步到任务计划程序，任何一步失败自动回滚。创建后无需再执行同步。
+4. `tm task create <类型>` 一步到位：写库 + 建触发器 + 同步到任务计划程序，任何一步失败自动回滚。创建后无需再执行同步。
 5. 没有 update 命令。修改任务 = `tm task delete <名称> --force` 然后重新 create。
 
 ## 命令选择
 
-- 创建任务 → `tm task create`
+- 创建任务 → `tm task create daily|weekly|monthly|once|boot|logon`
 - 查看已管理的任务 → `tm task list`
 - 删除任务 → `tm task delete <名称> --force`
 - 数据库与系统不一致时重新同步 → `tm task sync2schd`（别名 `tm task sync`）
@@ -33,7 +33,7 @@ version: 1.1.0
 
 1. 把脚本写到任意位置（例如当前工作目录）
 2. `tm scripts add "<脚本路径>"`，把它复制进脚本目录。输出中 `保存位置:` 后面就是脚本的新绝对路径
-3. `tm task create` 的 `--arguments` 引用这个新路径，不要引用原始位置
+3. `tm task create <类型>` 的 `--arguments` 引用这个新路径，不要引用原始位置
 
 这样做的原因：脚本目录位置固定，不会因为工作目录被清理、项目被移动而让任务在运行时找不到文件；用户也能用 `tm scripts list` 一眼看到定时任务依赖了哪些脚本。
 
@@ -47,22 +47,30 @@ version: 1.1.0
 
 ## 创建任务
 
+按触发类型选子命令，每个子命令只接受自己用得上的参数：
+
 ```
-tm task create <任务名> --path=<可执行文件或运行时> --trigger=<类型> [触发器参数] [--arguments=...] [--description=...] [--no-enabled]
+tm task create daily   <任务名> --path=<可执行文件或运行时> --start-time=<时间> [--interval=N]
+tm task create weekly  <任务名> --path=... --start-time=<时间> --weekdays=<星期> [--interval=N]
+tm task create monthly <任务名> --path=... --start-time=<时间> (--monthdays=<日期> | --weeks-of-month=<周次> --weekdays=<星期>) [--months=<月份>]
+tm task create once    <任务名> --path=... --start-time="YYYY-MM-DD HH:mm"
+tm task create boot    <任务名> --path=...
+tm task create logon   <任务名> --path=...
 ```
 
-必填：任务名、`--path`、`--trigger`。
+所有子命令都可选：`--arguments=...`、`--description=...`、`--no-enabled`，以及下面的高级选项。
 
-各触发类型的参数要求：
+各子命令的参数要求：
 
 - `daily`：必填 `--start-time`；可选 `--interval=N`（每隔 N 天，默认 1）
 - `weekly`：必填 `--start-time`、`--weekdays`；可选 `--interval=N`（每隔 N 周，默认 1）
-- `monthly`：必填 `--start-time`、`--months`，再二选一：
+- `monthly`：必填 `--start-time`，再二选一：
   - 按日期：`--monthdays="1,15"`
   - 按周次：`--weeks-of-month="1,5"` 且必须同时给 `--weekdays`
-  - 两者不能同时出现
+  - 两者不能同时出现；`--months` 缺省为每个月
 - `once`：必填 `--start-time`，且格式必须是完整的 `YYYY-MM-DD HH:mm`
-- `boot` / `logon`：不需要任何触发器参数
+- `boot`：以 SYSTEM 账户运行，必须在管理员终端中创建
+- `logon`：当前用户登录时运行
 
 取值约定：
 
@@ -73,6 +81,29 @@ tm task create <任务名> --path=<可执行文件或运行时> --trigger=<类�
 - `--weeks-of-month`：1-4 表示第几周，5 表示最后一周
 - `--no-enabled`：创建但不启用（默认启用）
 
+### 高级选项（所有子命令通用）
+
+- `--start-when-available`：错过开始时间后补运行（boot/logon 无效）
+- `--hidden`：隐藏任务
+- `--no-wake-to-run`：不唤醒电脑运行（默认唤醒）
+- `--disallow-start-on-batteries`：电池供电时不启动
+- `--stop-on-batteries`：切换到电池供电时停止
+- `--run-highest`：以最高权限运行，必须在管理员终端中创建，否则报拒绝访问
+- `--multiple-instances=ignore-new|parallel|queue|stop-existing`：任务已在运行时再次触发的处理策略，默认 `ignore-new`
+- `--time-limit=N`：执行时限（分钟），`0` 为不限制，系统默认 72 小时
+- `--end-time="YYYY-MM-DD HH:mm"`：触发器过期时间
+- `--repeat-interval=N`、`--repeat-duration=N`：触发后每隔 N 分钟重复，持续 N 分钟（缺省为无限期）；`--repeat-duration` 必须与 `--repeat-interval` 一起用
+- `--delay=N`：分钟。boot/logon 为触发后延迟执行；其余类型为开始时间后随机延迟 0~N 分钟
+
+每天 05:00 起每 5 分钟执行一次、持续 4 小时：
+
+```
+tm task create daily DTV检查 --path=pwsh --arguments="<脚本绝对路径>" --start-time="05:00" --repeat-interval=5 --repeat-duration=240
+```
+
+### 旧写法
+
+`tm task create <任务名> --path=... --trigger=<类型> ...` 仍可用，但不支持高级选项，新任务一律用子命令。
 ## path 与 arguments 的自动优化
 
 `--path` 可以直接写运行时名，无需绝对路径。已支持探测：`powershell`、`pwsh`、`uv`、`python`、`bun`、`node`、`deno`、`go`。
@@ -104,8 +135,9 @@ tm task delete --all --force      # 危险：清空全部任务，执行前必�
 
 ## 常见错误
 
-- `必须提供可执行文件路径 (--path)` / `必须提供触发类型 (--trigger)` → 漏了必填项
-- `daily 触发类型需要 --start-time 参数` → 对应触发类型的必填参数没给
+- `Missing required flag path` / `Missing required flag start-time` → 漏了必填项，错误信息里的 flag 名就是缺的参数
+- `repeat-duration ... must be provided when using --repeat-interval` 之类的依赖报错 → 高级选项组合不合法
+- `拒绝访问` → 用了 `--run-highest` 或创建 `boot` 任务，但终端不是管理员
 - `monthly 触发类型需要 --monthdays 或 --weeks-of-month 参数` → 月触发没指定按日期还是按周次
 - `使用 --weeks-of-month 时必须同时指定 --weekdays 参数` → 按周次模式缺星期
 - `start-time 格式必须为 YYYY-MM-DD HH:mm` → `once` 只给了 `HH:mm`
@@ -120,36 +152,39 @@ tm task delete --all --force      # 危险：清空全部任务，执行前必�
 # 新写的脚本：先入库，再用 add 输出的「保存位置」建任务
 tm scripts add ".\backup-notes.py"
 # 输出: 保存位置: C:\Users\lppx\AppData\Local\lppxtaskmgr\scripts\backup-notes.py
-tm task create 笔记备份 --path=uv --arguments="C:\Users\lppx\AppData\Local\lppxtaskmgr\scripts\backup-notes.py" --trigger=daily --start-time="21:00"
+tm task create daily 笔记备份 --path=uv --arguments="C:\Users\lppx\AppData\Local\lppxtaskmgr\scripts\backup-notes.py" --start-time="21:00"
 
 # 修改脚本内容：改完重新 add 覆盖即可，任务不用动
 tm scripts add ".\backup-notes.py"
 
 # 每天 23:30 静默跑一个 PowerShell 脚本
-tm task create 夜间清理 --path=pwsh --arguments="C:\Users\lppx\AppData\Local\lppxtaskmgr\scripts\倒计时关机脚本.ps1" --trigger=daily --start-time="23:30" --description="每晚清理"
+tm task create daily 夜间清理 --path=pwsh --arguments="C:\Users\lppx\AppData\Local\lppxtaskmgr\scripts\倒计时关机脚本.ps1" --start-time="23:30" --description="每晚清理"
 
 # 每隔 3 天 09:00 执行
-tm task create 三日巡检 --path="notepad.exe" --trigger=daily --start-time="09:00" --interval=3
+tm task create daily 三日巡检 --path="notepad.exe" --start-time="09:00" --interval=3
 
 # 每周一三五 14:30 执行
-tm task create 周报提醒 --path="notepad.exe" --trigger=weekly --start-time="14:30" --weekdays="1,3,5"
+tm task create weekly 周报提醒 --path="notepad.exe" --start-time="14:30" --weekdays="1,3,5"
 
 # 每隔 2 周的周一执行
-tm task create 双周会 --path="notepad.exe" --trigger=weekly --start-time="10:00" --weekdays="1" --interval=2
+tm task create weekly 双周会 --path="notepad.exe" --start-time="10:00" --weekdays="1" --interval=2
 
 # 每月 1 号和 15 号 20:00 执行
-tm task create 月中对账 --path="notepad.exe" --trigger=monthly --start-time="20:00" --months="1,2,3,4,5,6,7,8,9,10,11,12" --monthdays="1,15"
+tm task create monthly 月中对账 --path="notepad.exe" --start-time="20:00" --monthdays="1,15"
 
 # 每季度最后一周的周五 23:59 执行
-tm task create 季度收尾 --path="notepad.exe" --trigger=monthly --start-time="23:59" --months="3,6,9,12" --weeks-of-month="5" --weekdays="5"
+tm task create monthly 季度收尾 --path="notepad.exe" --start-time="23:59" --months="3,6,9,12" --weeks-of-month="5" --weekdays="5"
 
 # 指定时刻只跑一次
-tm task create 一次性提醒 --path="notepad.exe" --trigger=once --start-time="2026-10-01 08:00"
+tm task create once 一次性提醒 --path="notepad.exe" --start-time="2026-10-01 08:00"
+
+# 每 30 分钟重复一次、持续 8 小时，已在运行时排队，限时 20 分钟
+tm task create daily 周期巡检 --path="notepad.exe" --start-time="09:00" --repeat-interval=30 --repeat-duration=480 --multiple-instances=queue --time-limit=20
 
 # 开机时运行
-tm task create 开机启动 --path="notepad.exe" --trigger=boot
+tm task create boot 开机启动 --path="notepad.exe"
 
 # 修改已有任务：删除后重建
 tm task delete 夜间清理 --force
-tm task create 夜间清理 --path=pwsh --arguments="C:\Users\lppx\AppData\Local\lppxtaskmgr\scripts\休眠脚本.ps1" --trigger=daily --start-time="22:00"
+tm task create daily 夜间清理 --path=pwsh --arguments="C:\Users\lppx\AppData\Local\lppxtaskmgr\scripts\休眠脚本.ps1" --start-time="22:00"
 ```

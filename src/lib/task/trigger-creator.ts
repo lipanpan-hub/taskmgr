@@ -1,6 +1,7 @@
 import prompts from 'prompts'
 import Fuse from 'fuse.js'
 import {getDb} from '../../db/index.js'
+import type {AdvancedFlagValues} from './advanced-options.js'
 import {
   dailyTriggers,
   weeklyTriggers,
@@ -16,7 +17,7 @@ import {
 type DbInstance = ReturnType<typeof getDb>
 
 // 直接创建任务时由 CLI 传入的参数
-export interface DirectCreateFlags {
+export interface DirectCreateFlags extends AdvancedFlagValues {
   path?: string
   arguments?: string
   description?: string
@@ -327,7 +328,7 @@ export async function createTriggerDirect(taskId: number, triggerType: string, f
         taskId,
         startTime: flags['start-time'],
         intervalDays: flags.interval || 1,
-        startWhenAvailable: false,
+        startWhenAvailable: flags['start-when-available'] ?? false,
       }
 
       const result = await db.insert(dailyTriggers).values(dailyTrigger)
@@ -377,7 +378,7 @@ export async function createTriggerDirect(taskId: number, triggerType: string, f
           months: JSON.stringify(months),
           triggerMode: 'days',
           daysOfMonth: JSON.stringify(daysOfMonth),
-          startWhenAvailable: false,
+          startWhenAvailable: flags['start-when-available'] ?? false,
         }
       } else {
         // 按周模式：monthdays 为空时 weeks-of-month 必定有值，前面已校验
@@ -402,7 +403,7 @@ export async function createTriggerDirect(taskId: number, triggerType: string, f
           triggerMode: 'weeks',
           weeksOfMonth: JSON.stringify(weeksOfMonth),
           daysOfWeek: JSON.stringify(daysOfWeek),
-          startWhenAvailable: false,
+          startWhenAvailable: flags['start-when-available'] ?? false,
         }
       }
 
@@ -423,7 +424,7 @@ export async function createTriggerDirect(taskId: number, triggerType: string, f
       const onceTrigger: NewOnceTrigger = {
         taskId,
         startTime: flags['start-time'],
-        startWhenAvailable: false,
+        startWhenAvailable: flags['start-when-available'] ?? false,
       }
 
       const result = await db.insert(onceTriggers).values(onceTrigger)
@@ -448,7 +449,7 @@ export async function createTriggerDirect(taskId: number, triggerType: string, f
         startTime: flags['start-time'],
         intervalWeeks: flags.interval || 1,
         daysOfWeek: JSON.stringify(daysOfWeek),
-        startWhenAvailable: false,
+        startWhenAvailable: flags['start-when-available'] ?? false,
       }
 
       const result = await db.insert(weeklyTriggers).values(weeklyTrigger)

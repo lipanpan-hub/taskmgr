@@ -127,7 +127,10 @@ tm wtsk del -n myTask
 
 ```powershell
 # 1. 写入数据库（此时 Windows 侧还没有任何变化）
-tm task create myTask --path="notepad.exe" --trigger=daily --start-time="11:30" --interval=3
+tm task create daily myTask --path="notepad.exe" --start-time="11:30" --interval=3
+
+# 其他触发类型: weekly / monthly / once / boot / logon，各自支持高级选项（重复、过期时间、电池策略等）
+# 查看某个子命令的全部参数: tm task create weekly --help
 
 # 2. 确认一下
 tm task list --block
