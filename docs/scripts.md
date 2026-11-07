@@ -29,7 +29,7 @@ EXAMPLES
   $ tm scripts add ./script.ps1
 ```
 
-_See code: [src/commands/scripts/add.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.27/src/commands/scripts/add.ts)_
+_See code: [src/commands/scripts/add.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.28/src/commands/scripts/add.ts)_
 
 ## `tm scripts list`
 
@@ -50,18 +50,18 @@ EXAMPLES
   $ tm scripts list
 ```
 
-_See code: [src/commands/scripts/list.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.27/src/commands/scripts/list.ts)_
+_See code: [src/commands/scripts/list.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.28/src/commands/scripts/list.ts)_
 
 ## `tm scripts open`
 
-打开脚本文件目录
+打开脚本文件目录（供人类使用，AI 请勿调用）
 
 ```
 USAGE
   $ tm scripts open
 
 DESCRIPTION
-  打开脚本文件目录
+  打开脚本文件目录（供人类使用，AI 请勿调用）
 
 ALIASES
   $ tm script open
@@ -71,4 +71,4 @@ EXAMPLES
   $ tm scripts open
 ```
 
-_See code: [src/commands/scripts/open.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.27/src/commands/scripts/open.ts)_
+_See code: [src/commands/scripts/open.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.28/src/commands/scripts/open.ts)_
