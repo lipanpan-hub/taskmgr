@@ -12,7 +12,7 @@ export default class Sync2Schd extends BaseCommand {
 
   static examples = [
     {
-      description: '同步所有任务',
+      description: '同步所有任务（默认只补建 Windows 中缺失的任务）',
       command: '<%= config.bin %> <%= command.id %>',
     },
     {
@@ -20,8 +20,8 @@ export default class Sync2Schd extends BaseCommand {
       command: '<%= config.bin %> <%= command.id %> --name="myTask"',
     },
     {
-      description: '只同步 Windows 中缺失的任务（AutoSync 登录时使用）',
-      command: '<%= config.bin %> <%= command.id %> --only-missing',
+      description: '强制覆盖 Windows 中已存在的任务（会中断登录/开机触发器正在进行的重复计划）',
+      command: '<%= config.bin %> <%= command.id %> --no-only-missing',
     },
   ]
 
@@ -31,7 +31,9 @@ export default class Sync2Schd extends BaseCommand {
       description: '指定要同步的任务名称',
     }),
     'only-missing': Flags.boolean({
-      description: '只同步 Windows 中尚不存在的任务，已存在的跳过（重新注册会中断登录/开机触发器的重复计划）',
+      description: '只同步 Windows 中尚不存在的任务，已存在的跳过（重新注册会中断登录/开机触发器的重复计划）。用 --no-only-missing 可强制覆盖已存在的任务',
+      default: true,
+      allowNo: true,
     }),
   }
 

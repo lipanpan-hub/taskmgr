@@ -22,7 +22,7 @@ version: 1.2.0
 - 创建任务 → `tm task create daily|weekly|monthly|once|boot|logon`
 - 查看已管理的任务 → `tm task list`
 - 删除任务 → `tm task delete <名称> --force`
-- 数据库与系统不一致时重新同步 → `tm task sync2schd`（别名 `tm task sync`）。会重新注册已存在的任务，从而中断 `logon`/`boot` 任务正在进行的重复计划；只想补建缺失任务时加 `--only-missing`
+- 数据库与系统不一致时重新同步 → `tm task sync2schd`（别名 `tm task sync`）。默认只补建 Windows 中缺失的任务，已存在的跳过；修改了数据库中已有任务、需要覆盖时加 `--no-only-missing`，但覆盖会重新注册，从而中断 `logon`/`boot` 任务正在进行的重复计划
 - 查看系统里实际的任务（只读，含下次运行时间等系统状态）→ `tm wtsk list`
 - 把新写的脚本放进脚本目录 → `tm scripts add <路径>`
 - 查看脚本目录里已有的脚本及其绝对路径 → `tm scripts list`
