@@ -8,6 +8,7 @@
         "type": "command",
         "command": "npm run build"
       },
+      "description": "build",
       "enabled": true
     }
   ]
