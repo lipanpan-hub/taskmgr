@@ -1,13 +1,25 @@
 import {exec} from 'node:child_process'
+import {createRequire} from 'node:module'
 import path from 'node:path'
 import {fileURLToPath} from 'node:url'
 import {promisify} from 'node:util'
 
-import edge from 'edge-js'
+import type edge from 'edge-js'
 
 import {normalizeStartTime} from './trigger-utils.js'
 
 const execAsync = promisify(exec)
+
+// edge-js 是原生模块(加载约 100ms), init hook 只用 taskExists, 因此延迟到首次真正调用 C# 函数时才加载
+const nodeRequire = createRequire(import.meta.url)
+let edgeRuntime: null | typeof edge = null
+function loadEdge(): typeof edge {
+  if (!edgeRuntime) {
+    edgeRuntime = nodeRequire('edge-js') as typeof edge
+  }
+
+  return edgeRuntime
+}
 
 // 获取程序根目录：打包后 execPath 指向 exe 文件，开发环境指向 node.exe
 // 判断是否打包：检查 execPath 是否以项目名结尾
@@ -557,7 +569,7 @@ let _setTaskEnabled: null | ReturnType<typeof edge.func<unknown, string>> = null
 
 function getCreateTask() {
   if (!_createTask) {
-    _createTask = edge.func<unknown, string>(getCreateTaskCs())
+    _createTask = loadEdge().func<unknown, string>(getCreateTaskCs())
   }
 
   return _createTask
@@ -565,7 +577,7 @@ function getCreateTask() {
 
 function getDeleteTask() {
   if (!_deleteTask) {
-    _deleteTask = edge.func<unknown, string>(getDeleteTaskCs())
+    _deleteTask = loadEdge().func<unknown, string>(getDeleteTaskCs())
   }
 
   return _deleteTask
@@ -573,7 +585,7 @@ function getDeleteTask() {
 
 function getGetTasks() {
   if (!_getTasks) {
-    _getTasks = edge.func<unknown, string>(getGetTasksCs())
+    _getTasks = loadEdge().func<unknown, string>(getGetTasksCs())
   }
 
   return _getTasks
@@ -581,7 +593,7 @@ function getGetTasks() {
 
 function getGetTask() {
   if (!_getTask) {
-    _getTask = edge.func<unknown, string>(getGetTaskCs())
+    _getTask = loadEdge().func<unknown, string>(getGetTaskCs())
   }
 
   return _getTask
@@ -589,7 +601,7 @@ function getGetTask() {
 
 function getRunTask() {
   if (!_runTask) {
-    _runTask = edge.func<unknown, string>(getRunTaskCs())
+    _runTask = loadEdge().func<unknown, string>(getRunTaskCs())
   }
 
   return _runTask
@@ -597,7 +609,7 @@ function getRunTask() {
 
 function getStopTask() {
   if (!_stopTask) {
-    _stopTask = edge.func<unknown, string>(getStopTaskCs())
+    _stopTask = loadEdge().func<unknown, string>(getStopTaskCs())
   }
 
   return _stopTask
@@ -605,7 +617,7 @@ function getStopTask() {
 
 function getSetTaskEnabled() {
   if (!_setTaskEnabled) {
-    _setTaskEnabled = edge.func<unknown, string>(getSetTaskEnabledCs())
+    _setTaskEnabled = loadEdge().func<unknown, string>(getSetTaskEnabledCs())
   }
 
   return _setTaskEnabled

@@ -68,3 +68,13 @@ inclusion: always
 **安全**: 交互测试会在真实数据库里选任务，测试前后都要核对其它真实任务（如 `test1`）的启用状态；脚本挂住时用 `Get-CimInstance Win32_Process` 按命令行里的 `bin/dev.js|testmp` 过滤再清理残留 node 进程，不要按名称全部结束。
 
 **记录时间**: 2026-11-08
+
+## 启动耗时测量
+
+- 量启动速度用 `testmp/bench-startup.mjs`（`node testmp/bench-startup.mjs 7`），别在 execute_pwsh 里先定义 function 再调 node（输出会被截断到第一条）。
+- 仓库里没有 `oclif.manifest.json`（prepack 才生成，已 gitignore）。本地 `node bin/run.js` 没有 manifest 会多约 600ms，要贴近发布版需先 `npx oclif manifest`，量完删掉。
+- `tm` 全局命令是 npm link 到本仓库的，改完 `npm run build` 即生效。
+- 2026-11-08 优化前基线（Windows，Node 24）：node 空进程 75ms，`--version` 无 manifest 2.2s、有 manifest 1.6s。热点：oclif 探测 SHELL 约 593ms、init hook 的 `powershell Get-Host` 约 353ms、init hook 静态 import drizzle-orm 约 230-450ms。
+- 优化后：`--version` 有 manifest 335ms（无 manifest 1120ms），`task list` 约 1000ms。做法：`bin/run.js` 预设 SHELL；init hook 删掉 Get-Host 检查并去掉 drizzle/better-sqlite3；迁移挪到 `src/db/index.ts` 的 `getDb()` 首次调用；`task-scheduler.ts` 用 `createRequire` 延迟加载 edge-js（`import type` 保留类型）。
+- 验证迁移要用临时 `LOCALAPPDATA`（`$env:LOCALAPPDATA` 指到临时目录）建全新库，别动真实库；检查表用脚本文件，别在 pwsh 里写带转义引号的 `node -e`。
+- `task list` 仍比 `--version` 慢约 650ms，来源是命令自身加载 drizzle-orm（见 npm-field-notes drizzle-orm），尚未继续优化。
