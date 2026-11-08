@@ -31,7 +31,7 @@ FLAGS
       --monthdays=<value>       每月的几号 (1-31，用逗号分隔，仅 monthly 生效)
       --months=<value>          月份 (1-12，用逗号分隔，仅 monthly 生效)
       --path=<value>            可执行文件路径
-      --start-time=<value>      [default: 2026-11-07 11:30] 任务开始时间 (YYYY-MM-DD HH:mm 或 HH:mm)
+      --start-time=<value>      [default: 2026-11-08 11:30] 任务开始时间 (YYYY-MM-DD HH:mm 或 HH:mm)
       --start-when-available    错过启动时间后是否补运行
       --trigger=<option>        [default: daily] 触发类型: daily, weekly, monthly, once, boot, logon
                                 <options: boot|daily|logon|monthly|once|weekly>
@@ -65,7 +65,7 @@ EXAMPLES
       --weekdays="5" --start-time="23:59"
 ```
 
-_See code: [src/commands/wtsk/add.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.29/src/commands/wtsk/add.ts)_
+_See code: [src/commands/wtsk/add.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.30/src/commands/wtsk/add.ts)_
 
 ## `tm wtsk del`
 
@@ -90,7 +90,7 @@ EXAMPLES
   $ tm wtsk del -n myTask
 ```
 
-_See code: [src/commands/wtsk/del.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.29/src/commands/wtsk/del.ts)_
+_See code: [src/commands/wtsk/del.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.30/src/commands/wtsk/del.ts)_
 
 ## `tm wtsk delete`
 
@@ -144,7 +144,7 @@ EXAMPLES
   $ tm wtsk list -l 5 --block
 ```
 
-_See code: [src/commands/wtsk/list.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.29/src/commands/wtsk/list.ts)_
+_See code: [src/commands/wtsk/list.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.30/src/commands/wtsk/list.ts)_
 
 ## `tm wtsk ls`
 
