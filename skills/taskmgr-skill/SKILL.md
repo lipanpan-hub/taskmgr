@@ -2,7 +2,7 @@
 name: taskmgr-skill
 description: 用 tm 命令行工具管理 Windows 定时任务（计划任务）及其脚本。当用户要求创建/查询/删除定时任务、把写好的 PowerShell/Python 等脚本设为定时执行、定时关机休眠、设置每天/每周/每月/开机/登录时自动运行时使用。
 keywords: tm, taskmgr, 定时任务, 计划任务, 定时执行, 定时脚本, 定时关机, 开机自启, cron, schtasks, Task Scheduler
-version: 1.2.0
+version: 1.4.1
 ---
 
 # tm 定时任务管理
@@ -12,7 +12,7 @@ version: 1.2.0
 ## 铁律
 
 1. 只用 `tm task` 子命令，它是为非交互调用设计的。绝不使用 `tm wtsk`（面向人类，含交互式提示）。
-2. 绝不传 `-i` / `--interactive` / `--psi`，这些会挂起等待键盘输入。`tm scripts open` 会弹出资源管理器窗口，也不要调用。
+2. 绝不传 `-i` / `--interactive` / `--psi`，这些会挂起等待键盘输入。`stop` / `restart` / `enable` / `disable` 省略名称时也会弹出交互选择框，所以调用时必须显式带上任务名称。`tm scripts open` 会弹出资源管理器窗口，也不要调用。
 3. 删除必须带 `--force`，否则会卡在确认提示。
 4. `tm task create <类型>` 一步到位：写库 + 建触发器 + 同步到任务计划程序，任何一步失败自动回滚。创建后无需再执行同步。
 5. 没有 update 命令。修改任务 = `tm task delete <名称> --force` 然后重新 create。
@@ -22,6 +22,9 @@ version: 1.2.0
 - 创建任务 → `tm task create daily|weekly|monthly|once|boot|logon`
 - 查看已管理的任务 → `tm task list`
 - 删除任务 → `tm task delete <名称> --force`
+- 停止正在运行的任务 → `tm task stop <名称>`（只终止当前实例，不禁用任务，下次触发仍会执行；任务没在运行时不报错）
+- 重启任务 → `tm task restart <名称>`（运行中则先停止再启动，未运行则直接启动）
+- 启用 / 禁用任务 → `tm task enable <名称>` / `tm task disable <名称>`（同时更新数据库和系统任务计划程序，禁用后不再触发，但不会终止正在运行的实例，需要终止请再 `stop`）
 - 数据库与系统不一致时重新同步 → `tm task sync2schd`（别名 `tm task sync`）。默认只补建 Windows 中缺失的任务，已存在的跳过；修改了数据库中已有任务、需要覆盖时加 `--no-only-missing`，但覆盖会重新注册，从而中断 `logon`/`boot` 任务正在进行的重复计划
 - 查看系统里实际的任务（只读，含下次运行时间等系统状态）→ `tm wtsk list`
 - 把新写的脚本放进脚本目录 → `tm scripts add <路径>`

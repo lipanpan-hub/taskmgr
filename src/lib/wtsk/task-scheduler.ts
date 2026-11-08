@@ -438,6 +438,7 @@ function getRunTaskCs() {
 
 using Microsoft.Win32.TaskScheduler;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 public class Startup {
@@ -449,7 +450,7 @@ public class Startup {
             using (TaskService ts = new TaskService())
             {
                 TaskFolder taskFolder = ts.GetFolder("${TASK_FOLDER}");
-                var task = taskFolder.GetTask(taskName);
+                var task = taskFolder.GetTasks().FirstOrDefault(t => t.Name == taskName);
                 if (task == null)
                 {
                     return "Task '" + taskName + "' not found.";
@@ -468,11 +469,91 @@ public class Startup {
 `
 }
 
+function getStopTaskCs() {
+  return `
+#r "${TASK_SCHEDULER_DLL.replaceAll('\\', '\\\\')}"
+#r "System.Xml.dll"
+
+using Microsoft.Win32.TaskScheduler;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+
+public class Startup {
+    public async Task<object> Invoke(dynamic input) {
+        try {
+            await System.Threading.Tasks.Task.Delay(0);
+            string taskName = (string)input.taskName;
+            
+            using (TaskService ts = new TaskService())
+            {
+                TaskFolder taskFolder = ts.GetFolder("${TASK_FOLDER}");
+                var task = taskFolder.GetTasks().FirstOrDefault(t => t.Name == taskName);
+                if (task == null)
+                {
+                    return "Task '" + taskName + "' not found.";
+                }
+                
+                // 终止该任务当前所有正在运行的实例
+                task.Stop();
+                return "Task '" + taskName + "' stopped successfully.";
+            }
+        }
+        catch (Exception ex)
+        {
+            return "Error: " + ex.Message;
+        }
+    }
+}
+`
+}
+
+function getSetTaskEnabledCs() {
+  return `
+#r "${TASK_SCHEDULER_DLL.replaceAll('\\', '\\\\')}"
+#r "System.Xml.dll"
+
+using Microsoft.Win32.TaskScheduler;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+
+public class Startup {
+    public async Task<object> Invoke(dynamic input) {
+        try {
+            await System.Threading.Tasks.Task.Delay(0);
+            string taskName = (string)input.taskName;
+            bool enabled = (bool)input.enabled;
+            
+            using (TaskService ts = new TaskService())
+            {
+                TaskFolder taskFolder = ts.GetFolder("${TASK_FOLDER}");
+                var task = taskFolder.GetTasks().FirstOrDefault(t => t.Name == taskName);
+                if (task == null)
+                {
+                    return "Task '" + taskName + "' not found.";
+                }
+                
+                task.Enabled = enabled;
+                return "Task '" + taskName + "' " + (enabled ? "enabled" : "disabled") + " successfully.";
+            }
+        }
+        catch (Exception ex)
+        {
+            return "Error: " + ex.Message;
+        }
+    }
+}
+`
+}
+
 let _createTask: null | ReturnType<typeof edge.func<unknown, string>> = null
 let _deleteTask: null | ReturnType<typeof edge.func<unknown, string>> = null
 let _getTasks: null | ReturnType<typeof edge.func<unknown, string>> = null
 let _getTask: null | ReturnType<typeof edge.func<unknown, string>> = null
 let _runTask: null | ReturnType<typeof edge.func<unknown, string>> = null
+let _stopTask: null | ReturnType<typeof edge.func<unknown, string>> = null
+let _setTaskEnabled: null | ReturnType<typeof edge.func<unknown, string>> = null
 
 function getCreateTask() {
   if (!_createTask) {
@@ -512,6 +593,22 @@ function getRunTask() {
   }
 
   return _runTask
+}
+
+function getStopTask() {
+  if (!_stopTask) {
+    _stopTask = edge.func<unknown, string>(getStopTaskCs())
+  }
+
+  return _stopTask
+}
+
+function getSetTaskEnabled() {
+  if (!_setTaskEnabled) {
+    _setTaskEnabled = edge.func<unknown, string>(getSetTaskEnabledCs())
+  }
+
+  return _setTaskEnabled
 }
 
 export type MultipleInstancesPolicy = 'ignore-new' | 'parallel' | 'queue' | 'stop-existing'
@@ -671,6 +768,28 @@ export async function runScheduledTask(taskName: string): Promise<string> {
     fn({ taskName }, (error: Error | null, result: string) => {
       if (error) reject(error)
       else resolve(result ?? '运行任务失败')
+    })
+  })
+}
+
+export async function stopScheduledTask(taskName: string): Promise<string> {
+  const fn = getStopTask()
+
+  return new Promise((resolve, reject) => {
+    fn({ taskName }, (error: Error | null, result: string) => {
+      if (error) reject(error)
+      else resolve(result ?? '停止任务失败')
+    })
+  })
+}
+
+export async function setScheduledTaskEnabled(taskName: string, enabled: boolean): Promise<string> {
+  const fn = getSetTaskEnabled()
+
+  return new Promise((resolve, reject) => {
+    fn({ taskName, enabled }, (error: Error | null, result: string) => {
+      if (error) reject(error)
+      else resolve(result ?? '设置任务启用状态失败')
     })
   })
 }

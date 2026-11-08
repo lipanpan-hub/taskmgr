@@ -34,3 +34,37 @@ inclusion: always
 ### 修复与发布注意
 **修复**: `tm task sync2schd` 新增 `--only-missing`（已存在的任务跳过），`src/lib/wtsk/autosync.ts` 生成的启动器改为 `tm task sync2schd --only-missing`。
 **坑**: 全局安装的 `tm`（`@lppx/taskmgr`，在 nvm 目录下的 `tm.exe`）与源码是两份。init 钩子每次运行 tm 都会重写 `autosync-launcher.vbs`，旧版 tm 会把它写回不带 `--only-missing` 的命令，且旧版不认识该参数。本地用 `node bin/dev.js ...` 验证；生效前必须发布并升级全局 tm，之后启动器才会稳定带上新参数。
+
+## edge-js 内嵌 C# 调用 TaskScheduler 库
+
+### `TaskFolder.GetTask(name)` 在 TaskScheduler 2.12.2 中不存在
+**问题**: `src/lib/wtsk/task-scheduler.ts` 里的 `getRunTaskCs()` 原先用 `taskFolder.GetTask(taskName)`，C# 编译报 CS1061。因为 `runScheduledTask` 之前没有任何调用方，这个错误一直没暴露。
+**做法**: 按名称取任务统一用 `taskFolder.GetTasks().FirstOrDefault(t => t.Name == taskName)`（与 `getGetTaskCs` 一致），并在 C# 模板里加 `using System.Linq;`。
+**注意**: edge-js 的 C# 是在运行时才编译的，`tsc` 检查不到，新增或启用 C# 模板后必须用 `node bin/dev.js ...` 真实跑一遍。
+**验证方法**: 新增 `tm task stop` / `tm task restart`（`src/lib/task/task-control-handler.ts`）时，用 `ping -n 300 127.0.0.1` 做长时间运行的 once 任务，对比 `Get-Process ping` 的 PID 与 `Get-ScheduledTask` 的 State 来确认停止和重启生效。
+
+**记录时间**: 2026-11-08
+
+## 测试 tm 命令时不要并行调用
+
+### 同一个任务的 enable/disable/stop 等命令必须顺序执行
+**问题**: 在同一批工具调用里并行发起 `task enable` 和 `task disable`，两个 node 进程同时读写同一个任务和 SQLite，结果互相覆盖，出现 Windows 为 False、数据库为 1 的假性不一致，差点误判成代码 bug。
+**做法**: 验证会改状态的命令时一条一条顺序执行，再对比 `Get-ScheduledTask ... .Settings.Enabled`、数据库和 `tm task list --enabled/--disabled`。
+**状态存放**: `tasks.enabled` 在数据库里，`task-options-builder` 同步时会用它，所以 enable/disable 必须同时改数据库和 Windows（`TaskControlHandler.setEnabled`，先改 Windows 再改数据库），只改 Windows 会在下次 `sync2schd --no-only-missing` 时被改回去。
+**PowerShell 坑**: 在 execute_pwsh 里先定义 `function` 再调用 node 子进程时，输出曾被截断到第一条为止，把调用拆成单条命令就正常。
+
+**记录时间**: 2026-11-08
+
+## 命令缺参数时的交互式选择
+
+### oclif 在 stdin 非 TTY 时会把管道内容当成缺失的位置参数
+**问题**: `tm task stop|restart|enable|disable` 的 `name` 参数可省略，省略时应弹出 prompts 选择框。但 oclif 的 `tryStdin` 在 stdin 不是 TTY 时会读取管道内容，当作 `name` 的值，选择框根本不会出现。
+**做法**: 这类"省略则交互"的位置参数必须声明 `ignoreStdin: true`（`Args.string({description, ignoreStdin: true})`）。真实终端里 stdin 是 TTY，不受影响，只有脚本或测试驱动时才会触发。
+**实现**: 公共逻辑在 `TaskControlHandler.resolveTaskName`（prompts autocomplete + fuse.js，与 `TaskDeleteHandler.interactiveDelete` 同风格）。stop 只列运行中的任务，enable/disable 只列状态需要改变的任务，候选为空时直接提示，不弹空列表。
+
+### 测试 prompts 交互时必须等选择框出现再输入
+**问题**: 按固定延时给 prompts 送按键（例如启动后 4 秒），而 tm 启动较慢时，按键会在选择框就绪前积压，之后一次性送达。`prompts` 同步处理 `"zzPick\r"`，此时异步的 `suggest` 还没返回，回车按初始列表的第一项提交，选中了错误的真实任务（实测误禁用了 `test1`）。真人逐键输入不会出现。
+**做法**: 驱动脚本监听子进程 stdout，出现提示文字后再逐字符输入，最后等候选刷新再回车，并 `stdin.end()` 否则子进程不退出。脚本在 `testmp/interactive-pick.mjs`，用法 `node testmp/interactive-pick.mjs <子命令> <关键字>`，设置环境变量 `CANCEL=1` 则发送 Ctrl+C。
+**安全**: 交互测试会在真实数据库里选任务，测试前后都要核对其它真实任务（如 `test1`）的启用状态；脚本挂住时用 `Get-CimInstance Win32_Process` 按命令行里的 `bin/dev.js|testmp` 过滤再清理残留 node 进程，不要按名称全部结束。
+
+**记录时间**: 2026-11-08
