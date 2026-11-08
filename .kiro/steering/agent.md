@@ -78,3 +78,12 @@ inclusion: always
 - 优化后：`--version` 有 manifest 335ms（无 manifest 1120ms），`task list` 约 1000ms。做法：`bin/run.js` 预设 SHELL；init hook 删掉 Get-Host 检查并去掉 drizzle/better-sqlite3；迁移挪到 `src/db/index.ts` 的 `getDb()` 首次调用；`task-scheduler.ts` 用 `createRequire` 延迟加载 edge-js（`import type` 保留类型）。
 - 验证迁移要用临时 `LOCALAPPDATA`（`$env:LOCALAPPDATA` 指到临时目录）建全新库，别动真实库；检查表用脚本文件，别在 pwsh 里写带转义引号的 `node -e`。
 - `task list` 仍比 `--version` 慢约 650ms，来源是命令自身加载 drizzle-orm（见 npm-field-notes drizzle-orm），尚未继续优化。
+
+## Stop 钩子 `npm run build` 报 ENOENT（路径里夹着 JSON）
+
+### `oclif manifest` 在 stdin 非 TTY 时把管道内容当成 PATH 参数
+**现象**: `.kiro/hooks/build.json` 的 Stop 钩子执行 `npm run build`，钩子把会话 JSON 通过 stdin 传入，报 `E:\Desktop\taskmgr\{"session_id":...}\package.json: ENOENT`。
+**根因（已复现）**: 用 `'{"a":1}' | npm run build` 可复现。出错的是最后一步 `oclif manifest`，它的 PATH 参数省略时会读 stdin，与"oclif 缺位置参数读管道"是同一机制。
+**做法**: `package.json` 的 build 脚本改为 `oclif manifest .`，显式给出路径后不再读 stdin。用管道 JSON 重跑 `npm run build` 通过。`prepack` 里的 `oclif manifest` 没有 stdin 输入，暂未改。
+
+**记录时间**: 2026-11-08

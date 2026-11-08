@@ -141,7 +141,7 @@
   "repository": "lipanpan-hub/taskmgr",
   "scripts": {
     "start": "node bin/run.js",
-    "build": "shx rm -rf dist tsconfig.tsbuildinfo oclif.manifest.json && tsc -b && oclif manifest",
+    "build": "shx rm -rf dist tsconfig.tsbuildinfo oclif.manifest.json && tsc -b && oclif manifest .",
     "typecheck": "tsc && tsc --project test/tsconfig.json",
     "typecheck:test": "tsc --project test/tsconfig.json",
     "build:css": "cross-env BROWSERSLIST_IGNORE_OLD_DATA=1 npx tailwindcss -i ./public/css/input.css -o ./public/css/style.css --minify --content \"./public/**/*.{html,js}\"",

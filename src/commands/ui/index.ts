@@ -10,7 +10,7 @@ export default class Ui extends BaseCommand {
   static flags = {
     port: Flags.integer({
       char: 'p',
-      default: 3000,
+      default: 3004,
       description: '指定服务端口',
     }),
   }

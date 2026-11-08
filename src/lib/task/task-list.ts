@@ -67,28 +67,38 @@ export function formatDetailedLine(tasks: Task[]): string[] {
   return ['\n任务详细列表:', table.toString()]
 }
 
-// 仅输出与默认值不同的高级选项，避免默认任务的输出被无意义的行占满
+function formatYesNo(isEnabled: boolean): string {
+  return isEnabled ? '是' : '否'
+}
+
+// 输出全部高级选项（含默认值），让用户能看到任务的完整配置
 function formatAdvancedLines(task: Task): string[] {
-  const advancedItems: Array<[string, string]> = []
-  if (task.hidden) advancedItems.push(['隐藏任务', '是'])
-  if (!task.wakeToRun) advancedItems.push(['唤醒电脑运行', '否'])
-  if (task.disallowStartIfOnBatteries) advancedItems.push(['电池供电时不启动', '是'])
-  if (task.stopIfGoingOnBatteries) advancedItems.push(['切换电池时停止', '是'])
-  if (task.runHighest) advancedItems.push(['最高权限运行', '是'])
-  if (task.multipleInstances !== 'ignore-new') advancedItems.push(['已运行时再触发', task.multipleInstances])
+  // 执行时限：null=系统默认(72小时)，0=不限制
+  let timeLimitText = '系统默认(72小时)'
   if (task.executionTimeLimitMinutes !== null) {
-    advancedItems.push(['执行时限', (task.executionTimeLimitMinutes === 0) ? '不限制' : `${task.executionTimeLimitMinutes} 分钟`])
+    timeLimitText = (task.executionTimeLimitMinutes === 0) ? '不限制' : `${task.executionTimeLimitMinutes} 分钟`
   }
 
-  if (task.endTime) advancedItems.push(['过期时间', task.endTime])
+  // 重复：未设置间隔则视为不重复
+  let repeatText = '不重复'
   if (task.repeatIntervalMinutes !== null) {
     const durationText = (task.repeatDurationMinutes === null) ? '无限期' : `${task.repeatDurationMinutes} 分钟`
-    advancedItems.push(['重复', `每 ${task.repeatIntervalMinutes} 分钟，持续 ${durationText}`])
+    repeatText = `每 ${task.repeatIntervalMinutes} 分钟，持续 ${durationText}`
   }
 
-  if (task.delayMinutes !== null) advancedItems.push(['延迟', `${task.delayMinutes} 分钟`])
+  const advancedItems: Array<[string, string]> = [
+    ['隐藏任务', formatYesNo(task.hidden)],
+    ['唤醒电脑运行', formatYesNo(task.wakeToRun)],
+    ['电池供电时不启动', formatYesNo(task.disallowStartIfOnBatteries)],
+    ['切换电池时停止', formatYesNo(task.stopIfGoingOnBatteries)],
+    ['最高权限运行', formatYesNo(task.runHighest)],
+    ['已运行时再触发', task.multipleInstances],
+    ['执行时限', timeLimitText],
+    ['过期时间', task.endTime || '无'],
+    ['重复', repeatText],
+    ['延迟', (task.delayMinutes === null) ? '无' : `${task.delayMinutes} 分钟`],
+  ]
 
-  if (advancedItems.length === 0) return []
   return ['  高级选项:', ...advancedItems.map(([label, value]) => `    ${label}: ${value}`)]
 }
 
