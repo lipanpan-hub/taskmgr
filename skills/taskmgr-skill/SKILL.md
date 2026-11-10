@@ -25,6 +25,7 @@ version: 1.4.1
 - 停止正在运行的任务 → `tm task stop <名称>`（只终止当前实例，不禁用任务，下次触发仍会执行；任务没在运行时不报错）
 - 重启任务 → `tm task restart <名称>`（运行中则先停止再启动，未运行则直接启动）
 - 启用 / 禁用任务 → `tm task enable <名称>` / `tm task disable <名称>`（同时更新数据库和系统任务计划程序，禁用后不再触发，但不会终止正在运行的实例，需要终止请再 `stop`）
+- 修改已有任务 → `tm task update <名称> [flags]`（只改传入的 flag，并重新注册到系统任务计划程序；可改路径、参数、描述、启用状态、高级选项和当前触发类型的参数如 `--start-time`/`--weekdays`；不能改名称和触发类型，需要时 delete 后重新 create；清除可选项用空值，如 `--end-time=`、`--description=`；布尔项用 `--no-hidden` 取消；重新注册会中断 `logon`/`boot` 任务正在进行的重复计划）
 - 数据库与系统不一致时重新同步 → `tm task sync2schd`（别名 `tm task sync`）。默认只补建 Windows 中缺失的任务，已存在的跳过；修改了数据库中已有任务、需要覆盖时加 `--no-only-missing`，但覆盖会重新注册，从而中断 `logon`/`boot` 任务正在进行的重复计划
 - 查看系统里实际的任务（只读，含下次运行时间等系统状态）→ `tm wtsk list`
 - 把新写的脚本放进脚本目录 → `tm scripts add <路径>`

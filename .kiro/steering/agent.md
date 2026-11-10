@@ -87,3 +87,20 @@ inclusion: always
 **做法**: `package.json` 的 build 脚本改为 `oclif manifest .`，显式给出路径后不再读 stdin。用管道 JSON 重跑 `npm run build` 通过。`prepack` 里的 `oclif manifest` 没有 stdin 输入，暂未改。
 
 **记录时间**: 2026-11-08
+
+## `tm task update` 的实现要点
+
+### 设计与复用
+- 入口 `src/commands/task/update.ts`，逻辑在 `TaskUpdateHandler`（`src/lib/task/task-update-handler.ts`，与 WebSocket 用的 `updateTask` 函数同文件但互相独立，旧函数没有回滚且无法清除字段）。
+- 触发器更新方式：`TriggerSnapshot.toFlags()` 把旧触发器转成 create 的 flags，与新传入 flags 合并，删旧行后调用 `createTriggerDirect` 重建，校验规则只有一份。失败时 `TriggerSnapshot.restore()` 连同原行 id 恢复，任务行用更新前的字段值恢复。
+- update 专用 flags 在 `advanced-options.ts` 的 `advancedUpdateFlags`：不能直接复用 create 的 `advancedFlags`，因为它有 `wake-to-run` 默认 true（会把未传入的项覆盖掉）、布尔项没有 `--no-xxx`、`repeat-duration` 带 `dependsOn`。
+- 清除语义：`Flags.custom` 的 `parse` 里空串返回 `null`，`drizzle .set()` 会忽略 `undefined` 但会写入 `null`，所以 `undefined = 不改`、`null = 清除`。`--end-time=` 在 pwsh 里可正常传空值。
+- `TaskControlHandler.resolveTaskName` 已改为 public 并导出 `TaskChoice`，update 复用它做交互选择。
+
+### 验证
+- `bin/dev.js` 读的是 `dist` 和仓库根的 `oclif.manifest.json`，新增命令后必须先 `npm run build`，否则报 "is not a tm command"。
+- 用 `testmp/dump-task.mjs <任务名>` 查看数据库里的任务和触发器行，再用 `Export-ScheduledTask -TaskName <名> -TaskPath '\taskmgr\'` 对比 Windows 侧 XML。
+- 未验证：Windows 同步失败触发的回滚（无法稳定制造 C# 注册失败，回滚走的是与触发器校验失败相同的 catch 分支，已验证后者）；省略任务名的交互选择（`testmp/interactive-pick.mjs` 不带 flag 会先报"未指定更新内容"）。
+- 已知遗留：`TaskService.updateTask` 写的 `updatedAt` 是 ISO(UTC)，而表默认值是 `datetime('now','localtime')`，两种格式并存。
+
+**记录时间**: 2026-11-10

@@ -9,7 +9,7 @@ export interface ControlResult {
   message: string
 }
 
-interface TaskChoice {
+export interface TaskChoice {
   title: string
   value: string
 }
@@ -112,7 +112,7 @@ export class TaskControlHandler {
 
   // #region 交互式选择任务
   // 已传入名称则直接使用；未传入时加载候选项并弹出可模糊搜索的选择框
-  private async resolveTaskName(
+  async resolveTaskName(
     inputName: string | undefined,
     promptMessage: string,
     emptyMessage: string,
