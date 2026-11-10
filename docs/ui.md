@@ -16,7 +16,7 @@ USAGE
   $ tm ui [-p <value>]
 
 FLAGS
-  -p, --port=<value>  [default: 3000] 指定服务端口
+  -p, --port=<value>  [default: 3004] 指定服务端口
 
 DESCRIPTION
   启动 Web UI 服务
@@ -31,7 +31,7 @@ EXAMPLES
   $ tm ui --port 8080
 ```
 
-_See code: [src/commands/ui/index.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.29/src/commands/ui/index.ts)_
+_See code: [src/commands/ui/index.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.30/src/commands/ui/index.ts)_
 
 ## `tm ui run`
 
@@ -42,7 +42,7 @@ USAGE
   $ tm ui run [-p <value>]
 
 FLAGS
-  -p, --port=<value>  [default: 3000] 指定服务端口
+  -p, --port=<value>  [default: 3004] 指定服务端口
 
 DESCRIPTION
   启动 Web UI 服务
@@ -66,7 +66,7 @@ USAGE
   $ tm ui start [-p <value>]
 
 FLAGS
-  -p, --port=<value>  [default: 3000] 指定服务端口
+  -p, --port=<value>  [default: 3004] 指定服务端口
 
 DESCRIPTION
   启动 Web UI 服务

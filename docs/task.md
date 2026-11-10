@@ -13,9 +13,13 @@
 * [`tm task create weekly [NAME]`](#tm-task-create-weekly-name)
 * [`tm task del [NAME]`](#tm-task-del-name)
 * [`tm task delete [NAME]`](#tm-task-delete-name)
+* [`tm task disable [NAME]`](#tm-task-disable-name)
+* [`tm task enable [NAME]`](#tm-task-enable-name)
 * [`tm task list`](#tm-task-list)
 * [`tm task ls`](#tm-task-ls)
 * [`tm task remove [NAME]`](#tm-task-remove-name)
+* [`tm task restart [NAME]`](#tm-task-restart-name)
+* [`tm task stop [NAME]`](#tm-task-stop-name)
 * [`tm task sync`](#tm-task-sync)
 * [`tm task sync2schd`](#tm-task-sync2schd)
 
@@ -59,7 +63,7 @@ EXAMPLES
     $ tm task create
 ```
 
-_See code: [src/commands/task/create/index.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.29/src/commands/task/create/index.ts)_
+_See code: [src/commands/task/create/index.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.30/src/commands/task/create/index.ts)_
 
 ## `tm task create boot [NAME]`
 
@@ -106,7 +110,7 @@ EXAMPLES
     $ tm task create boot myTask --path="notepad.exe" --delay=5
 ```
 
-_See code: [src/commands/task/create/boot.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.29/src/commands/task/create/boot.ts)_
+_See code: [src/commands/task/create/boot.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.30/src/commands/task/create/boot.ts)_
 
 ## `tm task create daily [NAME]`
 
@@ -161,7 +165,7 @@ EXAMPLES
       --repeat-duration=120
 ```
 
-_See code: [src/commands/task/create/daily.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.29/src/commands/task/create/daily.ts)_
+_See code: [src/commands/task/create/daily.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.30/src/commands/task/create/daily.ts)_
 
 ## `tm task create logon [NAME]`
 
@@ -208,7 +212,7 @@ EXAMPLES
     $ tm task create logon myTask --path="notepad.exe" --delay=1
 ```
 
-_See code: [src/commands/task/create/logon.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.29/src/commands/task/create/logon.ts)_
+_See code: [src/commands/task/create/logon.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.30/src/commands/task/create/logon.ts)_
 
 ## `tm task create monthly [NAME]`
 
@@ -266,7 +270,7 @@ EXAMPLES
       --weekdays="1"
 ```
 
-_See code: [src/commands/task/create/monthly.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.29/src/commands/task/create/monthly.ts)_
+_See code: [src/commands/task/create/monthly.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.30/src/commands/task/create/monthly.ts)_
 
 ## `tm task create once [NAME]`
 
@@ -314,7 +318,7 @@ EXAMPLES
     $ tm task create once myTask --path="notepad.exe" --start-time="2026-12-31 23:59"
 ```
 
-_See code: [src/commands/task/create/once.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.29/src/commands/task/create/once.ts)_
+_See code: [src/commands/task/create/once.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.30/src/commands/task/create/once.ts)_
 
 ## `tm task create weekly [NAME]`
 
@@ -369,7 +373,7 @@ EXAMPLES
     $ tm task create weekly myTask --path="notepad.exe" --start-time="11:30" --weekdays="1" --interval=2
 ```
 
-_See code: [src/commands/task/create/weekly.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.29/src/commands/task/create/weekly.ts)_
+_See code: [src/commands/task/create/weekly.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.30/src/commands/task/create/weekly.ts)_
 
 ## `tm task del [NAME]`
 
@@ -463,7 +467,60 @@ EXAMPLES
     $ tm task delete myTask --force
 ```
 
-_See code: [src/commands/task/delete.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.29/src/commands/task/delete.ts)_
+_See code: [src/commands/task/delete.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.30/src/commands/task/delete.ts)_
+
+## `tm task disable [NAME]`
+
+禁用任务：同时更新数据库和 Windows Task Scheduler 中的启用状态。禁用后不再触发，但不会终止正在运行的实例（如需终止请用 stop）
+
+```
+USAGE
+  $ tm task disable [NAME]
+
+ARGUMENTS
+  [NAME]  要禁用的任务名称，省略则交互式选择
+
+DESCRIPTION
+  禁用任务：同时更新数据库和 Windows Task Scheduler 中的启用状态。禁用后不再触发，但不会终止正在运行的实例（如需终止请用
+  stop）
+
+EXAMPLES
+  交互式选择要禁用的任务
+
+    $ tm task disable
+
+  禁用指定任务
+
+    $ tm task disable myTask
+```
+
+_See code: [src/commands/task/disable.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.30/src/commands/task/disable.ts)_
+
+## `tm task enable [NAME]`
+
+启用任务：同时更新数据库和 Windows Task Scheduler 中的启用状态
+
+```
+USAGE
+  $ tm task enable [NAME]
+
+ARGUMENTS
+  [NAME]  要启用的任务名称，省略则交互式选择
+
+DESCRIPTION
+  启用任务：同时更新数据库和 Windows Task Scheduler 中的启用状态
+
+EXAMPLES
+  交互式选择要启用的任务
+
+    $ tm task enable
+
+  启用指定任务
+
+    $ tm task enable myTask
+```
+
+_See code: [src/commands/task/enable.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.30/src/commands/task/enable.ts)_
 
 ## `tm task list`
 
@@ -506,7 +563,7 @@ EXAMPLES
     $ tm task list --enabled
 ```
 
-_See code: [src/commands/task/list.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.29/src/commands/task/list.ts)_
+_See code: [src/commands/task/list.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.30/src/commands/task/list.ts)_
 
 ## `tm task ls`
 
@@ -595,6 +652,58 @@ EXAMPLES
     $ tm task remove myTask --force
 ```
 
+## `tm task restart [NAME]`
+
+重启任务：若任务正在运行则先停止，然后立即启动一次
+
+```
+USAGE
+  $ tm task restart [NAME]
+
+ARGUMENTS
+  [NAME]  要重启的任务名称，省略则交互式选择
+
+DESCRIPTION
+  重启任务：若任务正在运行则先停止，然后立即启动一次
+
+EXAMPLES
+  交互式选择要重启的任务
+
+    $ tm task restart
+
+  重启指定任务
+
+    $ tm task restart myTask
+```
+
+_See code: [src/commands/task/restart.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.30/src/commands/task/restart.ts)_
+
+## `tm task stop [NAME]`
+
+停止 Windows Task Scheduler 中正在运行的任务（不会禁用任务，下次触发时仍会执行）
+
+```
+USAGE
+  $ tm task stop [NAME]
+
+ARGUMENTS
+  [NAME]  要停止的任务名称，省略则交互式选择
+
+DESCRIPTION
+  停止 Windows Task Scheduler 中正在运行的任务（不会禁用任务，下次触发时仍会执行）
+
+EXAMPLES
+  交互式选择要停止的任务
+
+    $ tm task stop
+
+  停止指定任务
+
+    $ tm task stop myTask
+```
+
+_See code: [src/commands/task/stop.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.30/src/commands/task/stop.ts)_
+
 ## `tm task sync`
 
 将数据库中的任务同步到 Windows Task Scheduler
@@ -663,4 +772,4 @@ EXAMPLES
     $ tm task sync2schd --no-only-missing
 ```
 
-_See code: [src/commands/task/sync2schd.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.29/src/commands/task/sync2schd.ts)_
+_See code: [src/commands/task/sync2schd.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.30/src/commands/task/sync2schd.ts)_
