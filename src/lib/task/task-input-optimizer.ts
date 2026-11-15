@@ -1,6 +1,7 @@
 import {existsSync} from 'node:fs'
 import {extname, isAbsolute, resolve} from 'node:path'
 import {detectAvailableRuntimes} from '../utils/runtime-detector.js'
+import {HiddenLauncher} from '../wtsk/hidden-launcher.js'
 
 export interface OptimizedTaskInput {
   executablePath: string
@@ -70,13 +71,10 @@ function optimizeRuntimeArgs(
   const ext = extname(scriptPath).toLowerCase()
   const lowerRuntime = runtime.toLowerCase()
 
-  // PowerShell 脚本优化：后台静默执行
-  if ((lowerRuntime === 'pwsh' || lowerRuntime === 'powershell') && ext === '.ps1') {
+  // PowerShell 脚本优化：经 wscript 启动器隐藏运行，全程不闪控制台窗口
+  if (((lowerRuntime === 'pwsh') || (lowerRuntime === 'powershell')) && (ext === '.ps1')) {
     const absoluteScriptPath = isAbsolute(scriptPath) ? scriptPath : resolve(scriptPath)
-    return {
-      executablePath: 'cmd.exe',
-      arguments: `/c start /min "" powershell.exe -ExecutionPolicy Bypass -NoProfile -WindowStyle Hidden -File "${absoluteScriptPath}"`,
-    }
+    return HiddenLauncher.forPowerShellScript(`${lowerRuntime}.exe`, absoluteScriptPath)
   }
 
   // Python uv 脚本优化：隔离环境执行

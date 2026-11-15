@@ -60,7 +60,7 @@ inclusion: always
 ### oclif 在 stdin 非 TTY 时会把管道内容当成缺失的位置参数
 **问题**: `tm task stop|restart|enable|disable` 的 `name` 参数可省略，省略时应弹出 prompts 选择框。但 oclif 的 `tryStdin` 在 stdin 不是 TTY 时会读取管道内容，当作 `name` 的值，选择框根本不会出现。
 **做法**: 这类"省略则交互"的位置参数必须声明 `ignoreStdin: true`（`Args.string({description, ignoreStdin: true})`）。真实终端里 stdin 是 TTY，不受影响，只有脚本或测试驱动时才会触发。
-**实现**: 公共逻辑在 `TaskControlHandler.resolveTaskName`（prompts autocomplete + fuse.js，与 `TaskDeleteHandler.interactiveDelete` 同风格）。stop 只列运行中的任务，enable/disable 只列状态需要改变的任务，候选为空时直接提示，不弹空列表。
+**实现**: 公共逻辑在 `TaskControlHandler.resolveTaskName`（prompts autocomplete + fuse.js，与 `TaskDeleteHandler.interactiveDelete` 同风格）。enable/disable 只列状态需要改变的任务（`tm task stop` 已于 2026-11-12 删除，`stopScheduledTask` 仍供 restart 使用），候选为空时直接提示，不弹空列表。
 
 ### 测试 prompts 交互时必须等选择框出现再输入
 **问题**: 按固定延时给 prompts 送按键（例如启动后 4 秒），而 tm 启动较慢时，按键会在选择框就绪前积压，之后一次性送达。`prompts` 同步处理 `"zzPick\r"`，此时异步的 `suggest` 还没返回，回车按初始列表的第一项提交，选中了错误的真实任务（实测误禁用了 `test1`）。真人逐键输入不会出现。
@@ -104,3 +104,28 @@ inclusion: always
 - 已知遗留：`TaskService.updateTask` 写的 `updatedAt` 是 ISO(UTC)，而表默认值是 `datetime('now','localtime')`，两种格式并存。
 
 **记录时间**: 2026-11-10
+
+## 给计划任务写含中文的 .ps1 脚本
+
+### 脚本必须存成 UTF-8 带 BOM，并用 powershell.exe 5.1 验证
+**问题**: 任务（如 `DTV检查`）的参数是 `powershell.exe -File xxx.ps1`，跑的是 Windows PowerShell 5.1。fs_write 写出的 UTF-8 无 BOM 文件，在 5.1 下中文字面量被当 GBK 解码，弹窗文字乱码；用 `pwsh` 测试看不出来。
+**做法**: 写完后用 `[IO.File]::WriteAllText(path, text, (New-Object Text.UTF8Encoding($true)))` 加 BOM（行尾保持 LF），测试用 `powershell.exe -NoProfile -ExecutionPolicy Bypass -File`。调用外部 exe 前设 `[Console]::OutputEncoding = [Text.Encoding]::UTF8`。
+**验证弹窗**: 用 `Start-Process -PassThru` 起脚本，等几秒后看进程未退出且 `Get-Process` 的 `MainWindowTitle` 含弹窗标题，再 `Stop-Process`。
+**工具坑**: execute_pwsh 里写多行内联脚本（含 `Start-Process`、函数、`foreach`）时输出会被整段吞掉，改成写 `testmp/*.ps1` 再 `pwsh -File` 执行，用完删除。
+
+### dtv `check --json` 的失败形态
+命令抛错：`{"ok":false,"error":{"message":..}}`，退出码非 0。流程失败（下载/翻译/上传）：`{"ok":true,"data":{"taskStatus":"failed","errorMessage":..}}`，退出码 0，只看退出码会漏报。不要为验证直接跑真实 `dtv check`，有已批准任务时会真的下载和上传。dtv 源码在 `E:\Desktop\likai\packages\cli`（全局 `@lppx/dtv` 是指向它的 junction）。
+
+**记录时间**: 2026-11-12
+
+## PowerShell 任务不闪黑窗口（隐藏启动器）
+
+### 实现与验证
+**做法**: `optimizeRuntimeArgs` 和 `psi-handler` 生成的 ps1 任务改为 `wscript.exe //E:JScript //B "<configDir>\hidden-launcher.js" <pwsh|powershell>.exe ... -WindowStyle Hidden -File "<脚本>"`，启动器由 `src/lib/wtsk/hidden-launcher.ts` 的 `HiddenLauncher.ensure()` 生成，init 钩子每次补写。旧的 `cmd /c start /min` 会先后闪出 cmd 和 Windows Terminal 窗口。
+**坑**: 启动器里窗口样式 0 会把脚本 `Form.Show()` 的窗口一起隐藏，必须保留 `-WindowStyle Hidden`；启动器内容必须纯 ASCII（wscript 按 GBK 解码无 BOM 文件）。
+**验证**: 用 `testmp/window-watch.ps1 -FilePath <exe> -ArgumentList '<参数串>' -Seconds N` 记录新出现的可见窗口。经任务计划程序验证时要用隐藏方式执行 `schtasks /run`，否则触发命令自己的终端窗口会混进结果。`LastTaskResult` 能拿到脚本的退出码；`tm task restart` 会连同子进程一起结束。
+**限制**: `optimizeTaskInput` 按空白拆分参数，脚本路径含空格时不会走优化分支（原有逻辑）。在此之前创建的任务仍是旧写法，需要 `tm task update <名> --path powershell --arguments <脚本>` 才会改用新写法。
+
+**迁移记录（2026-11-15）**: 10 个旧写法任务已用 update 迁移，迁移前的数据库和 XML 备份在 `testmp/migrate-backup-20261115100151`。update 会把 daily 触发器的 `StartBoundary` 日期重置为当天（钟点和间隔不变，DaysInterval=1 时无影响，间隔大于 1 天的任务会改变执行日）。DTV检查（logon + 每 5 分钟重复）迁移后重复中断，需注销重登才恢复。`pwsh -File x.ps1 -Arr a,b` 会把 `a,b` 当成一个字符串传给 `[string[]]` 参数，批量脚本改为接收逗号分隔字符串再 `-split`。
+
+**记录时间**: 2026-11-12

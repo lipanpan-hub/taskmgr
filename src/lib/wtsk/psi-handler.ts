@@ -3,6 +3,7 @@ import { readdirSync } from 'node:fs'
 import { join } from 'node:path'
 import prompts from 'prompts'
 
+import {HiddenLauncher} from './hidden-launcher.js'
 import {normalizeStartTime} from './trigger-utils.js'
 
 // 各触发类型交互问答返回的配置字段
@@ -89,8 +90,9 @@ export async function handlePsiInteractive(configDir: string) {
     throw new Error('操作已中止: 缺少必要的时间设置')
   }
 
-  const executablePath = 'cmd.exe'
-  const execArguments = `/c start /min "" powershell.exe -ExecutionPolicy Bypass -NoProfile -WindowStyle Hidden -File "${join(scriptsDir, baseResponse.selected)}"`
+  const hiddenInput = HiddenLauncher.forPowerShellScript('powershell.exe', join(scriptsDir, baseResponse.selected))
+  const executablePath = hiddenInput.executablePath
+  const execArguments = hiddenInput.arguments
 
   return {
     executablePath,

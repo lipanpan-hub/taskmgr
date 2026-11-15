@@ -4,6 +4,7 @@ import {platform} from 'node:os'
 import {join} from 'node:path'
 
 import {createAutoSyncTask} from '../lib/wtsk/autosync.js'
+import {HiddenLauncher} from '../lib/wtsk/hidden-launcher.js'
 
 // 本 hook 每次启动都会执行, 属于启动热路径: 只放轻量逻辑, 不做同步子进程, 重依赖(数据库/edge-js)延迟到使用点加载
 const hook: Hook.Init = async function (options) {
@@ -28,6 +29,8 @@ const hook: Hook.Init = async function (options) {
     copyFileSync(join(templatesDir, file), join(scriptsDir, file))
   }
 
+  // 已创建的 PowerShell 任务依赖隐藏启动器, 每次都补写一遍以防被删
+  HiddenLauncher.ensure()
   // 数据库迁移已移到 src/db/index.ts 的 getDb() 首次调用时执行
 
   // 创建自动同步任务

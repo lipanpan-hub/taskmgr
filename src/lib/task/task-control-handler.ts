@@ -17,32 +17,6 @@ export interface TaskChoice {
 const RUNNING_STATE = 'Running'
 
 export class TaskControlHandler {
-  // #region 停止任务
-  async stop(inputName?: string): Promise<ControlResult> {
-    const resolved = await this.resolveTaskName(inputName, '选择要停止的任务', '当前没有正在运行的任务', async () => {
-      const schedulerTasks = await getAllTasks()
-      if (typeof schedulerTasks === 'string') throw new Error(schedulerTasks)
-      return schedulerTasks.filter((task) => task.state === RUNNING_STATE).map((task) => ({title: `${task.name} (状态: ${task.state})`, value: task.name}))
-    })
-    if (typeof resolved !== 'string') return resolved
-    const taskName = resolved
-
-    const stateResult = await this.getTaskState(taskName)
-    if (!stateResult.success) return stateResult
-
-    if (stateResult.state !== RUNNING_STATE) {
-      return {success: true, message: `任务 "${taskName}" 当前未在运行（状态: ${stateResult.state}），无需停止`}
-    }
-
-    const result = await stopScheduledTask(taskName)
-    if (result.startsWith('Error:')) {
-      return {success: false, message: `停止任务失败: ${result}`}
-    }
-
-    return {success: true, message: `✓ 已停止任务: ${taskName}`}
-  }
-  // #endregion
-
   // #region 重启任务
   async restart(inputName?: string): Promise<ControlResult> {
     const resolved = await this.resolveTaskName(inputName, '选择要重启的任务', 'Windows Task Scheduler 中暂无任务', async () => {

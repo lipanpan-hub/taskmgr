@@ -19,7 +19,6 @@
 * [`tm task ls`](#tm-task-ls)
 * [`tm task remove [NAME]`](#tm-task-remove-name)
 * [`tm task restart [NAME]`](#tm-task-restart-name)
-* [`tm task stop [NAME]`](#tm-task-stop-name)
 * [`tm task sync`](#tm-task-sync)
 * [`tm task sync2schd`](#tm-task-sync2schd)
 
@@ -471,7 +470,7 @@ _See code: [src/commands/task/delete.ts](https://github.com/lipanpan-hub/taskmgr
 
 ## `tm task disable [NAME]`
 
-禁用任务：同时更新数据库和 Windows Task Scheduler 中的启用状态。禁用后不再触发，但不会终止正在运行的实例（如需终止请用 stop）
+禁用任务：同时更新数据库和 Windows Task Scheduler 中的启用状态。禁用后不再触发，但不会终止正在运行的实例
 
 ```
 USAGE
@@ -481,8 +480,7 @@ ARGUMENTS
   [NAME]  要禁用的任务名称，省略则交互式选择
 
 DESCRIPTION
-  禁用任务：同时更新数据库和 Windows Task Scheduler 中的启用状态。禁用后不再触发，但不会终止正在运行的实例（如需终止请用
-  stop）
+  禁用任务：同时更新数据库和 Windows Task Scheduler 中的启用状态。禁用后不再触发，但不会终止正在运行的实例
 
 EXAMPLES
   交互式选择要禁用的任务
@@ -677,32 +675,6 @@ EXAMPLES
 ```
 
 _See code: [src/commands/task/restart.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.30/src/commands/task/restart.ts)_
-
-## `tm task stop [NAME]`
-
-停止 Windows Task Scheduler 中正在运行的任务（不会禁用任务，下次触发时仍会执行）
-
-```
-USAGE
-  $ tm task stop [NAME]
-
-ARGUMENTS
-  [NAME]  要停止的任务名称，省略则交互式选择
-
-DESCRIPTION
-  停止 Windows Task Scheduler 中正在运行的任务（不会禁用任务，下次触发时仍会执行）
-
-EXAMPLES
-  交互式选择要停止的任务
-
-    $ tm task stop
-
-  停止指定任务
-
-    $ tm task stop myTask
-```
-
-_See code: [src/commands/task/stop.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.30/src/commands/task/stop.ts)_
 
 ## `tm task sync`
 
