@@ -21,6 +21,7 @@
 * [`tm task restart [NAME]`](#tm-task-restart-name)
 * [`tm task sync`](#tm-task-sync)
 * [`tm task sync2schd`](#tm-task-sync2schd)
+* [`tm task update [NAME]`](#tm-task-update-name)
 
 ## `tm task add`
 
@@ -62,7 +63,7 @@ EXAMPLES
     $ tm task create
 ```
 
-_See code: [src/commands/task/create/index.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.30/src/commands/task/create/index.ts)_
+_See code: [src/commands/task/create/index.ts](https://github.com/lipanpan-hub/taskmgr/blob/v3.0.0/src/commands/task/create/index.ts)_
 
 ## `tm task create boot [NAME]`
 
@@ -109,7 +110,7 @@ EXAMPLES
     $ tm task create boot myTask --path="notepad.exe" --delay=5
 ```
 
-_See code: [src/commands/task/create/boot.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.30/src/commands/task/create/boot.ts)_
+_See code: [src/commands/task/create/boot.ts](https://github.com/lipanpan-hub/taskmgr/blob/v3.0.0/src/commands/task/create/boot.ts)_
 
 ## `tm task create daily [NAME]`
 
@@ -164,7 +165,7 @@ EXAMPLES
       --repeat-duration=120
 ```
 
-_See code: [src/commands/task/create/daily.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.30/src/commands/task/create/daily.ts)_
+_See code: [src/commands/task/create/daily.ts](https://github.com/lipanpan-hub/taskmgr/blob/v3.0.0/src/commands/task/create/daily.ts)_
 
 ## `tm task create logon [NAME]`
 
@@ -211,7 +212,7 @@ EXAMPLES
     $ tm task create logon myTask --path="notepad.exe" --delay=1
 ```
 
-_See code: [src/commands/task/create/logon.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.30/src/commands/task/create/logon.ts)_
+_See code: [src/commands/task/create/logon.ts](https://github.com/lipanpan-hub/taskmgr/blob/v3.0.0/src/commands/task/create/logon.ts)_
 
 ## `tm task create monthly [NAME]`
 
@@ -269,7 +270,7 @@ EXAMPLES
       --weekdays="1"
 ```
 
-_See code: [src/commands/task/create/monthly.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.30/src/commands/task/create/monthly.ts)_
+_See code: [src/commands/task/create/monthly.ts](https://github.com/lipanpan-hub/taskmgr/blob/v3.0.0/src/commands/task/create/monthly.ts)_
 
 ## `tm task create once [NAME]`
 
@@ -317,7 +318,7 @@ EXAMPLES
     $ tm task create once myTask --path="notepad.exe" --start-time="2026-12-31 23:59"
 ```
 
-_See code: [src/commands/task/create/once.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.30/src/commands/task/create/once.ts)_
+_See code: [src/commands/task/create/once.ts](https://github.com/lipanpan-hub/taskmgr/blob/v3.0.0/src/commands/task/create/once.ts)_
 
 ## `tm task create weekly [NAME]`
 
@@ -372,7 +373,7 @@ EXAMPLES
     $ tm task create weekly myTask --path="notepad.exe" --start-time="11:30" --weekdays="1" --interval=2
 ```
 
-_See code: [src/commands/task/create/weekly.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.30/src/commands/task/create/weekly.ts)_
+_See code: [src/commands/task/create/weekly.ts](https://github.com/lipanpan-hub/taskmgr/blob/v3.0.0/src/commands/task/create/weekly.ts)_
 
 ## `tm task del [NAME]`
 
@@ -466,7 +467,7 @@ EXAMPLES
     $ tm task delete myTask --force
 ```
 
-_See code: [src/commands/task/delete.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.30/src/commands/task/delete.ts)_
+_See code: [src/commands/task/delete.ts](https://github.com/lipanpan-hub/taskmgr/blob/v3.0.0/src/commands/task/delete.ts)_
 
 ## `tm task disable [NAME]`
 
@@ -492,7 +493,7 @@ EXAMPLES
     $ tm task disable myTask
 ```
 
-_See code: [src/commands/task/disable.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.30/src/commands/task/disable.ts)_
+_See code: [src/commands/task/disable.ts](https://github.com/lipanpan-hub/taskmgr/blob/v3.0.0/src/commands/task/disable.ts)_
 
 ## `tm task enable [NAME]`
 
@@ -518,7 +519,7 @@ EXAMPLES
     $ tm task enable myTask
 ```
 
-_See code: [src/commands/task/enable.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.30/src/commands/task/enable.ts)_
+_See code: [src/commands/task/enable.ts](https://github.com/lipanpan-hub/taskmgr/blob/v3.0.0/src/commands/task/enable.ts)_
 
 ## `tm task list`
 
@@ -561,7 +562,7 @@ EXAMPLES
     $ tm task list --enabled
 ```
 
-_See code: [src/commands/task/list.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.30/src/commands/task/list.ts)_
+_See code: [src/commands/task/list.ts](https://github.com/lipanpan-hub/taskmgr/blob/v3.0.0/src/commands/task/list.ts)_
 
 ## `tm task ls`
 
@@ -674,7 +675,7 @@ EXAMPLES
     $ tm task restart myTask
 ```
 
-_See code: [src/commands/task/restart.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.30/src/commands/task/restart.ts)_
+_See code: [src/commands/task/restart.ts](https://github.com/lipanpan-hub/taskmgr/blob/v3.0.0/src/commands/task/restart.ts)_
 
 ## `tm task sync`
 
@@ -744,4 +745,79 @@ EXAMPLES
     $ tm task sync2schd --no-only-missing
 ```
 
-_See code: [src/commands/task/sync2schd.ts](https://github.com/lipanpan-hub/taskmgr/blob/v2.3.30/src/commands/task/sync2schd.ts)_
+_See code: [src/commands/task/sync2schd.ts](https://github.com/lipanpan-hub/taskmgr/blob/v3.0.0/src/commands/task/sync2schd.ts)_
+
+## `tm task update [NAME]`
+
+更新任务：修改数据库中的任务信息，并重新同步到 Windows Task Scheduler。
+
+```
+USAGE
+  $ tm task update [NAME] [--path <value>] [--arguments <value>] [--description <value>] [--enabled]
+    [--start-time <value>] [--interval <value>] [--weekdays <value>] [--months <value>] [--monthdays <value>]
+    [--weeks-of-month <value>] [--start-when-available] [--hidden] [--wake-to-run] [--disallow-start-on-batteries]
+    [--stop-on-batteries] [--run-highest] [--multiple-instances ignore-new|parallel|queue|stop-existing] [--time-limit
+    <value>] [--end-time <value>] [--repeat-interval <value>] [--repeat-duration <value>] [--delay <value>]
+
+ARGUMENTS
+  [NAME]  要更新的任务名称，省略则交互式选择
+
+FLAGS
+  --arguments=<value>    执行参数；传空字符串(--arguments=)清除
+  --description=<value>  任务描述；传空字符串(--description=)清除
+  --[no-]enabled         是否启用任务 (--no-enabled 禁用)
+  --path=<value>         可执行文件路径或运行时名称
+
+高级选项 FLAGS
+  --delay=<value>                     延迟(分钟)；传 0 或空字符串清除
+  --[no-]disallow-start-on-batteries  使用电池供电时不启动任务 (--no-disallow-start-on-batteries 取消)
+  --end-time=<value>                  触发器过期时间 (YYYY-MM-DD HH:mm)；传空字符串(--end-time=)清除
+  --[no-]hidden                       隐藏任务 (--no-hidden 取消)
+  --multiple-instances=<option>       任务已在运行时再次触发的处理策略 (默认 ignore-new)
+                                      <options: ignore-new|parallel|queue|stop-existing>
+  --repeat-duration=<value>           重复执行持续 N 分钟；传 0 或空字符串清除(无限期)
+  --repeat-interval=<value>           触发后每隔 N 分钟重复执行；传 0 或空字符串清除
+  --[no-]run-highest                  以最高权限运行 (--no-run-highest 取消)
+  --[no-]start-when-available         错过启动时间后补运行 (--no-start-when-available 关闭)
+  --[no-]stop-on-batteries            切换到电池供电时停止任务 (--no-stop-on-batteries 取消)
+  --time-limit=<value>                执行时限(分钟)，0 表示不限制；传空字符串(--time-limit=)恢复系统默认
+  --[no-]wake-to-run                  唤醒电脑运行任务 (--no-wake-to-run 关闭)
+
+触发器参数（仅修改当前触发类型，不能切换类型） FLAGS
+  --interval=<value>        每隔几天(daily)/几周(weekly)执行一次
+  --monthdays=<value>       每月几号 (monthly 按天模式; 逗号分隔, 1-31)；传入会切换为按天模式
+  --months=<value>          月份 (monthly; 逗号分隔, 1-12)
+  --start-time=<value>      开始时间 (daily/weekly/monthly: HH:mm 或 YYYY-MM-DD HH:mm; once: YYYY-MM-DD HH:mm)
+  --weekdays=<value>        星期几 (weekly/monthly 按周模式; 逗号分隔, 0=周日...6=周六)
+  --weeks-of-month=<value>  每月第几周 (monthly 按周模式; 逗号分隔, 1-5)；传入会切换为按周模式，需要 --weekdays
+
+DESCRIPTION
+  更新任务：修改数据库中的任务信息，并重新同步到 Windows Task Scheduler。
+  只修改传入的 flag，未传入的保持原值；可清除的项传空字符串清除（如 --end-time=）。
+  不能修改任务名称和触发类型（需要时请 delete 后重新 create）。
+  同步是覆盖重新注册，会中断 logon/boot 类任务正在进行的重复计划。
+  只传 --arguments 时按原样保存，不会再做运行时参数优化（同时传 --path 和 --arguments 才会）。
+
+EXAMPLES
+  修改任务的执行参数
+
+    $ tm task update myTask --arguments="-n 5 127.0.0.1"
+
+  修改 weekly 任务的开始时间和星期
+
+    $ tm task update myTask --start-time="09:00" --weekdays="1,3,5"
+
+  修改 monthly 任务为按周模式
+
+    $ tm task update myTask --weeks-of-month="1,3" --weekdays="1"
+
+  清除过期时间和描述
+
+    $ tm task update myTask --end-time= --description=
+
+  关闭唤醒电脑并取消隐藏
+
+    $ tm task update myTask --no-wake-to-run --no-hidden
+```
+
+_See code: [src/commands/task/update.ts](https://github.com/lipanpan-hub/taskmgr/blob/v3.0.0/src/commands/task/update.ts)_
