@@ -110,7 +110,7 @@ inclusion: always
 ### 脚本必须存成 UTF-8 带 BOM，并用 powershell.exe 5.1 验证
 **问题**: 任务（如 `DTV检查`）的参数是 `powershell.exe -File xxx.ps1`，跑的是 Windows PowerShell 5.1。fs_write 写出的 UTF-8 无 BOM 文件，在 5.1 下中文字面量被当 GBK 解码，弹窗文字乱码；用 `pwsh` 测试看不出来。
 **做法**: 写完后用 `[IO.File]::WriteAllText(path, text, (New-Object Text.UTF8Encoding($true)))` 加 BOM（行尾保持 LF），测试用 `powershell.exe -NoProfile -ExecutionPolicy Bypass -File`。调用外部 exe 前设 `[Console]::OutputEncoding = [Text.Encoding]::UTF8`。
-**验证弹窗**: 用 `Start-Process -PassThru` 起脚本，等几秒后看进程未退出且 `Get-Process` 的 `MainWindowTitle` 含弹窗标题，再 `Stop-Process`。
+**验证弹窗**: 用 `Start-Process -PassThru` 起脚本，等几秒后看进程未退出且 `Get-Process` 的 `MainWindowTitle` 含弹窗标题，再 `Stop-Process`。要看排版效果用 `testmp/popup-preview.ps1 -Case failed|error|invalid`：它用假 dtv 输出生成脚本副本，按窗口句柄截图存 png 后用 read_file 查看，看完删掉生成物。假 dtv 脚本要用 `Write-Output` 输出，`[Console]::Out.Write` 不进管道，`& 脚本 | Out-String` 拿到的是空串。
 **工具坑**: execute_pwsh 里写多行内联脚本（含 `Start-Process`、函数、`foreach`）时输出会被整段吞掉，改成写 `testmp/*.ps1` 再 `pwsh -File` 执行，用完删除。
 
 ### dtv `check --json` 的失败形态
